@@ -52,10 +52,10 @@ SVG* createSVG(const char* filename){
     }
 */
 
-    svg->rectangles = initializeList(&printFunc, &deleteFunc, &compareFunc);
-    svg->circles = initializeList(&printFunc, &deleteFunc, &compareFunc);
-    svg->paths = initializeList(&printFunc, &deleteFunc, &compareFunc);
-    svg->groups = initializeList(&printFunc, &deleteFunc, &compareFunc);
+//    svg->rectangles = initializeList(&printFunc, &deleteFunc, &compareFunc);
+//    svg->circles = initializeList(&printFunc, &deleteFunc, &compareFunc);
+//    svg->paths = initializeList(&printFunc, &deleteFunc, &compareFunc);
+//    svg->groups = initializeList(&printFunc, &deleteFunc, &compareFunc);
 
     get_element_names(root_element, svg);
 

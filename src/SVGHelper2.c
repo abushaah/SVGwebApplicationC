@@ -3,12 +3,10 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include "SVGHelper2.h"
 #include "SVGParser.h"
 
 #ifdef LIBXML_TREE_ENABLED
-
-static void get_element_names(xmlNode * a_node, SVG * svg);
-void verifyCopy(char* field, xmlChar * data, size_t fLength, size_t dLength);
 
 static void get_element_names(xmlNode * a_node, SVG * svg){
 

@@ -43,8 +43,13 @@ xmlExample: $(SRC)libXmlExample.c
 
 StructListDemo: $(BIN)StructListDemo.o $(BIN)liblist.so
 	$(CC) $(CFLAGS) $(LDFLAGS) -L$(BIN) -o $(BIN)StructListDemo $(BIN)StructListDemo.o  -llist
-	
+
 $(BIN)StructListDemo.o: $(SRC)StructListDemo.c
 	$(CC) $(CFLAGS) -I$(INC) -c $(SRC)StructListDemo.c -o $(BIN)StructListDemo.o
 
 ###################################################################################################
+
+#This is the target for the in-class XML example
+SVGParser: $(SRC)SVGParser.c
+	$(CC) $(CFLAGS) -I$(XML_PATH) $(SRC)SVGParser.c -lxml2 -o $(BIN)SVGParser
+
