@@ -3,10 +3,12 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper2.h"
 #include "SVGParser.h"
 
 #ifdef LIBXML_TREE_ENABLED
+
+void verifyCopy(char* field, xmlChar * data, size_t fLength, size_t dLength);
+static void get_element_names(xmlNode * a_node, SVG * svg);
 
 static void get_element_names(xmlNode * a_node, SVG * svg){
 
@@ -37,12 +39,12 @@ static void get_element_names(xmlNode * a_node, SVG * svg){
             xmlNode *value = attr->children;
             char *attrName = (char *)attr->name;
             char *cont = (char *)(value->content);
-
+/*
             Attribute * anAtr = malloc(sizeof(Attribute) + sizeof(cont));
             anAtr->name = malloc(sizeof(attrName));
             strcpy(anAtr->name, attrName);
             strcpy(anAtr->value, cont);
-
+*/
 //            insertBack(list, (void*)anAtr);
 
             printf("\tattribute name: %s, attribute value = %s\n", attrName, cont);
