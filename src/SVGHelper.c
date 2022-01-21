@@ -1,3 +1,5 @@
+// Name: Haifaa Abushaaban [1146372]
+
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
