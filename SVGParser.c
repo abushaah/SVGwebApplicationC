@@ -11,7 +11,7 @@
 
 int main(void){
 
-    SVG* svg = createSVG("Emoji_poo.svg");
+    SVG* svg = createSVG("rect_with_units.svg");
     deleteSVG(svg);
 
     return 0;
@@ -55,6 +55,10 @@ SVG* createSVG(const char* filename){
     svg->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
 
     get_element_names(root_element, svg);
+
+    char* listDescr = toString(svg->rectangles);
+    printf("Here is the list of rectangles: %s\n", listDescr);
+    free(listDescr);
 
     xmlFreeDoc(doc); // free document
     xmlCleanupParser(); // free global variables allocated by parser
@@ -100,7 +104,7 @@ char* attributeToString( void* data){
 
     tmp = (Attribute*)data;
 
-    len = strlen(tmp->name) + strlen(tmp->value);
+    len = strlen(tmp->name) + strlen(tmp->value) + 5; // 5 for the ", ' ', =
 
     tmpStr = (char*) malloc(sizeof(char) * len);
 
@@ -109,7 +113,7 @@ char* attributeToString( void* data){
     return tmpStr;
 }
 
-int compareAttributes(const void *first, const void *second);
+int compareAttributes(const void *first, const void *second){ return 0; }
 
 void deleteGroup(void* data){
 
@@ -145,9 +149,9 @@ char* groupToString( void* data){
     char* groupList = toString(tmp->groups);
     char* attrList = toString(tmp->otherAttributes);
 
-    len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList);
+    len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 4; // 4 '\n'
     tmpStr = (char*) malloc(sizeof(char) * len);
-    sprintf(tmpStr, "%s\n%s\n%s\n%s\n%s\n", rectList, circList, pathList, groupList, attrList);
+    sprintf(tmpStr, "%s\n%s\n%s\n%s\n%s", rectList, circList, pathList, groupList, attrList);
 
     free(rectList);
     free(circList);
@@ -159,7 +163,7 @@ char* groupToString( void* data){
 
 }
 
-int compareGroups(const void *first, const void *second);
+int compareGroups(const void *first, const void *second){ return 0; }
 
 void deleteRectangle(void* data){
 
@@ -189,19 +193,18 @@ char* rectangleToString(void* data){
 
     char* attrList = toString(tmp->otherAttributes);
 
-    // 4 floats (35 characters each * 4 = 140) + 50 char  = 190 + list attributes
-    len = 190 + strlen(attrList);
+    // 4 floats (35 characters each * 4 = 140) + 50 char + (6 * 5 = 30) = 220 + list attributes
+    len = 220 + strlen(attrList);
 
     tmpStr = (char*) malloc(sizeof(char) * len);
-    sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nwidth = \"%f\"\nheight = \"%f\"\nunits = \"%s\"\n%s\n", tmp->x, tmp->y, tmp->width, tmp->height, tmp->units, attrList);
+    sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nwidth = \"%f\"\nheight = \"%f\"\nunits = \"%s\"\n%s", tmp->x, tmp->y, tmp->width, tmp->height, tmp->units, attrList);
 
     free(attrList);
-
     return tmpStr;
 
 }
 
-int compareRectangles(const void *first, const void *second);
+int compareRectangles(const void *first, const void *second){ return 0; }
 
 void deleteCircle(void* data){
 
@@ -216,8 +219,32 @@ void deleteCircle(void* data){
 
 }
 
-char* circleToString(void* data);
-int compareCircles(const void *first, const void *second);
+char* circleToString(void* data){
+
+    char* tmpStr;
+    Circle* tmp;
+    int len;
+
+    if (data == NULL){
+        return NULL;
+    }
+
+    tmp = (Circle*)data;
+
+    char* attrList = toString(tmp->otherAttributes);
+
+    // 3 floats (35 characters each * 3 = 105) + 50 char + (6 * 4 = 24) = 179 + list attributes
+    len = 179 + strlen(attrList);
+
+    tmpStr = (char*) malloc(sizeof(char) * len);
+    sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nr = \"%f\"\nunits = \"%s\"\n%s", tmp->cx, tmp->cy, tmp->r, tmp->units, attrList);
+
+    free(attrList);
+    return tmpStr;
+
+}
+
+int compareCircles(const void *first, const void *second){ return 0; }
 
 void deletePath(void* data){
 
@@ -231,5 +258,29 @@ void deletePath(void* data){
 
 }
 
-char* pathToString(void* data);
-int comparePaths(const void *first, const void *second);
+char* pathToString(void* data){
+
+    char* tmpStr;
+    Path* tmp;
+    int len;
+
+    if (data == NULL){
+        return NULL;
+    }
+
+    tmp = (Path*)data;
+
+    char* attrList = toString(tmp->otherAttributes);
+
+    len = strlen(tmp->data) + strlen(attrList) + 6; // 5 for the ", ' ', =, \n
+
+    tmpStr = (char*) malloc(sizeof(char) * len);
+
+    sprintf(tmpStr, "%s = \"%s\"\n%s", tmp->data, attrList);
+
+    free(attrList);
+    return tmpStr;
+
+}
+
+int comparePaths(const void *first, const void *second){ return 0; }
