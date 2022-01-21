@@ -1,4 +1,4 @@
-// Name: Haifaa Abushaaban [1146372]
+// Haifaa Abushaaban [1146372]
 
 #include <stdio.h>
 #include <string.h>
@@ -7,12 +7,12 @@
 #include <libxml/tree.h>
 
 #include "SVGParser.h"
-#include "SVGHelper3.h"
+#include "SVGHelper.h"
 
 #define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -=:;"
 #define NUMDELIMITERS "0123456789."
 
-#ifdef LIBXML_TREE_ENABLED
+// 0 means false!
 
 void get_element_names(xmlNode * a_node, SVG * svg){
 
@@ -20,21 +20,24 @@ void get_element_names(xmlNode * a_node, SVG * svg){
 
     for (cur_node = a_node; cur_node != NULL; cur_node = cur_node->next) {
 
-        if (strcasecmp(cur_node->name, "title") == 0){
-            verifyCopy(svg->title, cur_node->content, sizeof(svg->title), sizeof(cur_node->content));
+        char* name = (char*)(cur_node->name);
+        char* content = (char*)(cur_node->content);
+
+        if (strcasecmp(name, "title") == 0){
+            verifyCopy(svg->title, content, sizeof(svg->title), sizeof(cur_node->content));
             // title attributes are in the otherAttributes list
         }
-        else if (strcasecmp(cur_node->name, "desc") == 0){
-            verifyCopy(svg->description, cur_node->content, sizeof(svg->description), sizeof(cur_node->content));
+        else if (strcasecmp(name, "desc") == 0){
+            verifyCopy(svg->description, content, sizeof(svg->description), sizeof(cur_node->content));
             // desc attributes are in the otherAttributes list
         }
-        else if (strcasecmp(cur_node->name, "rect") == 0){ // create new rectangle
+        else if (strcasecmp(name, "rect") == 0){ // create new rectangle
             Rectangle* rect = rectAttributes(cur_node); // fill in with attributes
             insertBack(svg->rectangles, (void*)rect); // insert into the rectangle list
         }
-        else if (strcasecmp(cur_node->name, "circle") == 0){ // create new circle
+        else if (strcasecmp(name, "circle") == 0){ // create new circle
             Circle* circ = circAttributes(cur_node); // fill in with attributes
-            insertBack(svg->circles, (void*)circ); // insert into the rectangle list
+            insertBack(svg->circles, (void*)circ); // insert into the circle list
         }
         // repeat the same for circle, path, groups
         else{ // just call attr with no argument and place in otherAttributes list
@@ -81,8 +84,8 @@ Rectangle* rectAttributes(xmlNode *cur_node){ // fills in attributes for a recta
 
     for (attr = cur_node->properties; attr != NULL; attr = attr->next) {
         xmlNode *value = attr->children;
-        char *attrName = (char *)attr->name;
-        char *cont = (char *)(value->content);
+        char *attrName = (char*) (attr->name);
+        char *cont = (char*) (value->content);
 
         if (strcasecmp(attrName, "x") == 0){
             valid[0] = numberWithUnits(&(rect->x), rect->units, cont);
@@ -128,8 +131,8 @@ Circle* circAttributes(xmlNode *cur_node){ // fills in attributes for a rectangl
 
     for (attr = cur_node->properties; attr != NULL; attr = attr->next) {
         xmlNode *value = attr->children;
-        char *attrName = (char *)attr->name;
-        char *cont = (char *)(value->content);
+        char *attrName = (char*)(attr->name);
+        char *cont = (char*)(value->content);
 
         if (strcasecmp(attrName, "cx") == 0){
             valid[0] = numberWithUnits(&(circ->cx), circ->units, cont);
@@ -172,7 +175,7 @@ void firstOtherAttributes(xmlNode *cur_node, List* otherAttributesList){ // givi
  * verifyCopy verifies the data fits into the fields
  * if it exceeds, truncuates the data to fit
  */
-void verifyCopy(char* field, xmlChar * data, size_t fLength, size_t dLength){
+void verifyCopy(char* field, char* data, size_t fLength, size_t dLength){
 
     if (data == NULL){
         strcpy(field, "");
@@ -200,13 +203,15 @@ int numberWithUnits(float* number, char* units, char* value){
 
     char* token = strtok(value, DELIMITERS);
 
+    if (token == NULL) return 0; // no number found
+
     *number = atof (token);
 
     token = strtok(cpy, NUMDELIMITERS);
     if (token != NULL) strcpy(units, token);
 
     free(cpy);
-    return 1;
+    return 1; // valid
 }
 
 /**
@@ -237,10 +242,3 @@ int nameSpace(char *field, const xmlChar * data, size_t fLength, size_t dLength)
 
 }
 */
-
-#else
-int main(void) {
-    fprintf(stderr, "Tree support not compiled in SVGHelper.c\n");
-    return 0;
-}
-#endif

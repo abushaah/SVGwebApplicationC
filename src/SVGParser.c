@@ -5,7 +5,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper3.h"
+#include "SVGHelper.h"
 #include "SVGParser.h"
 
 int main(void){
@@ -23,8 +23,6 @@ SVG* createSVG(const char* filename){
     xmlNode *root_element = NULL;
     SVG* svg = (SVG*) (malloc(sizeof(SVG)));
 
-    int valid = 0; // 0 means false, 1 means true
-
     if (!filename) return NULL; // file is not given
 
     LIBXML_TEST_VERSION
@@ -32,7 +30,6 @@ SVG* createSVG(const char* filename){
     doc = xmlReadFile(filename, NULL, 0); // parse the file and get the DOM
 
     if (doc == NULL){
-        printf("Error: could not parse file %s in function createSVG\n", filename);
         return NULL;
     }
 
@@ -279,11 +276,11 @@ char* pathToString(void* data){
 
     char* attrList = toString(tmp->otherAttributes);
 
-    len = strlen(tmp->data) + strlen(attrList) + 8; // 7 for the ", ' ', =, \n, \0
+    len = strlen(tmp->data) + strlen(attrList) + 6; // 6 for the ", ' ', =, \n, \0
 
     tmpStr = (char*) malloc(sizeof(char) * len);
 
-    sprintf(tmpStr, "%s = \"%s\"\n%s\n", tmp->data, attrList);
+    sprintf(tmpStr, "%s = \"%s\"\n", tmp->data, attrList);
 
     free(attrList);
     return tmpStr;
