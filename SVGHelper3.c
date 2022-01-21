@@ -7,16 +7,18 @@
 #include "SVGParser.h"
 
 #define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -=:;"
+#define NUMDELIMITERS "0123456789."
 
 #ifdef LIBXML_TREE_ENABLED
 
 static void get_element_names(xmlNode * a_node, SVG * svg);
 
 Rectangle* rectAttributes(xmlNode *cur_node);
-Attribute* otherAttributes (xmlNode *value, xmlAttr *attr);
+Attribute* otherAttributes (char *name, char *content);
 
-void numberWithUnits(float* number, char* units, char* value);
+int numberWithUnits(float* number, char* units, char* value);
 void verifyCopy(char* field, xmlChar * data, size_t fLength, size_t dLength);
+int validChar(char* word);
 
 static void get_element_names(xmlNode * a_node, SVG * svg){
 
@@ -52,12 +54,12 @@ static void get_element_names(xmlNode * a_node, SVG * svg){
  * caller must free the node
  */
 
-Attribute* otherAttributes (xmlNode *value, xmlAttr *attr){
+Attribute* otherAttributes (char *name, char *content){
 
-    Attribute * anAtr = malloc(sizeof(Attribute) + sizeof(value->content));
-    anAtr->name = malloc(sizeof(attr->name));
-    strcpy(anAtr->name, attr->name);
-    strcpy(anAtr->value, value->content);
+    Attribute* anAtr = malloc(sizeof(Attribute) + strlen(content) + 1); // 1 for null
+    anAtr->name = malloc(strlen(name) + 1); // 1 for null
+    strcpy(anAtr->name, name);
+    strcpy(anAtr->value, content);
 
     return anAtr;
 
@@ -76,27 +78,36 @@ Rectangle* rectAttributes(xmlNode *cur_node){ // fills in attributes for a recta
 
     rect->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes); // must initialize list, cannot be NULL but can be empty
 
+    int valid[4] = {0, 0, 0, 0}; // x, y, w, h, if one of these is 1 in the end, then it is not valid and must be set to default value
+
     for (attr = cur_node->properties; attr != NULL; attr = attr->next) {
         xmlNode *value = attr->children;
         char *attrName = (char *)attr->name;
         char *cont = (char *)(value->content);
 
         if (strcasecmp(attrName, "x") == 0){
-            numberWithUnits(&(rect->x), rect->units, cont);
+            valid[0] = numberWithUnits(&(rect->x), rect->units, cont);
         }
         else if (strcasecmp(attrName, "y") == 0){
-            numberWithUnits(&(rect->y), rect->units, cont);
+            valid[1] = numberWithUnits(&(rect->y), rect->units, cont);
         }
         else if (strcasecmp(attrName, "width") == 0){
-            numberWithUnits(&(rect->width), rect->units, cont);
+            valid[2] = numberWithUnits(&(rect->width), rect->units, cont);
         }
         else if (strcasecmp(attrName, "height") == 0){
-            numberWithUnits(&(rect->height), rect->units, cont);
+            valid[3] = numberWithUnits(&(rect->height), rect->units, cont);
         }
         else{ // place in otherAttributes list
-          insertBack(rect->otherAttributes, (void*)otherAttributes (value, attr)); // create an attribute node and place it in the list
+          insertBack(rect->otherAttributes, (void*)otherAttributes (attrName, cont)); // create an attribute node and place it in the list
         }
     }
+
+    // if units are emtpy, emtpy string, etc assumes that all units are the same if specified
+    if (valid[0] == 0) rect->x = 0; // x is not specified
+    if (valid[1] == 0) rect->y = 0; // y is not specified
+    if (valid[2] == 0) rect->width = 0; // w is not specified
+    if (valid[3] == 0) rect->height = 0; // h is not specified
+    if (validChar(rect->units) == 0) strcpy(rect->units, ""); // u is not specified
 
     return rect;
 }
@@ -119,17 +130,28 @@ void verifyCopy(char* field, xmlChar * data, size_t fLength, size_t dLength){
     strcpy(field, data);
 }
 
-void numberWithUnits(float* number, char* units, char* value){
+int numberWithUnits(float* number, char* units, char* value){
 
-    if (value == NULL) return;
+    char* cpy = malloc (sizeof(value));
+    strcpy(cpy, value);
+
+    if (value == NULL) return 0;
 
     char* token = strtok(value, DELIMITERS);
 
     *number = atof (token);
 
-    token = strtok(NULL, "\0");
+    token = strtok(cpy, NUMDELIMITERS);
     if (token != NULL) strcpy(units, token);
 
+    free(cpy);
+    return 1;
+}
+
+int validChar(char* word){ // checks if a character is valid
+
+    if (word == NULL || word[0] == '\0' || word[0] == '\n' || strcmp(word, "") == 0) return 0; // 0 indicates false, not valid
+    return 1;
 }
 
 /*

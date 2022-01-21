@@ -57,7 +57,7 @@ SVG* createSVG(const char* filename){
     get_element_names(root_element, svg);
 
     char* listDescr = toString(svg->rectangles);
-    printf("Here is the list of rectangles: %s\n", listDescr);
+    printf("Here is the list of rectangles:\n%s\n", listDescr);
     free(listDescr);
 
     xmlFreeDoc(doc); // free document
@@ -104,11 +104,11 @@ char* attributeToString( void* data){
 
     tmp = (Attribute*)data;
 
-    len = strlen(tmp->name) + strlen(tmp->value) + 5; // 5 for the ", ' ', =
+    len = strlen(tmp->name) + strlen(tmp->value) + 7; // 7 for the ", ' ', =, \n, \0
 
     tmpStr = (char*) malloc(sizeof(char) * len);
 
-    sprintf(tmpStr, "%s = \"%s\"", tmp->name, tmp->value);
+    sprintf(tmpStr, "%s = \"%s\"\n", tmp->name, tmp->value);
 
     return tmpStr;
 }
@@ -149,9 +149,9 @@ char* groupToString( void* data){
     char* groupList = toString(tmp->groups);
     char* attrList = toString(tmp->otherAttributes);
 
-    len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 4; // 4 '\n'
+    len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 6; // 4 '\n', \0
     tmpStr = (char*) malloc(sizeof(char) * len);
-    sprintf(tmpStr, "%s\n%s\n%s\n%s\n%s", rectList, circList, pathList, groupList, attrList);
+    sprintf(tmpStr, "%s\n%s\n%s\n%s\n%s\n", rectList, circList, pathList, groupList, attrList);
 
     free(rectList);
     free(circList);
@@ -193,11 +193,11 @@ char* rectangleToString(void* data){
 
     char* attrList = toString(tmp->otherAttributes);
 
-    // 4 floats (35 characters each * 4 = 140) + 50 char + (6 * 5 = 30) = 220 + list attributes
-    len = 220 + strlen(attrList);
+    // 4 floats (35 characters each * 4 = 140) + 50 char + (6 * 5 = 30) + 1 newline + 1 null = 222 + list attributes
+    len = 222 + strlen(attrList);
 
     tmpStr = (char*) malloc(sizeof(char) * len);
-    sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nwidth = \"%f\"\nheight = \"%f\"\nunits = \"%s\"\n%s", tmp->x, tmp->y, tmp->width, tmp->height, tmp->units, attrList);
+    sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nwidth = \"%f\"\nheight = \"%f\"\nunits = \"%s\"\n%s\n", tmp->x, tmp->y, tmp->width, tmp->height, tmp->units, attrList);
 
     free(attrList);
     return tmpStr;
@@ -233,11 +233,11 @@ char* circleToString(void* data){
 
     char* attrList = toString(tmp->otherAttributes);
 
-    // 3 floats (35 characters each * 3 = 105) + 50 char + (6 * 4 = 24) = 179 + list attributes
-    len = 179 + strlen(attrList);
+    // 3 floats (35 characters each * 3 = 105) + 50 char + (6 * 4 = 24) + 1 + 1 = 181 + list attributes
+    len = 181 + strlen(attrList);
 
     tmpStr = (char*) malloc(sizeof(char) * len);
-    sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nr = \"%f\"\nunits = \"%s\"\n%s", tmp->cx, tmp->cy, tmp->r, tmp->units, attrList);
+    sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nr = \"%f\"\nunits = \"%s\"\n%s\n", tmp->cx, tmp->cy, tmp->r, tmp->units, attrList);
 
     free(attrList);
     return tmpStr;
@@ -272,11 +272,11 @@ char* pathToString(void* data){
 
     char* attrList = toString(tmp->otherAttributes);
 
-    len = strlen(tmp->data) + strlen(attrList) + 6; // 5 for the ", ' ', =, \n
+    len = strlen(tmp->data) + strlen(attrList) + 8; // 7 for the ", ' ', =, \n, \0
 
     tmpStr = (char*) malloc(sizeof(char) * len);
 
-    sprintf(tmpStr, "%s = \"%s\"\n%s", tmp->data, attrList);
+    sprintf(tmpStr, "%s = \"%s\"\n%s\n", tmp->data, attrList);
 
     free(attrList);
     return tmpStr;
