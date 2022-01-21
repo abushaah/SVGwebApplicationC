@@ -11,14 +11,14 @@
 
 #ifdef LIBXML_TREE_ENABLED
 
+#ifndef
 static void get_element_names(xmlNode * a_node, SVG * svg);
-
 Rectangle* rectAttributes(xmlNode *cur_node);
 Attribute* otherAttributes (char *name, char *content);
-
 int numberWithUnits(float* number, char* units, char* value);
 void verifyCopy(char* field, xmlChar * data, size_t fLength, size_t dLength);
 int validChar(char* word);
+#endif
 
 static void get_element_names(xmlNode * a_node, SVG * svg){
 
