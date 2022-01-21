@@ -5,9 +5,8 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper3.c"
+#include "SVGHelper3.h"
 #include "SVGParser.h"
-#include "LinkedListAPI.h"
 
 int main(void){
 
@@ -58,6 +57,14 @@ SVG* createSVG(const char* filename){
 
     char* listDescr = toString(svg->rectangles);
     printf("Here is the list of rectangles:\n%s\n", listDescr);
+    free(listDescr);
+
+    listDescr = toString(svg->circles);
+    printf("Here is the list of circles:\n%s\n", listDescr);
+    free(listDescr);
+
+    listDescr = toString(svg->otherAttributes);
+    printf("Here is the list of other attributes:\n%s\n", listDescr);
     free(listDescr);
 
     xmlFreeDoc(doc); // free document
