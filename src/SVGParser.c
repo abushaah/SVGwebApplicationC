@@ -2,15 +2,28 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper.h"
+#include "SVGHelper3.h"
 #include "SVGParser.h"
+
+// REMEMBER TO REMOVE THE MAIN AND PRINT STATMENTS!
 
 int main(void){
 
-    SVG* svg = createSVG("rect_with_units.svg");
+    SVG* svg = createSVG("quad01.svg");
+
+    if (svg == NULL){
+        printf("invalid svg file\n");
+        return 0;
+    }
+
+    char* svgString = SVGToString(svg);
+    printf("%s\n", svgString);
+    free(svgString);
+
     deleteSVG(svg);
 
     return 0;
@@ -21,7 +34,9 @@ SVG* createSVG(const char* filename){
 
     xmlDoc *doc = NULL;
     xmlNode *root_element = NULL;
-    SVG* svg = (SVG*) (malloc(sizeof(SVG)));
+    SVG* svg = (SVG*) (malloc(sizeof(SVG))); // CHECK MALLOC FOR FAIL!
+
+    int valid = 0; // 0 means false, 1 means true
 
     if (!filename) return NULL; // file is not given
 
@@ -35,34 +50,42 @@ SVG* createSVG(const char* filename){
 
     root_element = xmlDocGetRootElement(doc); // root element node
 
+    if (strcasecmp(root_element->name, "svg") != 0){
+        return NULL;
+    }
+
 /*
-    valid = nameSpace(svg->namespace, root_element->ns->href, sizeof(svg->namespace), sizeof(root_element->ns->href)); // funciton to create namespace
+    valid = nameSpace(svg->namespace, root_element->ns->href, sizeof(svg->namespace), sizeof(root_element->ns->href)); // funciton to create namespace (must)
     if (!valid){
-        fprintf(stderr, "Tree support not compiled in\n");
         //deleteAll();
         return NULL;
     }
 */
 
+    // must initialize all svg contents, may not be empty
+    strcpy(svg->namespace, "");
+    strcpy(svg->title, "");
+    strcpy(svg->description, "");
     svg->rectangles = initializeList(&rectangleToString, &deleteRectangle, &compareRectangles);
     svg->circles = initializeList(&circleToString, &deleteCircle, &compareCircles);
     svg->paths = initializeList(&pathToString, &deletePath, &comparePaths);
     svg->groups = initializeList(&groupToString, &deleteGroup, &compareGroups);
     svg->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
 
-    get_element_names(root_element, svg);
+    Group **group;
+    int groupIdx = 0;
 
-    char* listDescr = toString(svg->rectangles);
-    printf("Here is the list of rectangles:\n%s\n", listDescr);
-    free(listDescr);
+    group = malloc(sizeof(Group*) * (groupIdx + 1)); // group that will point to Group*, start with it pointing to one only
 
-    listDescr = toString(svg->circles);
-    printf("Here is the list of circles:\n%s\n", listDescr);
-    free(listDescr);
+    if (group == NULL){
+        return NULL;
+    }
 
-    listDescr = toString(svg->otherAttributes);
-    printf("Here is the list of other attributes:\n%s\n", listDescr);
-    free(listDescr);
+    get_element_names(root_element, svg, group, &groupIdx);
+    // root element is the root node, svg is the svg tree, group is the first layer of a group, 0 indicates a layer of 0 groups
+
+    freeGroup(group, groupIdx);
+    free(group);
 
     xmlFreeDoc(doc); // free document
     xmlCleanupParser(); // free global variables allocated by parser
@@ -71,7 +94,40 @@ SVG* createSVG(const char* filename){
 
 }
 
-//char* SVGToString(const SVG* img);
+char* SVGToString(const SVG* img){
+
+    char* tmpStr;
+    SVG* tmp;
+    int len;
+
+    if (img == NULL){
+        return NULL;
+    }
+
+    tmp = (SVG*)img;
+
+    char* namespace = tmp->namespace;
+    char* title = tmp->title;
+    char* description = tmp->description;
+    char* rectList = toString(tmp->rectangles);
+    char* circList = toString(tmp->circles);
+    char* pathList = toString(tmp->paths);
+    char* groupList = toString(tmp->groups);
+    char* attrList = toString(tmp->otherAttributes);
+
+    len = strlen(namespace) + strlen(title) + strlen(description) + strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 9 + 24; // 8 '\n', \0
+    tmpStr = (char*) malloc(sizeof(char) * len);
+    sprintf(tmpStr, "N: %s\nT: %s\nD: %s\nR: %s\nC: %s\nP: %s\nG: %s\nA: %s\n", namespace, title, description, rectList, circList, pathList, groupList, attrList);
+
+    free(rectList);
+    free(circList);
+    free(pathList);
+    free(groupList);
+    free(attrList);
+
+    return tmpStr;
+
+}
 
 void deleteSVG(SVG* img){
 
@@ -132,6 +188,7 @@ void deleteGroup(void* data){
     freeList (tmp->paths);
     freeList (tmp->groups);
     freeList (tmp->otherAttributes);
+    free(tmp);
 
 }
 
@@ -153,7 +210,7 @@ char* groupToString( void* data){
     char* groupList = toString(tmp->groups);
     char* attrList = toString(tmp->otherAttributes);
 
-    len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 6; // 4 '\n', \0
+    len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 6; // 5 '\n', \0
     tmpStr = (char*) malloc(sizeof(char) * len);
     sprintf(tmpStr, "%s\n%s\n%s\n%s\n%s\n", rectList, circList, pathList, groupList, attrList);
 
@@ -237,11 +294,11 @@ char* circleToString(void* data){
 
     char* attrList = toString(tmp->otherAttributes);
 
-    // 3 floats (35 characters each * 3 = 105) + 50 char + (6 * 4 = 24) + 1 + 1 = 181 + list attributes
-    len = 181 + strlen(attrList);
+    // 3 floats (35 characters each * 3 = 105) + 50 char + (6 * 4 = 24) + 4 = 181 + list attributes
+    len = 183 + strlen(attrList);
 
     tmpStr = (char*) malloc(sizeof(char) * len);
-    sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nr = \"%f\"\nunits = \"%s\"\n%s\n", tmp->cx, tmp->cy, tmp->r, tmp->units, attrList);
+    sprintf(tmpStr, "cx = \"%f\"\ncy = \"%f\"\nr = \"%f\"\nunits = \"%s\"\n%s\n", tmp->cx, tmp->cy, tmp->r, tmp->units, attrList);
 
     free(attrList);
     return tmpStr;
@@ -276,11 +333,11 @@ char* pathToString(void* data){
 
     char* attrList = toString(tmp->otherAttributes);
 
-    len = strlen(tmp->data) + strlen(attrList) + 6; // 6 for the ", ' ', =, \n, \0
+    len = strlen(tmp->data) + strlen(attrList) + 9; // 7 for the ", ' ', =, \n, \0
 
     tmpStr = (char*) malloc(sizeof(char) * len);
 
-    sprintf(tmpStr, "%s = \"%s\"\n", tmp->data, attrList);
+    sprintf(tmpStr, "d = \"%s\"\n%s\n", tmp->data, attrList);
 
     free(attrList);
     return tmpStr;

@@ -43,51 +43,42 @@ void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx){
             // desc attributes are in the otherAttributes list
         }
         else if (strcasecmp(name, "rect") == 0){ // create new rectangle
-
-            printf("creating rectangle\n");
-
             Rectangle* rect = rectAttributes(cur_node); // fill in with attributes
             insertBack(svg->rectangles, (void*)rect); // insert into the rectangle list
 
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                insertBack((group[*groupIdx])->rectangles, (void*)rect);
+                Rectangle* cpy = rectAttributes(cur_node); // create a copy to add to another list
+                insertBack((group[*groupIdx])->rectangles, (void*)cpy);
             }
 
         }
         else if (strcasecmp(name, "circle") == 0){ // create new circle
-
-            printf("creating circle\n");
-
             Circle* circ = circAttributes(cur_node); // fill in with attributes
             insertBack(svg->circles, (void*)circ); // insert into the circle list
 
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                insertBack((group[*groupIdx])->circles, (void*)circ);
+                Circle* cpy = circAttributes(cur_node);
+                insertBack((group[*groupIdx])->circles, (void*)cpy);
             }
 
         }
         else if (strcasecmp(name, "path") == 0){ // create new path
-
-            printf("creating path\n");
-
             Path* path = pathAttributes(cur_node); // fill in with attributes
             insertBack(svg->paths, (void*)path); // insert into the path list
 
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                insertBack((group[*groupIdx])->paths, (void*)path);
+                Path* cpy = pathAttributes(cur_node);
+                insertBack((group[*groupIdx])->paths, (void*)cpy);
             }
 
         }
         else if (strcasecmp(name, "g") == 0){ // create new group
-
-            printf("creating group\n");
-
             Group *newGroup = groupAttributes(cur_node); // fill in with attributes (not other primitives)
 
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in the previous group
 
-                insertBack((group[*groupIdx])->groups, (void*)newGroup);
-
+                Group* cpy = groupAttributes(cur_node);
+                insertBack((group[*groupIdx])->groups, (void*)cpy);
                 // create a new group:
                 ++*groupIdx;
                 group = realloc(group, sizeof(Group*) * (*groupIdx + 1)); // reallocate to hold for another new group
@@ -110,13 +101,8 @@ void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx){
                and we should reset the group variable
             */
             insertBack(svg->groups, (void*)group[0]); // insert the group list (when parent is g and next parent is svg, that means the group tag has finished and we must insert it into the list
-
-            printf("group idx: %d\n", *groupIdx);
-
             freeGroup(group, *groupIdx); // remove ALL the contents of group
-
             *groupIdx = 0; // group has ended and we are now part of svg
-            group = malloc(sizeof(Group*) * (*groupIdx + 1));
         }
 
         get_element_names(cur_node->children, svg, group, groupIdx);
@@ -304,7 +290,6 @@ void freeGroup(Group** group, int groupIdx){
     for (int i = 0; i < groupIdx; ++i){
         deleteGroup(group[i]);
     }
-    free(group);
 
 }
 
