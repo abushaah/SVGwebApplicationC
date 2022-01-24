@@ -13,7 +13,7 @@
 
 int main(void){
 
-    SVG* svg = createSVG("quad01.svg");
+    SVG* svg = createSVG("quad02.svg");
 
     if (svg == NULL){
         printf("invalid svg file\n");
@@ -74,6 +74,7 @@ SVG* createSVG(const char* filename){
 
     Group **group;
     int groupIdx = 0;
+    int inserted = 0;
 
     group = malloc(sizeof(Group*) * (groupIdx + 1)); // group that will point to Group*, start with it pointing to one only
 
@@ -81,10 +82,9 @@ SVG* createSVG(const char* filename){
         return NULL;
     }
 
-    get_element_names(root_element, svg, group, &groupIdx);
+    get_element_names(root_element, svg, group, &groupIdx, &inserted);
     // root element is the root node, svg is the svg tree, group is the first layer of a group, 0 indicates a layer of 0 groups
 
-    freeGroup(group, groupIdx);
     free(group);
 
     xmlFreeDoc(doc); // free document
@@ -183,12 +183,12 @@ void deleteGroup(void* data){
     }
     tmp = (Group*)data;
 
-    freeList (tmp->rectangles);
-    freeList (tmp->circles);
-    freeList (tmp->paths);
-    freeList (tmp->groups);
-    freeList (tmp->otherAttributes);
-    free(tmp);
+    if (tmp->rectangles != NULL) freeList(tmp->rectangles);
+    if (tmp->circles != NULL) freeList(tmp->circles);
+    if (tmp->paths != NULL) freeList(tmp->paths);
+    if (tmp->groups != NULL) freeList(tmp->groups);
+    if (tmp->otherAttributes != NULL) freeList(tmp->otherAttributes);
+    if (tmp != NULL) free(tmp);
 
 }
 
@@ -234,7 +234,7 @@ void deleteRectangle(void* data){
     }
     tmp = (Rectangle*)data;
 
-    freeList (tmp->otherAttributes);
+    if (tmp->otherAttributes != NULL) freeList (tmp->otherAttributes);
     free(tmp);
 
 }
@@ -275,7 +275,7 @@ void deleteCircle(void* data){
     }
     tmp = (Circle*)data;
 
-    freeList (tmp->otherAttributes);
+    if (tmp->otherAttributes != NULL) freeList (tmp->otherAttributes);
     free(tmp);
 
 }
@@ -314,7 +314,7 @@ void deletePath(void* data){
         return;
     }
     tmp = (Path*)data;
-    freeList (tmp->otherAttributes);
+    if (tmp->otherAttributes != NULL) freeList (tmp->otherAttributes);
     free(tmp);
 
 }

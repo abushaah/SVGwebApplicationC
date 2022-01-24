@@ -4,7 +4,7 @@
 #include "SVGParser.h"
 
 // svg parser function that loops through and creates the structs
-void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx);
+void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted);
 
 // struct creation functions
 Attribute* otherAttributes (char *name, char *content);
@@ -15,7 +15,6 @@ Group* groupAttributes (xmlNode *cur_node);
 
 // list within a struct creation functions
 void firstOtherAttributes(xmlNode *cur_node, List* otherAttributesList);
-void freeGroup(Group** group, int groupIdx);
 
 // validity check functions
 int numberWithUnits(float* number, char* units, char* value);
