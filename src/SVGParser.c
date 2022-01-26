@@ -6,7 +6,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper3.h"
+#include "SVGHelper.h"
 #include "SVGParser.h"
 
 #define COUNT 500
@@ -19,6 +19,7 @@ SVG* createSVG(const char* filename){
 
     xmlDoc *doc = NULL;
     xmlNode *root_element = NULL;
+    int valid = 0;
 
     doc = xmlReadFile(filename, NULL, 0); // parse the file and get the DOM
     if (doc == NULL){
@@ -42,7 +43,7 @@ SVG* createSVG(const char* filename){
     }
 
     // must initialize all svg contents, namespace may not be empty
-    int valid = titleDescNS(svg->namespace, (char*)root_element->ns->href); // funciton to create namespace (must)
+    valid = titleDescNS(svg->namespace, (char*)root_element->ns->href); // funciton to create namespace (must)
     if (valid == 0){
         free(svg);
         xmlFreeDoc(doc);
@@ -68,13 +69,21 @@ SVG* createSVG(const char* filename){
     int groupIdx = 0;
     int inserted = 0;
 
-    get_element_names(root_element, svg, group, &groupIdx, &inserted);
+    valid = get_element_names(root_element, svg, group, &groupIdx, &inserted);
     /* root element is the root node, svg is the svg tree,
     group is the array that point to groups,
     group index is the index in the array of groups,
     inserted is whether a group is inserted */
 
     free(group);
+
+    if (valid == 0){
+        free(svg);
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
+        return NULL;
+    }
+
     xmlFreeDoc(doc); // free document
     xmlCleanupParser(); // free global variables allocated by parser
 

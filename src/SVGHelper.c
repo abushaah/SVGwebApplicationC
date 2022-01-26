@@ -8,7 +8,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper3.h"
+#include "SVGHelper.h"
 #include "SVGParser.h"
 
 #define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+-=~`{}|[]:\";',/<>?"
@@ -17,7 +17,7 @@
 
 // 0 means false!
 
-void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted){
+int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted){
 
     // groupIdx keeps track of the group depth
     /*
@@ -25,6 +25,10 @@ void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, 
         * - first pointer is an array which points to multiple Group*
         * - second pointer are contents of the array, Group*
     */
+
+    if (a_node == NULL || svg == NULL || group == NULL || groupIdx == NULL || inserted == NULL){
+        return 0;
+    }
 
     xmlNode *cur_node = NULL;
 
@@ -120,6 +124,8 @@ void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, 
 
     }
 
+    return 1;
+
 }
 
 /**
@@ -128,8 +134,16 @@ void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, 
  */
 Attribute* otherAttributes (char *name, char *content){
 
+    if (name == NULL || content == NULL) return NULL;
+
     Attribute* anAtr = malloc(sizeof(Attribute) + strlen(content) + 1); // 1 for null
+    if (anAtr == NULL){
+        return NULL;
+    }
     anAtr->name = malloc(strlen(name) + 1); // 1 for null
+    if (anAtr->name == NULL){
+        return NULL;
+    }
     strcpy(anAtr->name, name);
     strcpy(anAtr->value, content);
 
@@ -141,6 +155,8 @@ Attribute* otherAttributes (char *name, char *content){
  * This function will add to the list of other attribute structures when given a node that doesnt belong to one of the geometric primitives
  */
 void firstOtherAttributes(xmlNode *cur_node, List* otherAttributesList){ // giving the list only and not the svg
+
+    if (cur_node == NULL || otherAttributesList == NULL) return;
 
     // Iterate through every attribute of the current node
     xmlAttr *attr;
@@ -160,9 +176,14 @@ void firstOtherAttributes(xmlNode *cur_node, List* otherAttributesList){ // givi
  */
 Rectangle* rectAttributes(xmlNode *cur_node){ // fills in attributes for a rectangle
 
+    if (cur_node == NULL) return NULL;
+
     // Iterate through every attribute of the current rectangle node
     xmlAttr *attr;
     Rectangle* rect = malloc(sizeof(Rectangle));
+    if (rect == NULL){
+        return NULL;
+    }
 
     rect->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes); // must initialize list, cannot be NULL but can be empty
     strcpy(rect->units, ""); // initialize units
@@ -206,9 +227,14 @@ Rectangle* rectAttributes(xmlNode *cur_node){ // fills in attributes for a recta
  */
 Circle* circAttributes(xmlNode *cur_node){ // fills in attributes for a rectangle
 
+    if (cur_node == NULL) return NULL;
+
     // Iterate through every attribute of the current circle node
     xmlAttr *attr;
     Circle* circ = malloc(sizeof(Circle));
+    if (circ == NULL){
+        return NULL;
+    }
 
     circ->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes); // must initialize list, cannot be NULL but can be empty
     strcpy(circ->units, "");
@@ -248,9 +274,14 @@ Circle* circAttributes(xmlNode *cur_node){ // fills in attributes for a rectangl
  */
 Path* pathAttributes (xmlNode *cur_node){
 
+    if (cur_node == NULL) return NULL;
+
     // Iterate through every attribute of the current node
     xmlAttr *attr;
     Path* path = malloc(sizeof(Path));
+    if (path == NULL){
+        return NULL;
+    }
 
     path->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes); // must initialize list, cannot be NULL but can be empty
 
@@ -273,9 +304,14 @@ Path* pathAttributes (xmlNode *cur_node){
 
 Group* groupAttributes (xmlNode *cur_node){
 
+    if (cur_node == NULL) return NULL;
+
     // Iterate through every attribute of the current node
     xmlAttr *attr;
     Group* group = malloc(sizeof(Group));
+    if (group == NULL){
+        return NULL;
+    }
 
     group->rectangles = initializeList(&rectangleToString, &deleteRectangle, &compareRectangles);
     group->circles = initializeList(&circleToString, &deleteCircle, &compareCircles);
@@ -300,10 +336,13 @@ Group* groupAttributes (xmlNode *cur_node){
  */
 int numberWithUnits(float* number, char* units, char* value){
 
-    char* cpy = malloc (sizeof(value));
-    strcpy(cpy, value);
-
     if (value == NULL) return 0;
+
+    char* cpy = malloc (sizeof(value));
+    if (cpy == NULL){
+        return 0;
+    }
+    strcpy(cpy, value);
 
     char* token = strtok(value, DELIMITERS);
 
@@ -337,6 +376,9 @@ int titleDescNS(char *field, char* data){
     if (data == NULL) return 0;
 
     char *dataCpy = malloc(strlen(data) + 1); // must create a copy since it is a constant and cannot be changed
+    if (dataCpy == NULL){
+        return 0;
+    }
     strcpy(dataCpy, data);
 
     int dLength = strlen(data) + 1;
@@ -358,6 +400,9 @@ int emptyString(char* word){ // checks if a character is valid
     if (word == NULL) return 0;
 
     char *dataCpy = malloc(strlen(word) + 1); // must create a copy since it is a constant and cannot be changed
+    if (dataCpy == NULL){
+        return 0;
+    }
     strcpy(dataCpy, word);
 
     char* token = strtok(dataCpy, " \n\t"); // must not be empty

@@ -6,7 +6,7 @@
 #include "SVGParser.h"
 
 // svg parser function that loops through and creates the structs
-void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted);
+int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted);
 
 // struct creation functions
 Attribute* otherAttributes (char *name, char *content);
