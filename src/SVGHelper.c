@@ -17,6 +17,7 @@
 
 // 0 means false!
 
+// Module 1 helper functions:
 int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted){
 
     // groupIdx keeps track of the group depth
@@ -26,7 +27,7 @@ int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, i
         * - second pointer are contents of the array, Group*
     */
 
-    if (a_node == NULL || svg == NULL || group == NULL || groupIdx == NULL || inserted == NULL){
+    if (svg == NULL || group == NULL){
         return 0;
     }
 
@@ -59,33 +60,33 @@ int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, i
         if (strcasecmp(name, "rect") == 0){ // create new rectangle
 
             Rectangle* rect = rectAttributes(cur_node); // fill in with attributes
-            insertBack(svg->rectangles, (void*)rect); // insert into the rectangle list
-
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                Rectangle* cpy = rectAttributes(cur_node); // create a copy to add to another list
-                insertBack((group[*groupIdx])->rectangles, (void*)cpy);
+                insertBack((group[*groupIdx])->rectangles, (void*)rect);
+            }
+            else{
+                insertBack(svg->rectangles, (void*)rect); // insert into the rectangle list
             }
 
         }
         else if (strcasecmp(name, "circle") == 0){ // create new circle
 
             Circle* circ = circAttributes(cur_node); // fill in with attributes
-            insertBack(svg->circles, (void*)circ); // insert into the circle list
-
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                Circle* cpy = circAttributes(cur_node);
-                insertBack((group[*groupIdx])->circles, (void*)cpy);
+                insertBack((group[*groupIdx])->circles, (void*)circ);
+            }
+            else{
+                insertBack(svg->circles, (void*)circ); // insert into the circle list
             }
 
         }
         else if (strcasecmp(name, "path") == 0){ // create new path
 
             Path* path = pathAttributes(cur_node); // fill in with attributes
-            insertBack(svg->paths, (void*)path); // insert into the path list
-
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                Path* cpy = pathAttributes(cur_node);
-                insertBack((group[*groupIdx])->paths, (void*)cpy);
+                insertBack((group[*groupIdx])->paths, (void*)path);
+            }
+            else{
+                insertBack(svg->paths, (void*)path); // insert into the path list
             }
 
         }
@@ -120,7 +121,8 @@ int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, i
             }
         }
 
-        get_element_names(cur_node->children, svg, group, groupIdx, inserted);
+        int valid = get_element_names(cur_node->children, svg, group, groupIdx, inserted);
+        if (valid == 0) return 0;
 
     }
 
@@ -176,7 +178,9 @@ void firstOtherAttributes(xmlNode *cur_node, List* otherAttributesList){ // givi
  */
 Rectangle* rectAttributes(xmlNode *cur_node){ // fills in attributes for a rectangle
 
-    if (cur_node == NULL) return NULL;
+    if (cur_node == NULL){
+        return NULL;
+    }
 
     // Iterate through every attribute of the current rectangle node
     xmlAttr *attr;
@@ -415,4 +419,67 @@ int emptyString(char* word){ // checks if a character is valid
     free(dataCpy);
     return 1;
 
+}
+
+// Module 2 helper functions:
+
+/**
+ * helper function for get uses 2 iterators: one that goes through the groups in the list one by one
+ * one that goes through the rectangle list inside the groups
+ */
+int getElementGroups(List *source, List *dest, char* type){
+
+    // a list of groups, a list for rectangle destination
+    if (source == NULL || dest == NULL) return 0; // error case
+
+    List* groupList = (List*) source;
+    if (groupList == NULL){
+        // base case - rectangles or groups list not initialized means that there are no more elements
+        return 1;
+    }
+
+    // recursive case
+    void* elemG;
+    ListIterator iterG = createIterator(groupList); // traverse through the Group list
+    while ((elemG = nextElement(&iterG)) != NULL){
+
+        Group* group = (Group*) elemG;
+        if (strcmp(type, "rect") == 0){
+            void* elemR;
+            ListIterator iter = createIterator(group->rectangles);
+            while ((elemR = nextElement(&iter)) != NULL){
+                Rectangle* rect = (Rectangle*) elemR; // points to the element
+                insertBack(dest, (void*)rect); // insert into the rectangle list
+            }
+        }
+        else if (strcmp(type, "circ") == 0){ // repeat above for circle
+            void* elemC;
+            ListIterator iter = createIterator(group->circles);
+            while ((elemC = nextElement(&iter)) != NULL){
+                Circle* circ = (Circle*) elemC;
+                insertBack(dest, (void*)circ);
+            }
+        }
+        else if (strcmp(type, "path") == 0){
+            void* elemP;
+            ListIterator iter = createIterator(group->paths);
+            while ((elemP = nextElement(&iter)) != NULL){
+                Path* path = (Path*) elemP;
+                insertBack(dest, (void*)path);
+            }
+        }
+        else if (strcmp(type, "group") == 0){
+            void* elemG;
+            ListIterator iter = createIterator(group->groups);
+            while ((elemG = nextElement(&iter)) != NULL){
+                Group* inGroup = (Group*) elemG;
+                insertBack(dest, (void*)inGroup);
+            }
+        }
+        int valid = getElementGroups(group->groups, dest, type);
+        if (valid == 0) return 0;
+
+    }
+
+    return 1;
 }

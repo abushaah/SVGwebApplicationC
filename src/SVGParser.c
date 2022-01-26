@@ -11,6 +11,11 @@
 
 #define COUNT 500
 
+void dummyDeleteRectangle(void* data){}
+void dummyDeleteCircle(void* data){}
+void dummyDeletePath(void* data){}
+void dummyDeleteGroup(void* data){}
+
 SVG* createSVG(const char* filename){
 
     if (filename == NULL) return NULL; // file is not given
@@ -342,3 +347,90 @@ char* pathToString(void* data){
 }
 
 int comparePaths(const void *first, const void *second){ return 0; }
+
+/**
+ * The get functions have fimilar format. They:
+ * 1. traverse shape list in img
+ * 2. call getElementGroups to:
+ * 3. traverse groups shape list in img and
+ * 4. recursively traverse groups groups shape list in img, and so on, until empty shape lists are reached
+*/
+List* getRects(const SVG* img){
+
+    if (img == NULL) return NULL;
+
+    List* rectangles = initializeList(&rectangleToString, &dummyDeleteRectangle, &compareRectangles);
+
+    void* elem;
+    ListIterator iter = createIterator(img->rectangles); // create iterator to traverse the list
+    while ((elem = nextElement(&iter)) != NULL){
+        Rectangle* rect = (Rectangle*) elem; // points to the element
+        insertBack(rectangles, (void*)rect); // insert into the rectangle list
+    }
+
+    int valid = getElementGroups(img->groups, rectangles, "rect");
+    if (valid == 0) return NULL;
+
+    return rectangles;
+
+}
+
+List* getCircles(const SVG* img){
+
+    if (img == NULL) return NULL;
+
+    List* circles = initializeList(&circleToString, &dummyDeleteCircle, &compareCircles);
+
+    void* elem;
+    ListIterator iter = createIterator(img->circles);
+    while ((elem = nextElement(&iter)) != NULL){
+        Circle* circ = (Circle*) elem;
+        insertBack(circles, (void*)circ);
+    }
+
+    int valid = getElementGroups(img->groups, circles, "circ");
+    if (valid == 0) return NULL;
+
+    return circles;
+
+}
+
+List* getPaths(const SVG* img){
+
+    if (img == NULL) return NULL;
+
+    List* paths = initializeList(&pathToString, &dummyDeletePath, &comparePaths);
+
+    void* elem;
+    ListIterator iter = createIterator(img->paths);
+    while ((elem = nextElement(&iter)) != NULL){
+        Path* path = (Path*) elem;
+        insertBack(paths, (void*)path);
+    }
+
+    int valid = getElementGroups(img->groups, paths, "path");
+    if (valid == 0) return NULL;
+
+    return paths;
+
+}
+
+List* getGroups(const SVG* img){ // again with these groups smh
+
+    if (img == NULL) return NULL;
+
+    List* groups = initializeList(&groupToString, &dummyDeleteGroup, &compareGroups);
+
+    void* elem;
+    ListIterator iter = createIterator(img->groups);
+    while ((elem = nextElement(&iter)) != NULL){
+        Group* group = (Group*) elem;
+        insertBack(groups, (void*)group);
+    }
+
+    int valid = getElementGroups(img->groups, groups, "group");
+    if (valid == 0) return NULL;
+
+    return groups;
+
+}

@@ -5,6 +5,8 @@
 
 #include "SVGParser.h"
 
+// Module 1 helper functions:
+
 // svg parser function that loops through and creates the structs
 int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted);
 
@@ -24,5 +26,8 @@ int titleDescNS(char *field, char* data);
 
 int validChar(char* word);
 int emptyString(char* word);
+
+// Module 2 helper funcitons:
+int getElementGroups(List *source, List *dest, char* type);
 
 #endif
