@@ -9,61 +9,46 @@
 #include "SVGHelper3.h"
 #include "SVGParser.h"
 
-// REMEMBER TO REMOVE THE MAIN AND PRINT STATMENTS!
-
-int main(void){
-
-    SVG* svg = createSVG("quad02.svg");
-
-    if (svg == NULL){
-        printf("invalid svg file\n");
-        return 0;
-    }
-
-    char* svgString = SVGToString(svg);
-    printf("%s\n", svgString);
-    free(svgString);
-
-    deleteSVG(svg);
-
-    return 0;
-
-}
+#define COUNT 500
 
 SVG* createSVG(const char* filename){
 
-    xmlDoc *doc = NULL;
-    xmlNode *root_element = NULL;
-    SVG* svg = (SVG*) (malloc(sizeof(SVG))); // CHECK MALLOC FOR FAIL!
-
-    int valid = 0; // 0 means false, 1 means true
-
-    if (!filename) return NULL; // file is not given
+    if (filename == NULL) return NULL; // file is not given
 
     LIBXML_TEST_VERSION
 
-    doc = xmlReadFile(filename, NULL, 0); // parse the file and get the DOM
+    xmlDoc *doc = NULL;
+    xmlNode *root_element = NULL;
 
+    doc = xmlReadFile(filename, NULL, 0); // parse the file and get the DOM
     if (doc == NULL){
+        return NULL;
+    }
+
+    SVG* svg = (SVG*) (malloc(sizeof(SVG)));
+    if (svg == NULL){
+        xmlFreeDoc(doc); // free document
+        xmlCleanupParser(); // free global variables allocated by parser
         return NULL;
     }
 
     root_element = xmlDocGetRootElement(doc); // root element node
 
-    if (strcasecmp(root_element->name, "svg") != 0){
+    if (strcasecmp((char*)root_element->name, "svg") != 0){ // when the root node is not null
+        free(svg);
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
         return NULL;
     }
 
-/*
-    valid = nameSpace(svg->namespace, root_element->ns->href, sizeof(svg->namespace), sizeof(root_element->ns->href)); // funciton to create namespace (must)
-    if (!valid){
-        //deleteAll();
+    // must initialize all svg contents, namespace may not be empty
+    int valid = titleDescNS(svg->namespace, (char*)root_element->ns->href); // funciton to create namespace (must)
+    if (valid == 0){
+        free(svg);
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
         return NULL;
     }
-*/
-
-    // must initialize all svg contents, may not be empty
-    strcpy(svg->namespace, "");
     strcpy(svg->title, "");
     strcpy(svg->description, "");
     svg->rectangles = initializeList(&rectangleToString, &deleteRectangle, &compareRectangles);
@@ -72,21 +57,24 @@ SVG* createSVG(const char* filename){
     svg->groups = initializeList(&groupToString, &deleteGroup, &compareGroups);
     svg->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
 
-    Group **group;
-    int groupIdx = 0;
-    int inserted = 0;
-
-    group = malloc(sizeof(Group*) * (groupIdx + 1)); // group that will point to Group*, start with it pointing to one only
-
+    Group **group = malloc(sizeof(Group*) * COUNT); // group that will point to Group*, start with it pointing to one only
     if (group == NULL){
+        free(svg);
+        xmlFreeDoc(doc); // free document
+        xmlCleanupParser(); // free global variables allocated by parser
         return NULL;
     }
 
+    int groupIdx = 0;
+    int inserted = 0;
+
     get_element_names(root_element, svg, group, &groupIdx, &inserted);
-    // root element is the root node, svg is the svg tree, group is the first layer of a group, 0 indicates a layer of 0 groups
+    /* root element is the root node, svg is the svg tree,
+    group is the array that point to groups,
+    group index is the index in the array of groups,
+    inserted is whether a group is inserted */
 
     free(group);
-
     xmlFreeDoc(doc); // free document
     xmlCleanupParser(); // free global variables allocated by parser
 

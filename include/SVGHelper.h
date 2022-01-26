@@ -1,3 +1,5 @@
+// Name: Hafaa Abushaaban [1146372]
+
 #ifndef SVGHELPER_H
 #define SVGHELPER_H
 
@@ -18,7 +20,9 @@ void firstOtherAttributes(xmlNode *cur_node, List* otherAttributesList);
 
 // validity check functions
 int numberWithUnits(float* number, char* units, char* value);
-void verifyCopy(char* field, char* data, size_t fLength, size_t dLength);
+int titleDescNS(char *field, char* data);
+
 int validChar(char* word);
+int emptyString(char* word);
 
 #endif

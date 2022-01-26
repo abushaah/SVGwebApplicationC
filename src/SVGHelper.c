@@ -1,3 +1,6 @@
+// Name: Hafaa Abushaaban [1146372]
+// Sample code "libXmlExample" used for understanding the traversal of tree from: http://xmlsoft.org/
+
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -8,51 +11,53 @@
 #include "SVGHelper3.h"
 #include "SVGParser.h"
 
-#define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ -=:;,<>?!@#$%^&*()_+"
+#define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+-=~`{}|[]:\";',/<>?"
 #define NUMDELIMITERS "0123456789."
+#define STRSIZE 256
 
 // 0 means false!
 
 void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted){
 
     // groupIdx keeps track of the group depth
-    // Group* group node will either be the previous group or null indicating create new group
-    // it will become null as soon as parent is no longer 'g', but svg instead
+    /*
+    Group**:
+        * - first pointer is an array which points to multiple Group*
+        * - second pointer are contents of the array, Group*
+    */
 
     xmlNode *cur_node = NULL;
 
     for (cur_node = a_node; cur_node != NULL; cur_node = cur_node->next) {
 
         char* name = (char*)(cur_node->name);
-        char* content = (char*)(cur_node->content);
 
-        char* parent;
-        if (cur_node->parent != NULL) parent = (char*)(cur_node->parent->name); // if not the head node, there is a parent
-        else parent = NULL;
+        char* parent = NULL;
+        if (cur_node->parent != NULL){
+            parent = (char*)(cur_node->parent->name); // if not the head node, there is a parent
+        }
 
-        char* nextParent;
-        if (cur_node->next != NULL) nextParent = (char*)(cur_node->next->parent->name); // if not the head node node, there is a next singling
-        else nextParent = NULL;
+        char* nextParent = NULL;
+        if (cur_node->next != NULL){
+            nextParent = (char*)(cur_node->next->parent->name); // if not the head node node, there is a next singling
+        }
 
         if (strcasecmp(name, "title") == 0){
-            verifyCopy(svg->title, content, sizeof(svg->title), sizeof(cur_node->content));
-            // title attributes are in the otherAttributes list
+            int valid = titleDescNS(svg->title, (char*)cur_node->children->content);
+            if (valid == 0) strcpy(svg->title, "");
         }
-        else if (strcasecmp(name, "desc") == 0){
-            verifyCopy(svg->description, content, sizeof(svg->description), sizeof(cur_node->content));
-            // desc attributes are in the otherAttributes list
+        if (strcasecmp(name, "desc") == 0){
+            int valid = titleDescNS(svg->description, (char*)cur_node->children->content);
+            if (valid == 0) strcpy(svg->description, "");
         }
-        else if (strcasecmp(name, "rect") == 0){ // create new rectangle
 
-            printf("creating rect\n");
+        // The primitives:
+        if (strcasecmp(name, "rect") == 0){ // create new rectangle
 
             Rectangle* rect = rectAttributes(cur_node); // fill in with attributes
             insertBack(svg->rectangles, (void*)rect); // insert into the rectangle list
 
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-
-                printf("rect in group %d\n", *groupIdx);
-
                 Rectangle* cpy = rectAttributes(cur_node); // create a copy to add to another list
                 insertBack((group[*groupIdx])->rectangles, (void*)cpy);
             }
@@ -60,15 +65,10 @@ void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, 
         }
         else if (strcasecmp(name, "circle") == 0){ // create new circle
 
-            printf("creating circ\n");
-
             Circle* circ = circAttributes(cur_node); // fill in with attributes
             insertBack(svg->circles, (void*)circ); // insert into the circle list
 
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-
-                printf("circ in group %d\n", *groupIdx);
-
                 Circle* cpy = circAttributes(cur_node);
                 insertBack((group[*groupIdx])->circles, (void*)cpy);
             }
@@ -76,15 +76,10 @@ void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, 
         }
         else if (strcasecmp(name, "path") == 0){ // create new path
 
-            printf("creating path\n");
-
             Path* path = pathAttributes(cur_node); // fill in with attributes
             insertBack(svg->paths, (void*)path); // insert into the path list
 
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-
-                printf("path in group %d\n", *groupIdx);
-
                 Path* cpy = pathAttributes(cur_node);
                 insertBack((group[*groupIdx])->paths, (void*)cpy);
             }
@@ -92,53 +87,37 @@ void get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, 
         }
         else if (strcasecmp(name, "g") == 0){ // create new group
 
-            printf("creating a group\n");
-
             Group *newGroup = groupAttributes(cur_node); // fill in with attributes (not other primitives)
             *inserted = 0; // cannot insert into the svg->groups list since it is not complete
 
             if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in the previous group
-
-                printf("group in a group %d\n", *groupIdx);
-
-                Group* cpy = groupAttributes(cur_node);
-                insertBack((group[*groupIdx])->groups, (void*)cpy);
-                // create a new group for next elements:
+                insertBack((group[*groupIdx])->groups, (void*)newGroup);
                 ++*groupIdx; // depth of group has increased
-                group = realloc(group, sizeof(Group*) * (*groupIdx + 1)); // reallocate to hold for another new group
             }
-            printf("group index %d\n", *groupIdx);
             group[*groupIdx] = newGroup;
-
         }
         else{ // just call attr with no argument and place in otherAttributes list
             firstOtherAttributes(cur_node, svg->otherAttributes); // fill in with attributes
         }
 
-        if ((parent != NULL && strcasecmp(parent, "g") == 0) && (nextParent == NULL || (strcasecmp(nextParent, "g") != 0))){
+        if (((parent != NULL) && (strcasecmp(parent, "g") == 0)) && ((nextParent == NULL) || ((strcasecmp(nextParent, "svg") == 0)))){
 
-            /* if the current elements parent is a group
+            /* if the current elements parent is a g
                and
-               either the next node is NULL or the next nodes parent is not a group
+               the prev nodes parent is not in a group anymore
                then
                we shall place the original group into the group list in the svg
                and we should reset the group variable
             */
             if (*inserted == 0){
-                printf("end of group, placing in svg, index is %d\n", *groupIdx);
                 insertBack(svg->groups, (void*)group[0]); // insert the group list (when parent is g and next parent is svg, that means the group tag has finished and we must insert it into the list
                 *inserted = 1; // have inserted it
+                *groupIdx = 0; // group has ended and we are going to be a child of svg
             }
-
-            *groupIdx = 0; // group has ended and we are going to be a child of svg
-
-            free(group);
-            group = NULL;
-            group = malloc(sizeof(Group*) * (*groupIdx + 1));
-
         }
 
         get_element_names(cur_node->children, svg, group, groupIdx, inserted);
+
     }
 
 }
@@ -316,24 +295,6 @@ Group* groupAttributes (xmlNode *cur_node){
 }
 
 /**
- * verifyCopy verifies the data fits into the fields
- * if it exceeds, truncuates the data to fit
- */
-void verifyCopy(char* field, char* data, size_t fLength, size_t dLength){
-
-    if (data == NULL){
-        strcpy(field, "");
-        return;
-    }
-
-    if (fLength < dLength){ // data is greater than allocated
-        data[fLength - 1] = '\0';
-    }
-
-    strcpy(field, data);
-}
-
-/**
  * This function separates the units from the floating number
  * @return 0 when no value is given
  */
@@ -367,20 +328,46 @@ int validChar(char* word){ // checks if a character is valid
     return 1;
 }
 
-/*
-int nameSpace(char *field, const xmlChar * data, size_t fLength, size_t dLength){
+/**
+ * verifies the data fits into the fields
+ * if it exceeds, truncuates the data to fit
+ */
+int titleDescNS(char *field, char* data){
 
-    char *dataCpy = malloc(sizeof(data)); // must create a copy since it is a constant and cannot be changed
-    strcpy(dataCpy, (char*)data);
+    if (data == NULL) return 0;
 
-    if (dataCpy == NULL || dataCpy[0] == '\0' || dataCpy[0] == '\n' || strcmp(dataCpy, "") == 0) return 0;
+    char *dataCpy = malloc(strlen(data) + 1); // must create a copy since it is a constant and cannot be changed
+    strcpy(dataCpy, data);
 
-    if (fLength < dLength){ // data is greater than allocated
-        dataCpy[fLength - 1] = '\0';
+    int dLength = strlen(data) + 1;
+
+    if (validChar(dataCpy) == 0) return 0;
+    if (emptyString(dataCpy) == 0) return 0;
+
+    if (STRSIZE < dLength){ // data is greater than allocated
+        dataCpy[STRSIZE - 1] = '\0';
     }
 
-    strcpy(field, data);
+    strcpy(field, dataCpy);
     free(dataCpy);
+    return 1;
+}
+
+int emptyString(char* word){ // checks if a character is valid
+
+    if (word == NULL) return 0;
+
+    char *dataCpy = malloc(strlen(word) + 1); // must create a copy since it is a constant and cannot be changed
+    strcpy(dataCpy, word);
+
+    char* token = strtok(dataCpy, " \n\t"); // must not be empty
+
+    if (token == NULL){
+        free(dataCpy);
+        return 0;
+    }
+
+    free(dataCpy);
+    return 1;
 
 }
-*/
