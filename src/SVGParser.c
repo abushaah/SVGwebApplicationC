@@ -1,4 +1,4 @@
-// Name: Hafaa Abushaaban [1146372]
+// Name: Haifaa Abushaaban [1146372]
 
 #include <stdio.h>
 #include <stdlib.h>

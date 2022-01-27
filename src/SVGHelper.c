@@ -1,4 +1,4 @@
-// Name: Hafaa Abushaaban [1146372]
+// Name: Haifaa Abushaaban [1146372]
 // Sample code "libXmlExample" used for understanding the traversal of tree from: http://xmlsoft.org/
 
 #include <stdio.h>
@@ -19,17 +19,17 @@
 // 0 means false!
 
 // Module 1 helper functions:
+/**
+  * get element names traverses the tree and creates the svg by adding nodes to the list
+  * caller must initialize the lists, root node, and svg
+  */
 int getElementNames(xmlNode* a_node, SVG* svg){
 
-    // groupIdx keeps track of the group depth
-    /*
-    Group**:
-        * - first pointer is an array which points to multiple Group*
-        * - second pointer are contents of the array, Group*
-    */
-
     if (a_node == NULL || svg == NULL){
-        return 1;
+        return 0;
+    }
+    if (svg->rectangles == NULL || svg->circles == NULL || svg->paths == NULL || svg->otherAttributes == NULL){
+        return 0;
     }
 
     xmlNode *cur_node = NULL;
@@ -79,8 +79,9 @@ int getElementNames(xmlNode* a_node, SVG* svg){
 
         // if its a group dont go to the children since we already traversed the children in the children in the getElementNamesGroups function
         if (strcasecmp(name, "g") != 0){
-            int valid = getElementNames(cur_node->children, svg);
-            if (valid == 0) return 0;
+            getElementNames(cur_node->children, svg);
+            //int valid = getElementNames(cur_node->children, svg);
+            //if (valid == 0) return 0;
         }
 
     }
