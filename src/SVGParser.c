@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <math.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
@@ -434,3 +435,32 @@ List* getGroups(const SVG* img){ // again with these groups smh
     return groups;
 
 }
+
+int numRectsWithArea(const SVG* img, float area){
+
+    int count = 0;
+    int areaR = (int)(ceil(area));
+    count = findNumShape(img->rectangles, &compareRectAreas, &areaR);
+    count += compareInGroups(img->groups, &compareRectAreas, &areaR, "rect");
+    return count;
+}
+
+int numCirclesWithArea(const SVG* img, float area){
+
+    int count = 0;
+    int areaC = (int)(ceil(area));
+    count = findNumShape(img->circles, &compareCircAreas, &areaC);
+    count += compareInGroups(img->groups, &compareCircAreas, &areaC, "circ");
+    return count;
+}
+
+int numPathsWithdata(const SVG* img, const char* data){
+
+    int count = 0;
+    count = findNumShape(img->paths, &comparePathData, data);
+    count += compareInGroups(img->groups, &comparePathData, data, "path");
+    return count;
+}
+
+int numGroupsWithLen(const SVG* img, int len);
+int numAttr(const SVG* img);

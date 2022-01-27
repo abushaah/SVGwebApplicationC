@@ -5,6 +5,7 @@
 #include <string.h>
 #include <strings.h>
 #include <ctype.h>
+#include <math.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
@@ -444,42 +445,120 @@ int getElementGroups(List *source, List *dest, char* type){
     while ((elemG = nextElement(&iterG)) != NULL){
 
         Group* group = (Group*) elemG;
+        ListIterator iter;
+        void* elem;
+
+        // identify the iterator type for the list
         if (strcmp(type, "rect") == 0){
-            void* elemR;
-            ListIterator iter = createIterator(group->rectangles);
-            while ((elemR = nextElement(&iter)) != NULL){
-                Rectangle* rect = (Rectangle*) elemR; // points to the element
-                insertBack(dest, (void*)rect); // insert into the rectangle list
-            }
+            iter = createIterator(group->rectangles);
         }
         else if (strcmp(type, "circ") == 0){ // repeat above for circle
-            void* elemC;
-            ListIterator iter = createIterator(group->circles);
-            while ((elemC = nextElement(&iter)) != NULL){
-                Circle* circ = (Circle*) elemC;
-                insertBack(dest, (void*)circ);
-            }
+            iter = createIterator(group->circles);
         }
         else if (strcmp(type, "path") == 0){
-            void* elemP;
-            ListIterator iter = createIterator(group->paths);
-            while ((elemP = nextElement(&iter)) != NULL){
-                Path* path = (Path*) elemP;
-                insertBack(dest, (void*)path);
-            }
+            iter = createIterator(group->paths);
         }
         else if (strcmp(type, "group") == 0){
-            void* elemG;
-            ListIterator iter = createIterator(group->groups);
-            while ((elemG = nextElement(&iter)) != NULL){
-                Group* inGroup = (Group*) elemG;
-                insertBack(dest, (void*)inGroup);
-            }
+            iter = createIterator(group->groups);
         }
+
+        while ((elem = nextElement(&iter)) != NULL){
+            insertBack(dest, elem); // insert into the specified list
+        }
+
         int valid = getElementGroups(group->groups, dest, type);
         if (valid == 0) return 0;
 
     }
 
     return 1;
+}
+
+/*
+    Development path:
+    1. traverse through shape list for the item
+    2. recursively traverse through the groups shape list for the item
+*/
+
+int findNumShape(List * list, bool (*customCompare)(const void* first, const void* second), const void* searchRecord){
+
+    if (list == NULL || customCompare == NULL || searchRecord == NULL) return 0;
+
+    int count = 0;
+    ListIterator iter = createIterator(list);
+    void* data;
+
+    while ((data = nextElement(&iter)) != NULL){
+        if (customCompare(data, searchRecord)){
+            ++count;
+        }
+    }
+
+    return count;
+
+}
+
+bool compareRectAreas(const void* data, const void* area){
+
+    Rectangle* rect = (Rectangle*) data;
+    int shapeArea = ceil(rect->width * rect->height);
+    return (shapeArea == *(int*)area);
+
+}
+
+bool compareCircAreas(const void* data, const void* area){
+
+    Circle* circ = (Circle*) data;
+    int shapeArea = ceil(pow(circ->r, 2) * M_PI);
+    return (shapeArea == *(int*)area);
+
+}
+
+bool comparePathData(const void* data, const void* area){
+
+    Path* path = (Path*) data;
+    return (!strcasecmp(path->data, (char*)area));
+
+}
+
+/**
+    Similar to get element groups, this funciton recursively computes the search for area/data/length in the groups
+*/
+int compareInGroups(List *group, bool (*customCompare)(const void* first, const void* second), const void* searchRecord, char* type){
+
+    if (group == NULL || customCompare == NULL || searchRecord == NULL) return 0;
+    // base case, not initialized
+
+    List* groupList = group;
+
+    int count = 0;
+
+    // recursive case
+    void* elemG;
+    ListIterator iterG = createIterator(groupList); // traverse through the Group list
+    while ((elemG = nextElement(&iterG)) != NULL){
+
+        Group* group = (Group*) elemG;
+
+        // identify the iterator type for the list
+        if (strcmp(type, "rect") == 0){
+            count += findNumShape(group->rectangles, customCompare, searchRecord);
+        }
+        else if (strcmp(type, "circ") == 0){ // repeat above for circle
+            count += findNumShape(group->circles, customCompare, searchRecord);
+        }
+        else if (strcmp(type, "path") == 0){
+            count += findNumShape(group->paths, customCompare, searchRecord);
+        }
+        else if (strcmp(type, "group") == 0){
+            count += findNumShape(group->groups, customCompare, searchRecord);
+        }
+        else if (strcmp(type, "attr") == 0){
+            count += findNumShape(group->otherAttributes, customCompare, searchRecord);
+        }
+        count += compareInGroups(group->groups, customCompare, searchRecord, type);
+    }
+
+    return count;
+
 }

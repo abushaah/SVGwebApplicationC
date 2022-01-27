@@ -29,5 +29,10 @@ int emptyString(char* word);
 
 // Module 2 helper funcitons:
 int getElementGroups(List *source, List *dest, char* type);
+int findNumShape(List * list, bool (*customCompare)(const void* first,const void* second), const void* searchRecord);
+bool compareRectAreas(const void* data, const void* area);
+bool compareCircAreas(const void* data, const void* area);
+bool comparePathData(const void* data, const void* area);
+int compareInGroups(List *group, bool (*customCompare)(const void* first, const void* second), const void* searchRecord, char* type);
 
 #endif
