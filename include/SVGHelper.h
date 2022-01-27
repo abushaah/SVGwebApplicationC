@@ -30,9 +30,17 @@ int emptyString(char* word);
 // Module 2 helper funcitons:
 int getElementGroups(List *source, List *dest, char* type);
 int findNumShape(List * list, bool (*customCompare)(const void* first,const void* second), const void* searchRecord);
+
 bool compareRectAreas(const void* data, const void* area);
 bool compareCircAreas(const void* data, const void* area);
-bool comparePathData(const void* data, const void* area);
+bool comparePathData(const void* data, const void* string);
+bool compareGroupLen(const void* data, const void* length);
+bool compareAttr(const void* data, const void* length);
+int getRectAttrLen(List* list);
+int getCircAttrLen(List* list);
+int getPathAttrLen(List* list);
+int getGroupAttrLen(List* list);
+
 int compareInGroups(List *group, bool (*customCompare)(const void* first, const void* second), const void* searchRecord, char* type);
 
 #endif

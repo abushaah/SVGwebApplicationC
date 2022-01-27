@@ -500,6 +500,7 @@ int findNumShape(List * list, bool (*customCompare)(const void* first, const voi
 
 bool compareRectAreas(const void* data, const void* area){
 
+    if (data == NULL || area == NULL) return 0;
     Rectangle* rect = (Rectangle*) data;
     int shapeArea = ceil(rect->width * rect->height);
     return (shapeArea == *(int*)area);
@@ -508,17 +509,101 @@ bool compareRectAreas(const void* data, const void* area){
 
 bool compareCircAreas(const void* data, const void* area){
 
+    if (data == NULL || area == NULL) return 0;
     Circle* circ = (Circle*) data;
     int shapeArea = ceil(pow(circ->r, 2) * M_PI);
     return (shapeArea == *(int*)area);
 
 }
 
-bool comparePathData(const void* data, const void* area){
+bool comparePathData(const void* data, const void* string){
 
+    if (data == NULL || string == NULL) return 0;
     Path* path = (Path*) data;
-    return (!strcasecmp(path->data, (char*)area));
+    return (!strcasecmp(path->data, (char*)string));
 
+}
+
+bool compareGroupLen(const void* data, const void* length){
+
+    if (data == NULL || length == NULL) return 0;
+    Group* group = (Group*) data;
+    int count = 0;
+    count += getLength(group->rectangles);
+    count += getLength(group->circles);
+    count += getLength(group->paths);
+    count += getLength(group->groups);
+
+    return (count == *(int*)length);
+
+}
+
+/**
+ * the getShapeAttrLen(List* list) functions return the amount of attributes given in a shape list
+ */
+int getRectAttrLen(List* list){
+
+    if (list == NULL) return 0;
+
+    int count = 0;
+    ListIterator iter = createIterator(list);
+    Rectangle* rect;
+
+    while ((rect = nextElement(&iter)) != NULL){
+        count += getLength(rect->otherAttributes);
+    }
+
+    return count;
+}
+
+int getCircAttrLen(List* list){
+
+    if (list == NULL) return 0;
+
+    int count = 0;
+    ListIterator iter = createIterator(list);
+    Circle* circ;
+
+    while ((circ = nextElement(&iter)) != NULL){
+        count += getLength(circ->otherAttributes);
+    }
+
+    return count;
+}
+
+int getPathAttrLen(List* list){
+
+    if (list == NULL) return 0;
+
+    int count = 0;
+    ListIterator iter = createIterator(list);
+    Path* path;
+
+    while ((path = nextElement(&iter)) != NULL){
+        count += getLength(path->otherAttributes);
+    }
+
+    return count;
+}
+
+/**
+ * the getGroupAttrLen(List* list) function returns the amount of attributes given in a group list and all its subgroups
+ * it is a recursive function
+ */
+int getGroupAttrLen(List* list){
+
+    if (list == NULL) return 0; // base case
+
+    int count = 0;
+    ListIterator iter = createIterator(list);
+    Group* group;
+
+    while ((group = nextElement(&iter)) != NULL){
+        count += getLength(group->otherAttributes);
+        count += getGroupAttrLen(group->groups);
+    }
+
+    return count;
 }
 
 /**
@@ -549,12 +634,6 @@ int compareInGroups(List *group, bool (*customCompare)(const void* first, const 
         }
         else if (strcmp(type, "path") == 0){
             count += findNumShape(group->paths, customCompare, searchRecord);
-        }
-        else if (strcmp(type, "group") == 0){
-            count += findNumShape(group->groups, customCompare, searchRecord);
-        }
-        else if (strcmp(type, "attr") == 0){
-            count += findNumShape(group->otherAttributes, customCompare, searchRecord);
         }
         count += compareInGroups(group->groups, customCompare, searchRecord, type);
     }

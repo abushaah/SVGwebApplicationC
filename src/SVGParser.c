@@ -350,7 +350,7 @@ char* pathToString(void* data){
 int comparePaths(const void *first, const void *second){ return 0; }
 
 /**
- * The get functions have fimilar format. They:
+ * The get functions have similar format. They:
  * 1. traverse shape list in img
  * 2. call getElementGroups to:
  * 3. traverse groups shape list in img and
@@ -436,7 +436,16 @@ List* getGroups(const SVG* img){ // again with these groups smh
 
 }
 
+/**
+ * The summaries functions have similar format. They:
+ * 1. traverse shape list in img to compare with the search value
+ * 2. call compareInGroups to:
+ * 3. traverse groups shape list in img and
+ * 4. recursively traverse groups groups shape list in img, and so on, until empty shape lists are reached
+ */
 int numRectsWithArea(const SVG* img, float area){
+
+    if (img == NULL) return 0;
 
     int count = 0;
     int areaR = (int)(ceil(area));
@@ -447,6 +456,8 @@ int numRectsWithArea(const SVG* img, float area){
 
 int numCirclesWithArea(const SVG* img, float area){
 
+    if (img == NULL) return 0;
+
     int count = 0;
     int areaC = (int)(ceil(area));
     count = findNumShape(img->circles, &compareCircAreas, &areaC);
@@ -456,11 +467,41 @@ int numCirclesWithArea(const SVG* img, float area){
 
 int numPathsWithdata(const SVG* img, const char* data){
 
+    if (img == NULL) return 0;
+
     int count = 0;
     count = findNumShape(img->paths, &comparePathData, data);
     count += compareInGroups(img->groups, &comparePathData, data, "path");
     return count;
 }
 
-int numGroupsWithLen(const SVG* img, int len);
-int numAttr(const SVG* img);
+/** traverses the groups list in the svg and sums the length of their primitive lists */
+int numGroupsWithLen(const SVG* img, int len){
+
+    if (img == NULL) return 0;
+
+    int count = 0;
+    count = findNumShape(img->groups, &compareGroupLen, &len);
+    return count;
+
+}
+
+/**
+  * other attr traverses
+  * rect, path, circ, etc traverse the list and then traverse the struct
+ * 1. traverse each lists structs for the other attribute list length in the svg
+ * 2. recursively travser the groups lists other attributes list
+ */
+int numAttr(const SVG* img){
+
+    if (img == NULL) return 0;
+
+    int count = 0;
+    count = getLength(img->otherAttributes);
+    count += getRectAttrLen(img->rectangles);
+    count += getCircAttrLen(img->circles);
+    count += getPathAttrLen(img->paths);
+    count += getGroupAttrLen(img->groups);
+    return count;
+
+}
