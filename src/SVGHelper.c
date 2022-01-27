@@ -9,7 +9,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper.h"
+#include "SVGHelper3.h"
 #include "SVGParser.h"
 
 #define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+-=~`{}|[]:\";',/<>?"
@@ -18,7 +18,6 @@
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
-
 // 0 means false!
 
 // Module 1 helper functions:
@@ -610,6 +609,9 @@ int getGroupAttrLen(List* list){
 
     while ((group = nextElement(&iter)) != NULL){
         count += getLength(group->otherAttributes);
+        count += getRectAttrLen(group->rectangles);
+        count += getCircAttrLen(group->circles);
+        count += getPathAttrLen(group->paths);
         count += getGroupAttrLen(group->groups);
     }
 

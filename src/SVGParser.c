@@ -7,7 +7,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper.h"
+#include "SVGHelper3.h"
 #include "SVGParser.h"
 
 #define COUNT 500
@@ -134,6 +134,7 @@ char* SVGToString(const SVG* img){
 
 void deleteSVG(SVG* img){
 
+    if (img == NULL) return;
     if (img->rectangles != NULL) freeList(img->rectangles);
     if (img->circles != NULL) freeList(img->circles);
     if (img->paths != NULL) freeList(img->paths);
