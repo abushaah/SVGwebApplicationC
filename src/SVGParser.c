@@ -7,7 +7,7 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper.h"
+#include "SVGHelper3.h"
 #include "SVGParser.h"
 
 #define COUNT 500
@@ -213,9 +213,9 @@ char* groupToString( void* data){
     char* groupList = toString(tmp->groups);
     char* attrList = toString(tmp->otherAttributes);
 
-    len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 6; // 5 '\n', \0
+    len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 72; // '\n', \0
     tmpStr = (char*) malloc(sizeof(char) * len);
-    sprintf(tmpStr, "%s\n%s\n%s\n%s\n%s\n", rectList, circList, pathList, groupList, attrList);
+    sprintf(tmpStr, "Rectangles:\n(%s)\nCircles:\n(%s)\nPaths:\n(%s)\nSubgroups:\n(%s)\nOtherAttributes:\n(%s)\n", rectList, circList, pathList, groupList, attrList);
 
     free(rectList);
     free(circList);

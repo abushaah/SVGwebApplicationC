@@ -9,12 +9,13 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper.h"
+#include "SVGHelper3.h"
 #include "SVGParser.h"
 
 #define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+-=~`{}|[]:\";',/<>?"
 #define NUMDELIMITERS "0123456789."
 #define STRSIZE 256
+#define _USE_MATH_DEFINES
 
 // 0 means false!
 
@@ -124,6 +125,13 @@ int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, i
 
         int valid = get_element_names(cur_node->children, svg, group, groupIdx, inserted);
         if (valid == 0) return 0;
+
+        // upon returning from a group, if its parent is also a group, we must decrement the index to place the following elements in their proper group list
+        if (((name != NULL) && (strcasecmp(name, "g") == 0)) && ((parent != NULL) && ((strcasecmp(parent, "g") == 0)))){
+            if (*groupIdx > 0){
+                --*groupIdx;
+            }
+        }
 
     }
 
