@@ -64,25 +64,7 @@ SVG* createSVG(const char* filename){
     svg->groups = initializeList(&groupToString, &deleteGroup, &compareGroups);
     svg->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
 
-    Group **group = malloc(sizeof(Group*) * COUNT); // group that will point to Group*, start with it pointing to one only
-    if (group == NULL){
-        free(svg);
-        xmlFreeDoc(doc); // free document
-        xmlCleanupParser(); // free global variables allocated by parser
-        return NULL;
-    }
-
-    int groupIdx = 0;
-    int inserted = 0;
-
-    valid = get_element_names(root_element, svg, group, &groupIdx, &inserted);
-    /* root element is the root node, svg is the svg tree,
-    group is the array that point to groups,
-    group index is the index in the array of groups,
-    inserted is whether a group is inserted */
-
-    free(group);
-
+    valid = getElementNames(root_element, svg); // root node of the tree, the svg we want to traverse
     if (valid == 0){
         free(svg);
         xmlFreeDoc(doc);

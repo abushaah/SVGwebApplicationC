@@ -15,13 +15,11 @@
 #define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+-=~`{}|[]:\";',/<>?"
 #define NUMDELIMITERS "0123456789."
 #define STRSIZE 256
-#ifndef M_PI
-    #define M_PI 3.14159265358979323846
-#endif
+#define M_PI 3.14159265358979323846
 // 0 means false!
 
 // Module 1 helper functions:
-int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted){
+int getElementNames(xmlNode* a_node, SVG* svg){
 
     // groupIdx keeps track of the group depth
     /*
@@ -30,8 +28,8 @@ int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, i
         * - second pointer are contents of the array, Group*
     */
 
-    if (svg == NULL || group == NULL){
-        return 0;
+    if (a_node == NULL || svg == NULL){
+        return 1;
     }
 
     xmlNode *cur_node = NULL;
@@ -39,16 +37,6 @@ int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, i
     for (cur_node = a_node; cur_node != NULL; cur_node = cur_node->next) {
 
         char* name = (char*)(cur_node->name);
-
-        char* parent = NULL;
-        if (cur_node->parent != NULL){
-            parent = (char*)(cur_node->parent->name); // if not the head node, there is a parent
-        }
-
-        char* nextParent = NULL;
-        if (cur_node->next != NULL){
-            nextParent = (char*)(cur_node->next->parent->name); // if not the head node node, there is a next singling
-        }
 
         if (strcasecmp(name, "title") == 0){
             int valid = titleDescNS(svg->title, (char*)cur_node->children->content);
@@ -63,75 +51,36 @@ int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, i
         if (strcasecmp(name, "rect") == 0){ // create new rectangle
 
             Rectangle* rect = rectAttributes(cur_node); // fill in with attributes
-            if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                insertBack((group[*groupIdx])->rectangles, (void*)rect);
-            }
-            else{
-                insertBack(svg->rectangles, (void*)rect); // insert into the rectangle list
-            }
+            insertBack(svg->rectangles, (void*)rect); // insert into the rectangle list
 
         }
         else if (strcasecmp(name, "circle") == 0){ // create new circle
 
             Circle* circ = circAttributes(cur_node); // fill in with attributes
-            if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                insertBack((group[*groupIdx])->circles, (void*)circ);
-            }
-            else{
-                insertBack(svg->circles, (void*)circ); // insert into the circle list
-            }
+            insertBack(svg->circles, (void*)circ); // insert into the circle list
 
         }
         else if (strcasecmp(name, "path") == 0){ // create new path
 
             Path* path = pathAttributes(cur_node); // fill in with attributes
-            if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in group
-                insertBack((group[*groupIdx])->paths, (void*)path);
-            }
-            else{
-                insertBack(svg->paths, (void*)path); // insert into the path list
-            }
+            insertBack(svg->paths, (void*)path); // insert into the path list
 
         }
         else if (strcasecmp(name, "g") == 0){ // create new group
 
             Group *newGroup = groupAttributes(cur_node); // fill in with attributes (not other primitives)
-            *inserted = 0; // cannot insert into the svg->groups list since it is not complete
+            getElementNamesGroups(cur_node->children, newGroup);
+            insertBack(svg->groups, (void*)newGroup);
 
-            if (parent != NULL && strcasecmp(parent, "g") == 0){ // if it belongs to a group, place in the previous group
-                insertBack((group[*groupIdx])->groups, (void*)newGroup);
-                ++*groupIdx; // depth of group has increased
-            }
-            group[*groupIdx] = newGroup;
         }
         else{ // just call attr with no argument and place in otherAttributes list
             firstOtherAttributes(cur_node, svg->otherAttributes); // fill in with attributes
         }
 
-        if (((parent != NULL) && (strcasecmp(parent, "g") == 0)) && ((nextParent == NULL) || ((strcasecmp(nextParent, "svg") == 0)))){
-
-            /* if the current elements parent is a g
-               and
-               the prev nodes parent is not in a group anymore
-               then
-               we shall place the original group into the group list in the svg
-               and we should reset the group variable
-            */
-            if (*inserted == 0){
-                insertBack(svg->groups, (void*)group[0]); // insert the group list (when parent is g and next parent is svg, that means the group tag has finished and we must insert it into the list
-                *inserted = 1; // have inserted it
-                *groupIdx = 0; // group has ended and we are going to be a child of svg
-            }
-        }
-
-        int valid = get_element_names(cur_node->children, svg, group, groupIdx, inserted);
-        if (valid == 0) return 0;
-
-        // upon returning from a group, if its parent is also a group, we must decrement the index to place the following elements in their proper group list
-        if (((name != NULL) && (strcasecmp(name, "g") == 0)) && ((parent != NULL) && ((strcasecmp(parent, "g") == 0)))){
-            if (*groupIdx > 0){
-                --*groupIdx;
-            }
+        // if its a group dont go to the children since we already traversed the children in the children in the getElementNamesGroups function
+        if (strcasecmp(name, "g") != 0){
+            int valid = getElementNames(cur_node->children, svg);
+            if (valid == 0) return 0;
         }
 
     }
@@ -139,6 +88,42 @@ int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, i
     return 1;
 
 }
+
+void getElementNamesGroups(xmlNode* a_node, Group* group){
+
+    // group is the group that the elements are added to
+    // this function will recursively go through a groups children and add them to the group
+
+    if (a_node == NULL || group == NULL){ // base case
+        return;
+    }
+
+    xmlNode *cur_node = NULL;
+
+    for (cur_node = a_node; cur_node != NULL; cur_node = cur_node->next) {
+
+        char* name = (char*)(cur_node->name);
+
+        if (strcasecmp(name, "rect") == 0){ // create new rectangle
+            Rectangle* rect = rectAttributes(cur_node); // fill in with attributes
+            insertBack(group->rectangles, (void*)rect);
+        }
+        else if (strcasecmp(name, "circle") == 0){ // create new circle
+            Circle* circ = circAttributes(cur_node); // fill in with attributes
+            insertBack(group->circles, (void*)circ);
+        }
+        else if (strcasecmp(name, "path") == 0){ // create new path
+            Path* path = pathAttributes(cur_node); // fill in with attributes
+            insertBack(group->paths, (void*)path);
+        }
+        else if (strcasecmp(name, "g") == 0){ // create new group
+            Group *newGroup = groupAttributes(cur_node); // fill in with attributes
+            getElementNamesGroups(cur_node->children, newGroup);
+            insertBack(group->groups, (void*)newGroup);
+        }
+    }
+}
+
 
 /**
  * This function will return an attribute struct when given a node and its attributes
@@ -339,6 +324,8 @@ Group* groupAttributes (xmlNode *cur_node){
         char *cont = (char *)(value->content);
         insertBack(group->otherAttributes, (void*)otherAttributes (attrName, cont)); // create a node and insert into the other attribute list
     }
+
+
 
     return group;
 

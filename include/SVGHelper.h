@@ -8,7 +8,8 @@
 // Module 1 helper functions:
 
 // svg parser function that loops through and creates the structs
-int get_element_names(xmlNode* a_node, SVG* svg, Group** group, int* groupIdx, int* inserted);
+void getElementNamesGroups(xmlNode* a_node, Group* group);
+int getElementNames(xmlNode* a_node, SVG* svg);
 
 // struct creation functions
 Attribute* otherAttributes (char *name, char *content);
