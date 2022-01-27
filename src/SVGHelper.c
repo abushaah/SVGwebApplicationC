@@ -9,13 +9,15 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "SVGHelper3.h"
+#include "SVGHelper.h"
 #include "SVGParser.h"
 
 #define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+-=~`{}|[]:\";',/<>?"
 #define NUMDELIMITERS "0123456789."
 #define STRSIZE 256
-#define _USE_MATH_DEFINES
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 // 0 means false!
 
