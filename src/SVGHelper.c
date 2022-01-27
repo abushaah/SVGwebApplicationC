@@ -121,6 +121,9 @@ void getElementNamesGroups(xmlNode* a_node, Group* group){
             getElementNamesGroups(cur_node->children, newGroup);
             insertBack(group->groups, (void*)newGroup);
         }
+        else{
+            firstOtherAttributes(cur_node, group->otherAttributes);
+        }
     }
 }
 
