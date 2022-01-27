@@ -80,8 +80,6 @@ int getElementNames(xmlNode* a_node, SVG* svg){
         // if its a group dont go to the children since we already traversed the children in the children in the getElementNamesGroups function
         if (strcasecmp(name, "g") != 0){
             getElementNames(cur_node->children, svg);
-            //int valid = getElementNames(cur_node->children, svg);
-            //if (valid == 0) return 0;
         }
 
     }
@@ -90,12 +88,16 @@ int getElementNames(xmlNode* a_node, SVG* svg){
 
 }
 
+/**
+ * this function will recursively go through a groups children and add them to the group
+ * group is the group that the elements are added to
+ */
 void getElementNamesGroups(xmlNode* a_node, Group* group){
 
-    // group is the group that the elements are added to
-    // this function will recursively go through a groups children and add them to the group
-
     if (a_node == NULL || group == NULL){ // base case
+        return;
+    }
+    if (group->rectangles == NULL || group->circles == NULL || group->paths == NULL || group->otherAttributes == NULL){
         return;
     }
 
