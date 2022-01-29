@@ -12,8 +12,8 @@
 #include "SVGHelper.h"
 #include "SVGParser.h"
 
-#define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_+-=~`{}|[]:\";',/<>?"
-#define NUMDELIMITERS "0123456789."
+#define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_~`{}|[]:\";',/<>?"
+#define NUMDELIMITERS "0123456789.-"
 #define STRSIZE 256
 #define M_PI 3.14159265358979323846
 // 0 means false!

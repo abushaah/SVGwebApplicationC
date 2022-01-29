@@ -10,8 +10,6 @@
 #include "SVGHelper.h"
 #include "SVGParser.h"
 
-#define COUNT 500
-
 void dummyDeleteRectangle(void* data){}
 void dummyDeleteCircle(void* data){}
 void dummyDeletePath(void* data){}
