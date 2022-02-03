@@ -145,6 +145,7 @@ Attribute* otherAttributes (char *name, char *content){
     }
     anAtr->name = malloc(strlen(name) + 1); // 1 for null
     if (anAtr->name == NULL){
+        free(anAtr);
         return NULL;
     }
     strcpy(anAtr->name, name);
@@ -296,6 +297,9 @@ Path* pathAttributes (xmlNode *cur_node){
         char *cont = (char *)(value->content);
         if (strcasecmp(attrName, "d") == 0){ // path data
             path = realloc(path, sizeof(Path) + strlen(cont) + 1); // for the data
+            if (path == NULL){
+                return NULL;
+            }
             strcpy(path->data, cont);
         }
         else{

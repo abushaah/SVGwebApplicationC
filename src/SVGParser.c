@@ -100,6 +100,14 @@ char* SVGToString(const SVG* img){
 
     len = strlen(namespace) + strlen(title) + strlen(description) + strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 9 + 24; // 8 '\n', \0
     tmpStr = (char*) malloc(sizeof(char) * len);
+    if (tmpStr == NULL){
+        free(rectList);
+        free(circList);
+        free(pathList);
+        free(groupList);
+        free(attrList);
+        return NULL;
+    }
     sprintf(tmpStr, "N: %s\nT: %s\nD: %s\nR: %s\nC: %s\nP: %s\nG: %s\nA: %s\n", namespace, title, description, rectList, circList, pathList, groupList, attrList);
 
     free(rectList);
@@ -151,6 +159,9 @@ char* attributeToString( void* data){
     len = strlen(tmp->name) + strlen(tmp->value) + 7; // 7 for the ", ' ', =, \n, \0
 
     tmpStr = (char*) malloc(sizeof(char) * len);
+    if (tmpStr == NULL){
+        return NULL;
+    }
 
     sprintf(tmpStr, "%s = \"%s\"\n", tmp->name, tmp->value);
 
@@ -196,6 +207,9 @@ char* groupToString( void* data){
 
     len = strlen(rectList) + strlen(circList) + strlen(pathList) + strlen(groupList) + strlen(attrList) + 72; // '\n', \0
     tmpStr = (char*) malloc(sizeof(char) * len);
+    if (tmpStr == NULL){
+        return NULL;
+    }
     sprintf(tmpStr, "Rectangles:\n(%s)\nCircles:\n(%s)\nPaths:\n(%s)\nSubgroups:\n(%s)\nOtherAttributes:\n(%s)\n", rectList, circList, pathList, groupList, attrList);
 
     free(rectList);
@@ -242,6 +256,9 @@ char* rectangleToString(void* data){
     len = 222 + strlen(attrList);
 
     tmpStr = (char*) malloc(sizeof(char) * len);
+    if (tmpStr == NULL){
+        return NULL;
+    }
     sprintf(tmpStr, "x = \"%f\"\ny = \"%f\"\nwidth = \"%f\"\nheight = \"%f\"\nunits = \"%s\"\n%s\n", tmp->x, tmp->y, tmp->width, tmp->height, tmp->units, attrList);
 
     free(attrList);
@@ -282,6 +299,9 @@ char* circleToString(void* data){
     len = 183 + strlen(attrList);
 
     tmpStr = (char*) malloc(sizeof(char) * len);
+    if (tmpStr == NULL){
+        return NULL;
+    }
     sprintf(tmpStr, "cx = \"%f\"\ncy = \"%f\"\nr = \"%f\"\nunits = \"%s\"\n%s\n", tmp->cx, tmp->cy, tmp->r, tmp->units, attrList);
 
     free(attrList);
@@ -320,7 +340,9 @@ char* pathToString(void* data){
     len = strlen(tmp->data) + strlen(attrList) + 9; // 7 for the ", ' ', =, \n, \0
 
     tmpStr = (char*) malloc(sizeof(char) * len);
-
+    if (tmpStr == NULL){
+        return NULL;
+    }
     sprintf(tmpStr, "d = \"%s\"\n%s\n", tmp->data, attrList);
 
     free(attrList);
