@@ -275,7 +275,7 @@ Circle* circAttributes(xmlNode *cur_node){ // fills in attributes for a rectangl
 }
 
 /**
- * This function will return an attribute struct when given a node and its attributes
+ * This function will return a path struct when given a node and its attributes
  * caller must free the node
  */
 Path* pathAttributes (xmlNode *cur_node){
