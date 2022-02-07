@@ -8,7 +8,7 @@
 
 #include "LinkedListAPI.h"
 #include "SVGParser.h"
-#include "SVGHelper.h"
+#include "SVGHelperA1.h"
 
 bool writeSVG(const SVG* img, const char* fileName);
 void addAttrListToParentNode(List* list, xmlNodePtr* parent);
@@ -38,10 +38,7 @@ bool writeSVG(const SVG* img, const char* fileName){
     xmlDocSetRootElement(doc, root_node);
 
     // 2. set the namespace, title, and description using the xmlNewText
-    xmlNodePtr nsNode = xmlNewNode(NULL, BAD_CAST "xmlns");
-    xmlNodePtr nsNodeTxt = xmlNewText(BAD_CAST img->namespace);
-    xmlAddChild(nsNode, nsNodeTxt);
-    xmlAddChild(root_node, nsNode);
+    xmlNewProp(root_node, BAD_CAST "xmlns", BAD_CAST img->namespace);
 
     if (strlen(img->title) != 0){
         xmlNodePtr titleNode = xmlNewNode(NULL, BAD_CAST "title");
@@ -255,3 +252,5 @@ char* unitsWithNumber(float number, char units[]){
     return numWithUnits;
 
 }
+
+//bool validateSVG(const SVG* img, const char* schemaFile);
