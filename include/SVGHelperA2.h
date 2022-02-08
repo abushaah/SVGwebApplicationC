@@ -7,6 +7,9 @@
 
 // Module 1 helper functions:
 
+// Function to validate xml file against a schema file
+bool validateFileSVG(const char* fileName, const char* schemaFile);
+
 // Functions to write svg shape struct to a node in the xml tree
 void addAttrListToParentNode(List* list, xmlNodePtr* parent);
 void addRectListToParentNode(List* rectList, xmlNodePtr* parent);

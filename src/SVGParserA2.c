@@ -27,70 +27,16 @@
 */
 SVG* createValidSVG(const char* fileName, const char* schemaFile){
 
-    if (fileName == NULL || schemaFile == NULL) return NULL;
+    if (fileName == NULL || schemaFile == NULL) return false;
+    bool valid = validateFileSVG(fileName, schemaFile);
+    if (valid == false) return NULL;
 
-    xmlDocPtr doc;
-    xmlSchemaPtr schema = NULL;
-    xmlSchemaParserCtxtPtr pCtxt;
-
-    xmlLineNumbersDefault(1);
-
-    // schema parser for the schema file
-    pCtxt = xmlSchemaNewParserCtxt(schemaFile);
-    xmlSchemaSetParserErrors(pCtxt, (xmlSchemaValidityErrorFunc) fprintf, (xmlSchemaValidityWarningFunc) fprintf, stderr);
-    schema = xmlSchemaParse(pCtxt);
-
-    xmlSchemaFreeParserCtxt(pCtxt);
-
-    // tree parsing for the svg file
-    doc = xmlReadFile(fileName, NULL, 0);
-    if (doc == NULL) return NULL;
-
-    xmlSchemaValidCtxtPtr vCtxt;
-    int ret;
-
-    // validate the schema against the svg tree
-    vCtxt = xmlSchemaNewValidCtxt(schema);
-    xmlSchemaSetValidErrors(vCtxt, (xmlSchemaValidityErrorFunc) fprintf, (xmlSchemaValidityWarningFunc) fprintf, stderr);
-    ret = xmlSchemaValidateDoc(vCtxt, doc);
-
-    // xmlSchemaValidateDoc returns 0 if the document is schemas valid, any other number indicates fail
-    if (ret != 0){
-        xmlSchemaFreeValidCtxt(vCtxt);
-        xmlFreeDoc(doc);
-        if (schema != NULL) xmlSchemaFree(schema);
-        xmlSchemaCleanupTypes();
-        xmlCleanupParser();
-        xmlMemoryDump();
-        return NULL;
-    }
-
-    // ret == 0, the file is valid, can create a valid svg
     // negative values in the width/height will not be considered invalid,
     // so funcion "validateSVG" will test the svg against the constraints specified in SVGParser.h
     SVG* svg = createSVG(fileName);
-    if (svg == NULL){
-        xmlSchemaFreeValidCtxt(vCtxt);
-        xmlFreeDoc(doc);
-        if (schema != NULL) xmlSchemaFree(schema);
-        xmlSchemaCleanupTypes();
-        xmlCleanupParser();
-        xmlMemoryDump();
-        return NULL;
-    }
-
-    xmlSchemaFreeValidCtxt(vCtxt);
-    xmlFreeDoc(doc);
-
-    // free the resource
-    if (schema != NULL) xmlSchemaFree(schema);
-
-    xmlSchemaCleanupTypes();
-    xmlCleanupParser();
-    xmlMemoryDump();
+    if (svg == NULL) return NULL;
 
     return svg;
-
 }
 
 /*

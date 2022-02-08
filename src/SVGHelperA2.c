@@ -1,4 +1,8 @@
 // Name: Haifaa Abushaaban[1146372]
+/*
+    Sample code "xmlvalidation.c" used for understanding how to validate xmlDoc against
+    an XSD file from: http://knol2share.blogspot.com/2009/05/validate-xml-against-xsd-in-c.html
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +19,75 @@
 #include "SVGHelperA2.h"
 
 #define LIBXML_SCHEMAS_ENABLED
+
+/*
+    given an xml file name and a schema file,
+    this function will parse the schema file,
+    parse the svg tree,
+    and if both files are valid,
+    will validate the file against the schema file
+    if any function is not valid or the file validation is not successful, will return false
+    if all functions succeed and the file validation is successful, will return true
+*/
+bool validateFileSVG(const char* fileName, const char* schemaFile){
+
+    if (fileName == NULL || schemaFile == NULL) return false;
+
+    xmlDocPtr doc;
+    xmlSchemaPtr schema = NULL;
+    xmlSchemaParserCtxtPtr pCtxt;
+
+    xmlLineNumbersDefault(1);
+
+    // schema parser for the schema file
+    pCtxt = xmlSchemaNewParserCtxt(schemaFile);
+    if (pCtxt == NULL) return false; // error creating context
+
+    xmlSchemaSetParserErrors(pCtxt, (xmlSchemaValidityErrorFunc) fprintf, (xmlSchemaValidityWarningFunc) fprintf, stderr);
+
+    schema = xmlSchemaParse(pCtxt);
+    if (schema == NULL) return false; // error parsing schema file
+
+    xmlSchemaFreeParserCtxt(pCtxt);
+
+    // tree parsing for the svg file
+    doc = xmlReadFile(fileName, NULL, 0);
+    if (doc == NULL) return false; // error parsing svg file
+
+    xmlSchemaValidCtxtPtr vCtxt;
+    int ret;
+
+    // validate the schema against the svg tree
+    vCtxt = xmlSchemaNewValidCtxt(schema);
+    if (vCtxt == NULL) return false; // error creating context
+
+    xmlSchemaSetValidErrors(vCtxt, (xmlSchemaValidityErrorFunc) fprintf, (xmlSchemaValidityWarningFunc) fprintf, stderr);
+    ret = xmlSchemaValidateDoc(vCtxt, doc);
+
+    // xmlSchemaValidateDoc returns 0 if the document is schemas valid, any other number indicates fail
+    if (ret != 0){
+        xmlSchemaFreeValidCtxt(vCtxt);
+        xmlFreeDoc(doc);
+        if (schema != NULL) xmlSchemaFree(schema);
+        xmlSchemaCleanupTypes();
+        xmlCleanupParser();
+        xmlMemoryDump();
+        return false;
+    }
+
+    // ret == 0, the file is valid, can create a valid svg
+    xmlSchemaFreeValidCtxt(vCtxt);
+    xmlFreeDoc(doc);
+    // free the resource
+    if (schema != NULL) xmlSchemaFree(schema);
+
+    xmlSchemaCleanupTypes();
+    xmlCleanupParser();
+    xmlMemoryDump();
+
+    return true;
+
+}
 
 /*
     this function is for adding items in a list to a parent when:
