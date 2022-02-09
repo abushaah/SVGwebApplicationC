@@ -311,7 +311,7 @@ bool validAttrListStruct(List* otherAttributes){
     while ((elem = nextElement(&iter)) != NULL){
         Attribute* attr = (Attribute*) elem;
         // check for initialized name and value
-        if (attr->name == NULL || attr->value == NULL) return false;
+        if (((validChar(attr->name) == 0) && (strcmp(attr->name, "") != 0)) || ((validChar(attr->value) == 0) && (strcmp(attr->value, "") != 0))) return false; // may be empty, may not be null
     }
 
     return true;
@@ -441,4 +441,166 @@ bool isListEmpty(List* list){
 
     if (getLength(list) == 0) return 1; // 1 means true, it is empty
     return 0; // 0 indicate that it is NOT empty
+}
+
+/*
+check the names
+if it is specified as a definition, set it
+if it is not specified as a deifnition, call changeValueInattribute to try to find it in other attibrutes
+if it is not in the other attrbutes, append it to the other attributes list
+strcpy when updating the strings will not reult in memory leaks
+*/
+bool changeValueInAttr (List* attrList, Attribute* newAttribute){
+
+    if (attrList == NULL || newAttribute == NULL) return false;
+
+    bool found = false;
+    void* elem;
+    ListIterator iter = createIterator(attrList); // traverse through the other attributes
+    while ((elem = nextElement(&iter)) != NULL){
+        Attribute* attr = (Attribute*) elem;
+        if (strcasecmp(attr->name, newAttribute->name) == 0){
+            found = true;
+            strcpy(attr->value, newAttribute->value);
+            deleteAttribute((void*) newAttribute);
+            break;
+        }
+    }
+
+    if (found == false){ // append to list if not found
+        insertBack(attrList, newAttribute);
+    }
+    return true;
+}
+
+bool changeValueInRect (List* rectList, int index, Attribute* newAttribute){
+
+    if (rectList == NULL || newAttribute == NULL) return false;
+
+    int i = 0;
+    bool found = false;
+    void* elem;
+    ListIterator iter = createIterator(rectList); // traverse through the rects
+    while ((elem = nextElement(&iter)) != NULL){
+        Rectangle* rect = (Rectangle*) elem;
+
+        // reached the index of the rect struct that we want to adjust
+        if (i == index){
+            if (strcasecmp(newAttribute->name, "x") == 0){
+                found = numberWithUnits(&(rect->x), rect->units, newAttribute->value); // since units dont need ot be updated, the funciton will not update it
+                deleteAttribute((void*) newAttribute);
+            }
+            else if (strcasecmp(newAttribute->name, "y") == 0){
+                found = numberWithUnits(&(rect->y), rect->units, newAttribute->value);
+                deleteAttribute((void*) newAttribute);
+            }
+            else if (strcasecmp(newAttribute->name, "width") == 0){
+                found = numberWithUnits(&(rect->width), rect->units, newAttribute->value);
+                // must also check if it is valid number?
+                // if (rect->width < 0) return false;
+                deleteAttribute((void*) newAttribute);
+            }
+            else if (strcasecmp(newAttribute->name, "height") == 0){
+                found = numberWithUnits(&(rect->height), rect->units, newAttribute->value);
+                // if (rect->height < 0) return false;
+                deleteAttribute((void*) newAttribute);
+            }
+            else{
+                found = changeValueInAttr(rect->otherAttributes, newAttribute);
+            }
+            break;
+        }
+        ++i;
+    }
+
+    return found;
+}
+
+bool changeValueInCirc (List* circList, int index, Attribute* newAttribute){
+
+    if (circList == NULL || newAttribute == NULL) return false;
+
+    int i = 0;
+    bool found = false;
+    void* elem;
+    ListIterator iter = createIterator(circList); // traverse through the circle
+    while ((elem = nextElement(&iter)) != NULL){
+        Circle* circ = (Circle*) elem;
+
+        // reached the index of the circle struct that we want to adjust
+        if (i == index){
+            if (strcasecmp(newAttribute->name, "cx") == 0){
+                found = numberWithUnits(&(circ->cx), circ->units, newAttribute->value); // since units dont need ot be updated, the funciton will not update it
+                deleteAttribute((void*) newAttribute);
+            }
+            else if (strcasecmp(newAttribute->name, "cy") == 0){
+                found = numberWithUnits(&(circ->cy), circ->units, newAttribute->value);
+                deleteAttribute((void*) newAttribute);
+            }
+            else if (strcasecmp(newAttribute->name, "r") == 0){
+                found = numberWithUnits(&(circ->r), circ->units, newAttribute->value);
+                // if (circ->r < 0) return false;
+                deleteAttribute((void*) newAttribute);
+            }
+            else{
+                found = changeValueInAttr(circ->otherAttributes, newAttribute);
+            }
+            break;
+        }
+        ++i;
+    }
+
+    return found;
+}
+
+bool changeValueInPath (List* pathList, int index, Attribute* newAttribute){
+
+    if (pathList == NULL || newAttribute == NULL) return false;
+
+    int i = 0;
+    bool found = false;
+    void* elem;
+    ListIterator iter = createIterator(pathList); // traverse through the path
+    while ((elem = nextElement(&iter)) != NULL){
+        Path* path = (Path*) elem;
+
+        // reached the index of the path struct that we want to adjust
+        if (i == index){
+            if (strcasecmp(newAttribute->name, "d") == 0){
+                found = true;
+                strcpy(path->data, newAttribute->value);
+                deleteAttribute((void*) newAttribute);
+            }
+            else{
+                found = changeValueInAttr(path->otherAttributes, newAttribute);
+            }
+            break;
+        }
+        ++i;
+    }
+
+    return found;
+}
+
+bool changeValueInGroup (List* groupList, int index, Attribute* newAttribute){
+
+    if (groupList == NULL || newAttribute == NULL) return false;
+
+    int i = 0;
+    bool found = false;
+    void* elem;
+    ListIterator iter = createIterator(groupList); // traverse through the path
+    while ((elem = nextElement(&iter)) != NULL){
+        Group* group = (Group*) elem;
+
+        // reached the index of the path struct that we want to adjust
+        if (i == index){
+            // in a group, we do not modify items in the inner lists
+            found = changeValueInAttr(group->otherAttributes, newAttribute);
+            break;
+        }
+        ++i;
+    }
+
+    return found;
 }

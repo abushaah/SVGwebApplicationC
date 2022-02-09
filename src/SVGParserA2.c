@@ -17,6 +17,7 @@
 
 #include "LinkedListAPI.h"
 #include "SVGParser.h"
+#include "SVGHelper.h"
 #include "SVGHelperA2.h"
 
 #define LIBXML_SCHEMAS_ENABLED
@@ -131,4 +132,48 @@ bool validateSVG(const SVG* img, const char* schemaFile){
     if (valid == false) return false;
 
     return true;
+}
+
+bool setAttribute(SVG* img, elementType elemType, int elemIndex, Attribute* newAttribute){
+
+    if (img == NULL || newAttribute == NULL) return false;
+
+    // 1. valid attribute strings
+    if ((validChar(newAttribute->name) == 0) || (strcmp(newAttribute->name, "") == 0) || (validChar(newAttribute->value) == 0) || (strcmp(newAttribute->value, "") == 0)) return false;
+
+    // 2. check the type
+    if (elemType == SVG_IMG){
+        bool valid = changeValueInAttr(img->otherAttributes, newAttribute);
+        if (valid == false) return false;
+    }
+    else if (elemType == RECT){
+        // 3. check if index is out of bounds
+        if (getLength(img->rectangles) <= elemIndex) return false;
+        // 4. separate function for changing value in order to check for validity of the new attribute
+        //    the functions are in charge of freeing the newAttribute attribute depending on whether it was appended or not
+        bool valid = changeValueInRect(img->rectangles, elemIndex, newAttribute); // list** rectList, int index, Attribute* attr
+        if (valid == false) return false;
+
+    }
+    else if (elemType == CIRC){
+        if (getLength(img->circles) <= elemIndex) return false;
+        bool valid = changeValueInCirc(img->circles, elemIndex, newAttribute); // list** rectList, int index, Attribute* attr
+        if (valid == false) return false;
+    }
+    else if (elemType == PATH){
+        if (getLength(img->paths) <= elemIndex) return false;
+        bool valid = changeValueInPath(img->paths, elemIndex, newAttribute); // list** rectList, int index, Attribute* attr
+        if (valid == false) return false;
+    }
+    else if (elemType == GROUP){
+        if (getLength(img->groups) <= elemIndex) return false;
+        bool valid = changeValueInGroup(img->groups, elemIndex, newAttribute); // list** rectList, int index, Attribute* attr
+        if (valid == false) return false;
+    }
+    else{ // not the appropriate element
+        return false;
+    }
+
+    return true;
+
 }

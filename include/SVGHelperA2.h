@@ -29,4 +29,11 @@ bool validGroupListStruct(List* groupList);
 bool isListEmpty(List* list);
 bool checkRange(float number);
 
+// Functions to help in the setting of attributes
+bool changeValueInAttr (List* attrList, Attribute* newAttribute);
+bool changeValueInRect (List* rectList, int index, Attribute* newAttribute);
+bool changeValueInCirc (List* circList, int index, Attribute* newAttribute);
+bool changeValueInPath (List* pathList, int index, Attribute* newAttribute);
+bool changeValueInGroup (List* groupList, int index, Attribute* newAttribute);
+
 #endif
