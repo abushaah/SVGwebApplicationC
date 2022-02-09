@@ -19,4 +19,14 @@ void addGroupListToParentNode(List* groupList, xmlNodePtr* parent);
 // Function to convert floating point number and units to a string
 char* unitsWithNumber(float number, char units[]);
 
+// Functions to check for validity for the structs and lists in SVGParser.h
+bool validSVGStruct(const SVG* svg);
+bool validAttrListStruct(List* otherAttributes);
+bool validRectListStruct(List* rectangles);
+bool validCircListStruct(List* circles);
+bool validPathListStruct(List* paths);
+bool validGroupListStruct(List* groupList);
+bool isListEmpty(List* list);
+bool checkRange(float number);
+
 #endif

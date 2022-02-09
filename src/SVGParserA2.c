@@ -103,8 +103,22 @@ bool writeSVG(const SVG* img, const char* fileName){
     return true;
 }
 
-//bool validateSVG(const SVG* img, const char* schemaFile);
-/*
-void validateXMLTree(){
+bool validateSVG(const SVG* img, const char* schemaFile){
+
+    if (img == NULL || schemaFile == NULL) return false;
+
+    // 1. Convert the svg to an xml file using write to file
+    bool valid = writeSVG(img, "validatingFile.svg");
+    if (valid == false) return false;
+
+    // 2. Validate the file against the schema similar to the create valid svg function
+    valid = validateFileSVG("validatingFile.svg", schemaFile);
+    if (valid == false) return false;
+
+    // 3. Validate the svg struct against the svgparser.h specifications
+    valid = validSVGStruct(img);
+printf("valid from struct: %d\n", valid);
+    if (valid == false) return false;
+
+    return true;
 }
-*/

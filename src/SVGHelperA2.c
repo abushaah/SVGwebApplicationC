@@ -224,7 +224,7 @@ void addGroupListToParentNode(List* groupList, xmlNodePtr* parent){
 
     // 1. iterate through the struct list
     void* elem;
-    ListIterator iter = createIterator(groupList); // traverse through the rectangle
+    ListIterator iter = createIterator(groupList); // traverse through the group
     while ((elem = nextElement(&iter)) != NULL){
 
         Group* group = (Group*) elem;
@@ -262,4 +262,183 @@ char* unitsWithNumber(float number, char units[]){
 
     return numWithUnits;
 
+}
+
+/*
+    validSVGStruct helper function will take an svg and check for validity:
+    - Namespace must be present and cannot be empty
+    - Title, description must be initialized and must not be empty
+    - Lists must not be NULL
+    - Loops through items in lists and validates each struct in those lists
+*/
+bool validSVGStruct(const SVG* svg){
+
+    if (svg == NULL) return false;
+
+    // 1. initialized values?
+    if ((svg->namespace == NULL) ||
+       (svg->title == NULL) ||
+       (svg->description == NULL) ||
+       (svg->rectangles == NULL) ||
+       (svg->circles == NULL) ||
+       (svg->paths == NULL) ||
+       (svg->groups == NULL) ||
+       (svg->otherAttributes == NULL)) return false;
+
+    // 2. empty strings?
+    if (validChar((char*)svg->namespace) == 0) return false;
+    if (emptyString((char*)svg->namespace) == 0) return false;
+
+    // 3. if not empty, are the list contents valid?
+    if ((isListEmpty(svg->otherAttributes) == 0) && (validAttrListStruct(svg->otherAttributes) == false)) return false;
+    if ((isListEmpty(svg->rectangles) == 0) && (validRectListStruct(svg->rectangles) == false)) return false;
+    if ((isListEmpty(svg->circles) == 0) && (validCircListStruct(svg->circles) == false)) return false;
+    if ((isListEmpty(svg->paths) == 0) && (validPathListStruct(svg->paths) == false)) return false;
+    if ((isListEmpty(svg->groups) == 0) && (validGroupListStruct(svg->groups) == false)) return false;
+
+    // 4. success
+    return true;
+
+}
+
+bool validAttrListStruct(List* otherAttributes){
+
+    if (otherAttributes == NULL) return false;
+
+    void* elem;
+
+    ListIterator iter = createIterator(otherAttributes); // traverse through the attribute
+    while ((elem = nextElement(&iter)) != NULL){
+        Attribute* attr = (Attribute*) elem;
+        // check for initialized name and value
+        if (attr->name == NULL || attr->value == NULL) return false;
+    }
+
+    return true;
+
+}
+
+bool validRectListStruct(List* rectangles){
+
+    if (rectangles == NULL) return false;
+
+    void* elem;
+
+    ListIterator iter = createIterator(rectangles); // traverse through the rectangle list
+    while ((elem = nextElement(&iter)) != NULL){
+        Rectangle* rect = (Rectangle*) elem;
+
+        // check for initialized units
+        if ((validChar(rect->units) == 0) && (strcmp(rect->units, "") != 0)) return false; // may be empty, may not be null
+
+        // check for valid range: >= 0
+        if (checkRange(rect->width) == false) return false;
+        if (checkRange(rect->height) == false) return false;
+
+        // initialized list?
+        if (rect->otherAttributes == NULL) return false;
+
+        // if not empty, check for valid attributes structs
+        if ((isListEmpty(rect->otherAttributes) == 0) && (validAttrListStruct(rect->otherAttributes) == false)) return false;
+
+    }
+
+    return true;
+}
+
+bool validCircListStruct(List* circles){
+
+    if (circles == NULL) return false;
+
+    void* elem;
+
+    ListIterator iter = createIterator(circles); // traverse through the rectangle list
+    while ((elem = nextElement(&iter)) != NULL){
+        Circle* circ = (Circle*) elem;
+
+        // check for initialized units
+        if ((validChar(circ->units) == 0) && (strcmp(circ->units, "") != 0)) return false; // may be empty, may not be null
+
+        // check for valid range: >= 0
+        if (checkRange(circ->r) == false) return false;
+
+        // initialized list?
+        if (circ->otherAttributes == NULL) return false;
+
+        // check for valid attributes structs
+        if ((isListEmpty(circ->otherAttributes) == 0) && (validAttrListStruct(circ->otherAttributes) == false)) return false;
+
+    }
+
+    return true;
+}
+
+bool validPathListStruct(List* paths){
+
+    if (paths == NULL) return false;
+
+    void* elem;
+
+    ListIterator iter = createIterator(paths); // traverse through the rectangle list
+    while ((elem = nextElement(&iter)) != NULL){
+        Path* path = (Path*) elem;
+
+        // check for initialized units
+        if ((validChar(path->data) == 0) && (strcmp(path->data, "") != 0)) return false; // may be empty, may not be null
+
+        // initialized list?
+        if (path->otherAttributes == NULL) return false;
+
+        // check for valid attributes structs
+        if ((isListEmpty(path->otherAttributes) == 0) && (validAttrListStruct(path->otherAttributes) == false)) return false;
+
+    }
+
+    return true;
+}
+
+bool validGroupListStruct(List* groupList){
+
+    if (groupList == NULL) return false;
+
+    void* elem;
+
+    ListIterator iter = createIterator(groupList); // traverse through the rectangle list
+    while ((elem = nextElement(&iter)) != NULL){
+        Group* group = (Group*) elem;
+
+        // 1. initialized values, is the list NULL?
+        if ((group->rectangles == NULL) ||
+           (group->circles == NULL) ||
+           (group->paths == NULL) ||
+           (group->groups == NULL) ||
+           (group->otherAttributes == NULL)) return false;
+
+        // 2. list contents valid?
+        // if the list is not empty, check if the content is valid
+        if ((isListEmpty(group->otherAttributes) == 0) && (validAttrListStruct(group->otherAttributes) == false)) return false;
+        if ((isListEmpty(group->rectangles) == 0) && (validRectListStruct(group->rectangles) == false)) return false;
+        if ((isListEmpty(group->circles) == 0) && (validCircListStruct(group->circles) == false)) return false;
+        if ((isListEmpty(group->paths) == 0) && (validPathListStruct(group->paths) == false)) return false;
+        if ((isListEmpty(group->groups) == 0) && (validGroupListStruct(group->groups) == false)) return false;
+
+    }
+
+    // 4. success
+    return true;
+
+}
+
+bool checkRange(float number){
+
+    if (number < 0) return false;
+    //do we have to check for range in a floating point number? isfinate?
+    return true;
+
+}
+
+bool isListEmpty(List* list){
+
+    if (getLength(list) == 0) return 1; // 1 means true, it is empty
+    return 0; // 0 indicate that it is NOT empty
 }
