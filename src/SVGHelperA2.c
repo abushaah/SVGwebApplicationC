@@ -301,6 +301,13 @@ bool validSVGStruct(const SVG* svg){
 
 }
 
+// validates single attribute structure
+bool validAttrStruct(Attribute* attr){
+    if (attr == NULL) return false;
+    if (((validChar(attr->name) == 0) && (strcmp(attr->name, "") != 0)) || ((validChar(attr->value) == 0) && (strcmp(attr->value, "") != 0))) return false; // may be empty, may not be null
+    return true;
+}
+
 // validates the attribute structs against specifications
 bool validAttrListStruct(List* otherAttributes){
 
@@ -312,9 +319,30 @@ bool validAttrListStruct(List* otherAttributes){
     while ((elem = nextElement(&iter)) != NULL){
         Attribute* attr = (Attribute*) elem;
         // check for initialized name and value
-        if (((validChar(attr->name) == 0) && (strcmp(attr->name, "") != 0)) || ((validChar(attr->value) == 0) && (strcmp(attr->value, "") != 0))) return false; // may be empty, may not be null
+        if (validAttrStruct(attr) == false) return false;
     }
 
+    return true;
+
+}
+
+// validates single rectangle structure
+bool validRectStruct(Rectangle* rect){
+
+    if (rect == NULL) return false;
+
+    // check for initialized units
+    if ((validChar(rect->units) == 0) && (strcmp(rect->units, "") != 0)) return false; // may be empty, may not be null
+
+    // check for valid range: >= 0
+    if (checkRange(rect->width) == false) return false;
+    if (checkRange(rect->height) == false) return false;
+
+    // initialized list?
+    if (rect->otherAttributes == NULL) return false;
+
+    // if not empty, check for valid attributes structs
+    if ((isListEmpty(rect->otherAttributes) == 0) && (validAttrListStruct(rect->otherAttributes) == false)) return false;
     return true;
 
 }
@@ -329,21 +357,28 @@ bool validRectListStruct(List* rectangles){
     ListIterator iter = createIterator(rectangles); // traverse through the rectangle list
     while ((elem = nextElement(&iter)) != NULL){
         Rectangle* rect = (Rectangle*) elem;
-
-        // check for initialized units
-        if ((validChar(rect->units) == 0) && (strcmp(rect->units, "") != 0)) return false; // may be empty, may not be null
-
-        // check for valid range: >= 0
-        if (checkRange(rect->width) == false) return false;
-        if (checkRange(rect->height) == false) return false;
-
-        // initialized list?
-        if (rect->otherAttributes == NULL) return false;
-
-        // if not empty, check for valid attributes structs
-        if ((isListEmpty(rect->otherAttributes) == 0) && (validAttrListStruct(rect->otherAttributes) == false)) return false;
-
+        if (validRectStruct(rect) == false) return false;
     }
+
+    return true;
+}
+
+// validates single circle struct
+bool validCircStruct(Circle* circ){
+
+    if (circ == NULL) return false;
+
+    // check for initialized units
+    if ((validChar(circ->units) == 0) && (strcmp(circ->units, "") != 0)) return false; // may be empty, may not be null
+
+    // check for valid range: >= 0
+    if (checkRange(circ->r) == false) return false;
+
+    // initialized list?
+    if (circ->otherAttributes == NULL) return false;
+
+    // check for valid attributes structs
+    if ((isListEmpty(circ->otherAttributes) == 0) && (validAttrListStruct(circ->otherAttributes) == false)) return false;
 
     return true;
 }
@@ -358,20 +393,25 @@ bool validCircListStruct(List* circles){
     ListIterator iter = createIterator(circles); // traverse through the rectangle list
     while ((elem = nextElement(&iter)) != NULL){
         Circle* circ = (Circle*) elem;
-
-        // check for initialized units
-        if ((validChar(circ->units) == 0) && (strcmp(circ->units, "") != 0)) return false; // may be empty, may not be null
-
-        // check for valid range: >= 0
-        if (checkRange(circ->r) == false) return false;
-
-        // initialized list?
-        if (circ->otherAttributes == NULL) return false;
-
-        // check for valid attributes structs
-        if ((isListEmpty(circ->otherAttributes) == 0) && (validAttrListStruct(circ->otherAttributes) == false)) return false;
-
+        if (validCircStruct(circ) == false) return false;
     }
+
+    return true;
+}
+
+// validates path structure
+bool validPathStruct(Path* path){
+
+    if (path == NULL) return false;
+
+    // check for initialized units
+    if ((validChar(path->data) == 0) && (strcmp(path->data, "") != 0)) return false; // may be empty, may not be null
+
+    // initialized list?
+    if (path->otherAttributes == NULL) return false;
+
+    // check for valid attributes structs
+    if ((isListEmpty(path->otherAttributes) == 0) && (validAttrListStruct(path->otherAttributes) == false)) return false;
 
     return true;
 }
@@ -386,17 +426,31 @@ bool validPathListStruct(List* paths){
     ListIterator iter = createIterator(paths); // traverse through the rectangle list
     while ((elem = nextElement(&iter)) != NULL){
         Path* path = (Path*) elem;
-
-        // check for initialized units
-        if ((validChar(path->data) == 0) && (strcmp(path->data, "") != 0)) return false; // may be empty, may not be null
-
-        // initialized list?
-        if (path->otherAttributes == NULL) return false;
-
-        // check for valid attributes structs
-        if ((isListEmpty(path->otherAttributes) == 0) && (validAttrListStruct(path->otherAttributes) == false)) return false;
-
+        if (validPathStruct(path) == false) return false;
     }
+
+    return true;
+}
+
+// validates a single group struct
+bool validGroupStruct(Group* group){
+
+    if (group == NULL) return false;
+
+    // 1. initialized values, is the list NULL?
+    if ((group->rectangles == NULL) ||
+       (group->circles == NULL) ||
+       (group->paths == NULL) ||
+       (group->groups == NULL) ||
+       (group->otherAttributes == NULL)) return false;
+
+    // 2. list contents valid?
+    // if the list is not empty, check if the content is valid
+    if ((isListEmpty(group->otherAttributes) == 0) && (validAttrListStruct(group->otherAttributes) == false)) return false;
+    if ((isListEmpty(group->rectangles) == 0) && (validRectListStruct(group->rectangles) == false)) return false;
+    if ((isListEmpty(group->circles) == 0) && (validCircListStruct(group->circles) == false)) return false;
+    if ((isListEmpty(group->paths) == 0) && (validPathListStruct(group->paths) == false)) return false;
+    if ((isListEmpty(group->groups) == 0) && (validGroupListStruct(group->groups) == false)) return false;
 
     return true;
 }
@@ -411,22 +465,7 @@ bool validGroupListStruct(List* groupList){
     ListIterator iter = createIterator(groupList); // traverse through the rectangle list
     while ((elem = nextElement(&iter)) != NULL){
         Group* group = (Group*) elem;
-
-        // 1. initialized values, is the list NULL?
-        if ((group->rectangles == NULL) ||
-           (group->circles == NULL) ||
-           (group->paths == NULL) ||
-           (group->groups == NULL) ||
-           (group->otherAttributes == NULL)) return false;
-
-        // 2. list contents valid?
-        // if the list is not empty, check if the content is valid
-        if ((isListEmpty(group->otherAttributes) == 0) && (validAttrListStruct(group->otherAttributes) == false)) return false;
-        if ((isListEmpty(group->rectangles) == 0) && (validRectListStruct(group->rectangles) == false)) return false;
-        if ((isListEmpty(group->circles) == 0) && (validCircListStruct(group->circles) == false)) return false;
-        if ((isListEmpty(group->paths) == 0) && (validPathListStruct(group->paths) == false)) return false;
-        if ((isListEmpty(group->groups) == 0) && (validGroupListStruct(group->groups) == false)) return false;
-
+        if (validGroupStruct(group) == false) return false;
     }
 
     // 4. success
@@ -470,6 +509,7 @@ bool changeValueInAttr (List* attrList, Attribute* newAttribute){
         Attribute* attr = (Attribute*) elem;
         if (strcasecmp(attr->name, newAttribute->name) == 0){
             found = true;
+            if (validAttrStruct(newAttribute) == false) return false;
             strcpy(attr->value, newAttribute->value);
             deleteAttribute((void*) newAttribute);
             break;
@@ -477,7 +517,7 @@ bool changeValueInAttr (List* attrList, Attribute* newAttribute){
     }
 
     if (found == false){ // append to list if not found
-        insertBack(attrList, newAttribute);
+        insertBack(attrList, (void*)newAttribute);
     }
     return true;
 }

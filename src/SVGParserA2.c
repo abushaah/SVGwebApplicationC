@@ -151,23 +151,23 @@ bool setAttribute(SVG* img, elementType elemType, int elemIndex, Attribute* newA
         if (getLength(img->rectangles) <= elemIndex) return false;
         // 4. separate function for changing value in order to check for validity of the new attribute
         //    the functions are in charge of freeing the newAttribute attribute depending on whether it was appended or not
-        bool valid = changeValueInRect(img->rectangles, elemIndex, newAttribute); // list** rectList, int index, Attribute* attr
+        bool valid = changeValueInRect(img->rectangles, elemIndex, newAttribute);
         if (valid == false) return false;
 
     }
     else if (elemType == CIRC){
         if (getLength(img->circles) <= elemIndex) return false;
-        bool valid = changeValueInCirc(img->circles, elemIndex, newAttribute); // list** rectList, int index, Attribute* attr
+        bool valid = changeValueInCirc(img->circles, elemIndex, newAttribute);
         if (valid == false) return false;
     }
     else if (elemType == PATH){
         if (getLength(img->paths) <= elemIndex) return false;
-        bool valid = changeValueInPath(img->paths, elemIndex, newAttribute); // list** rectList, int index, Attribute* attr
+        bool valid = changeValueInPath(img->paths, elemIndex, newAttribute);
         if (valid == false) return false;
     }
     else if (elemType == GROUP){
         if (getLength(img->groups) <= elemIndex) return false;
-        bool valid = changeValueInGroup(img->groups, elemIndex, newAttribute); // list** rectList, int index, Attribute* attr
+        bool valid = changeValueInGroup(img->groups, elemIndex, newAttribute);
         if (valid == false) return false;
     }
     else{ // not the appropriate element
@@ -175,5 +175,36 @@ bool setAttribute(SVG* img, elementType elemType, int elemIndex, Attribute* newA
     }
 
     return true;
+
+}
+
+void addComponent(SVG* img, elementType type, void* newElement){
+
+    if (img == NULL || newElement == NULL) return;
+
+    // 1. determine component type
+    if (type == RECT){
+        Rectangle* newRect = (Rectangle*) newElement;
+        // 2. check if component is valid
+        bool valid = validRectStruct(newRect);
+        if (valid == false) return;
+        if (img->rectangles == NULL) return;
+        // 3. add comopnent to the end of the list
+        insertBack(img->rectangles, (void*)newRect);
+    }
+    else if (type == CIRC){
+        Circle* newCirc = (Circle*) newElement;
+        bool valid = validCircStruct(newCirc);
+        if (valid == false) return;
+        if (img->circles == NULL) return;
+        insertBack(img->circles, (void*)newCirc);
+    }
+    else if (type == PATH){
+        Path* newPath = (Path*) newElement;
+        bool valid = validPathStruct(newPath);
+        if (valid == false) return;
+        if (img->paths == NULL) return;
+        insertBack(img->paths, (void*)newPath);
+    }
 
 }

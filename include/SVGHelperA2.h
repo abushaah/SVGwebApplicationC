@@ -21,6 +21,11 @@ char* unitsWithNumber(float number, char units[]);
 
 // Functions to check for validity for the structs and lists in SVGParser.h
 bool validSVGStruct(const SVG* svg);
+bool validAttrStruct(Attribute* attr);
+bool validRectStruct(Rectangle* rect);
+bool validCircStruct(Circle* circ);
+bool validPathStruct(Path* path);
+bool validGroupStruct(Group* group);
 bool validAttrListStruct(List* otherAttributes);
 bool validRectListStruct(List* rectangles);
 bool validCircListStruct(List* circles);
