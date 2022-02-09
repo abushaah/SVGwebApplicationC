@@ -301,6 +301,7 @@ bool validSVGStruct(const SVG* svg){
 
 }
 
+// validates the attribute structs against specifications
 bool validAttrListStruct(List* otherAttributes){
 
     if (otherAttributes == NULL) return false;
@@ -318,6 +319,7 @@ bool validAttrListStruct(List* otherAttributes){
 
 }
 
+// validates the rect structs against specifications
 bool validRectListStruct(List* rectangles){
 
     if (rectangles == NULL) return false;
@@ -346,6 +348,7 @@ bool validRectListStruct(List* rectangles){
     return true;
 }
 
+// validates the circle structs against specifications
 bool validCircListStruct(List* circles){
 
     if (circles == NULL) return false;
@@ -373,6 +376,7 @@ bool validCircListStruct(List* circles){
     return true;
 }
 
+// validates the path structs against specifications
 bool validPathListStruct(List* paths){
 
     if (paths == NULL) return false;
@@ -397,6 +401,7 @@ bool validPathListStruct(List* paths){
     return true;
 }
 
+// validates the group structs against specifications, as well as the inner lists structs
 bool validGroupListStruct(List* groupList){
 
     if (groupList == NULL) return false;
@@ -429,6 +434,7 @@ bool validGroupListStruct(List* groupList){
 
 }
 
+// for validating the circle and rectangle width height and radius
 bool checkRange(float number){
 
     if (number < 0) return false;
@@ -437,6 +443,7 @@ bool checkRange(float number){
 
 }
 
+// for validating list contents
 bool isListEmpty(List* list){
 
     if (getLength(list) == 0) return 1; // 1 means true, it is empty
@@ -444,12 +451,14 @@ bool isListEmpty(List* list){
 }
 
 /*
-check the names
-if it is specified as a definition, set it
-if it is not specified as a deifnition, call changeValueInattribute to try to find it in other attibrutes
-if it is not in the other attrbutes, append it to the other attributes list
-strcpy when updating the strings will not reult in memory leaks
+    the following funcitons with signiture changeValueInShape will traverse the shape list for the specified shape, and
+    if attribute name is specified as a definition, set it
+    if it is not specified as a deifnition, call changeValueInattribute to try to find it in other attibrutes
+    if it is not in the other attrbutes, append it to the other attributes list
+    strcpy when updating the strings will not reult in memory leaks
+    if any error occurs (ie, null values, invalid values, conversion error, etc) they will return false
 */
+// loops through attributes to change the value. if not present, appends to the end of the list
 bool changeValueInAttr (List* attrList, Attribute* newAttribute){
 
     if (attrList == NULL || newAttribute == NULL) return false;
@@ -473,6 +482,7 @@ bool changeValueInAttr (List* attrList, Attribute* newAttribute){
     return true;
 }
 
+// loops through rectangles to change the value. if not present, checks other attributes list
 bool changeValueInRect (List* rectList, int index, Attribute* newAttribute){
 
     if (rectList == NULL || newAttribute == NULL) return false;
@@ -516,6 +526,7 @@ bool changeValueInRect (List* rectList, int index, Attribute* newAttribute){
     return found;
 }
 
+// loops through circles to change the value. if not present, checks other attributes list
 bool changeValueInCirc (List* circList, int index, Attribute* newAttribute){
 
     if (circList == NULL || newAttribute == NULL) return false;
@@ -553,6 +564,7 @@ bool changeValueInCirc (List* circList, int index, Attribute* newAttribute){
     return found;
 }
 
+// loops through paths to change the value. if not present, checks other attributes list
 bool changeValueInPath (List* pathList, int index, Attribute* newAttribute){
 
     if (pathList == NULL || newAttribute == NULL) return false;
@@ -582,6 +594,7 @@ bool changeValueInPath (List* pathList, int index, Attribute* newAttribute){
     return found;
 }
 
+// loops through groups other attributes list to change the value. if not present, appends to list
 bool changeValueInGroup (List* groupList, int index, Attribute* newAttribute){
 
     if (groupList == NULL || newAttribute == NULL) return false;
