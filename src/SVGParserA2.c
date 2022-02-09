@@ -63,7 +63,15 @@ bool writeSVG(const SVG* img, const char* fileName){
     xmlDocSetRootElement(doc, root_node);
 
     // 2. set the namespace, title, and description using the xmlNewText
-    xmlNewProp(root_node, BAD_CAST "xmlns", BAD_CAST img->namespace);
+    xmlNsPtr nameSpace = xmlNewNs(root_node, (const xmlChar*) img->namespace, NULL); // prefix = NULL
+    if (nameSpace == NULL){
+        fclose(file);
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
+        xmlMemoryDump();
+        return false;
+    }
+    xmlSetNs(root_node, nameSpace); // set the namespace for the root node
 
     if (strlen(img->title) != 0){
         xmlNodePtr titleNode = xmlNewNode(NULL, BAD_CAST "title");
