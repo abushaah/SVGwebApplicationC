@@ -28,7 +28,7 @@ int getElementNames(xmlNode* a_node, SVG* svg){
     if (a_node == NULL || svg == NULL){
         return 0;
     }
-    if (svg->rectangles == NULL || svg->circles == NULL || svg->paths == NULL || svg->otherAttributes == NULL){
+    if (svg->rectangles == NULL || svg->circles == NULL || svg->paths == NULL || svg->groups == NULL || svg->otherAttributes == NULL){
         return 0;
     }
 
@@ -49,29 +49,21 @@ int getElementNames(xmlNode* a_node, SVG* svg){
 
         // The primitives:
         if (strcasecmp(name, "rect") == 0){ // create new rectangle
-
             Rectangle* rect = rectAttributes(cur_node); // fill in with attributes
             insertBack(svg->rectangles, (void*)rect); // insert into the rectangle list
-
         }
         else if (strcasecmp(name, "circle") == 0){ // create new circle
-
             Circle* circ = circAttributes(cur_node); // fill in with attributes
             insertBack(svg->circles, (void*)circ); // insert into the circle list
-
         }
         else if (strcasecmp(name, "path") == 0){ // create new path
-
             Path* path = pathAttributes(cur_node); // fill in with attributes
             insertBack(svg->paths, (void*)path); // insert into the path list
-
         }
         else if (strcasecmp(name, "g") == 0){ // create new group
-
             Group *newGroup = groupAttributes(cur_node); // fill in with attributes (not other primitives)
             getElementNamesGroups(cur_node->children, newGroup);
             insertBack(svg->groups, (void*)newGroup);
-
         }
         else{ // just call attr with no argument and place in otherAttributes list
             firstOtherAttributes(cur_node, svg->otherAttributes); // fill in with attributes
@@ -97,7 +89,7 @@ void getElementNamesGroups(xmlNode* a_node, Group* group){
     if (a_node == NULL || group == NULL){ // base case
         return;
     }
-    if (group->rectangles == NULL || group->circles == NULL || group->paths == NULL || group->otherAttributes == NULL){
+    if (group->rectangles == NULL || group->circles == NULL || group->paths == NULL || group->groups == NULL || group->otherAttributes == NULL){
         return;
     }
 
@@ -275,7 +267,7 @@ Circle* circAttributes(xmlNode *cur_node){ // fills in attributes for a rectangl
 }
 
 /**
- * This function will return a path struct when given a node and its attributes
+ * This function will return an attribute struct when given a node and its attributes
  * caller must free the node
  */
 Path* pathAttributes (xmlNode *cur_node){
@@ -441,7 +433,7 @@ int getElementGroups(List *source, List *dest, char* type){
 
     List* groupList = (List*) source;
     if (groupList == NULL){
-        // base case - rectangles or groups list not initialized means that there are no more elements
+        // base case - groups list not initialized means that there are no more elements
         return 1;
     }
 

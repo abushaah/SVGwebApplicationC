@@ -103,6 +103,9 @@ bool writeSVG(const SVG* img, const char* fileName){
     return true;
 }
 
+/*
+    validates every struct and list
+*/
 bool validateSVG(const SVG* img, const char* schemaFile){
 
     if (img == NULL || schemaFile == NULL) return false;
@@ -117,7 +120,6 @@ bool validateSVG(const SVG* img, const char* schemaFile){
 
     // 3. Validate the svg struct against the svgparser.h specifications
     valid = validSVGStruct(img);
-printf("valid from struct: %d\n", valid);
     if (valid == false) return false;
 
     return true;
