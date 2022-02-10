@@ -8,7 +8,8 @@
 // Module 1 helper functions:
 
 // Function to validate xml file against a schema file
-bool validateFileSVG(const char* fileName, const char* schemaFile);
+bool validateFileSVG(xmlDocPtr doc, const char* schemaFile);
+xmlDocPtr createXMLFromStruct(const SVG* img);
 
 // Functions to write svg shape struct to a node in the xml tree
 void addAttrListToParentNode(List* list, xmlNodePtr* parent);
@@ -26,13 +27,17 @@ bool validRectStruct(Rectangle* rect);
 bool validCircStruct(Circle* circ);
 bool validPathStruct(Path* path);
 bool validGroupStruct(Group* group);
+
 bool validAttrListStruct(List* otherAttributes);
 bool validRectListStruct(List* rectangles);
 bool validCircListStruct(List* circles);
 bool validPathListStruct(List* paths);
 bool validGroupListStruct(List* groupList);
+
 bool isListEmpty(List* list);
+bool checkString(char* string);
 bool checkRange(float number);
+bool checkInvalid(float number);
 
 // Functions to help in the setting of attributes
 bool changeValueInAttr (List* attrList, Attribute* newAttribute);

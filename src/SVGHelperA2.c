@@ -356,7 +356,7 @@ bool validSVGStruct(const SVG* svg){ // const means it cannot be changes
 // validates single attribute structure
 bool validAttrStruct(Attribute* attr){
     if (attr == NULL) return false;
-    if (((validChar(attr->name) == 0) && (strcmp(attr->name, "") != 0)) || ((validChar(attr->value) == 0) && (strcmp(attr->value, "") != 0))) return false; // may be empty, may not be null
+    if (checkString(attr->name) == false || checkString(attr->value) == false) return false; // may be empty, may not be null
     return true;
 }
 
@@ -384,7 +384,7 @@ bool validRectStruct(Rectangle* rect){
     if (rect == NULL) return false;
 
     // check for initialized units
-    if ((validChar(rect->units) == 0) && (strcmp(rect->units, "") != 0)) return false; // may be empty, may not be null
+    if (checkString(rect->units) == false) return false;
 
     // check for valid range: >= 0
     if (checkRange(rect->width) == false) return false;
@@ -421,7 +421,7 @@ bool validCircStruct(Circle* circ){
     if (circ == NULL) return false;
 
     // check for initialized units
-    if ((validChar(circ->units) == 0) && (strcmp(circ->units, "") != 0)) return false; // may be empty, may not be null
+    if (checkString(circ->units) == false) return false;
 
     // check for valid range: >= 0
     if (checkRange(circ->r) == false) return false;
@@ -457,7 +457,7 @@ bool validPathStruct(Path* path){
     if (path == NULL) return false;
 
     // check for initialized units
-    if ((validChar(path->data) == 0) && (strcmp(path->data, "") != 0)) return false; // may be empty, may not be null
+    if (checkString(path->data) == false) return false;
 
     // initialized list?
     if (path->otherAttributes == NULL) return false;
@@ -525,13 +525,27 @@ bool validGroupListStruct(List* groupList){
 
 }
 
+// validates that a string is initialized and may be empty
+bool checkString(char* string){
+
+    if ((validChar(string) == 0) && (strcmp(string, "") != 0)) return false; // may be empty, may not be null
+    return true;
+}
+
 // for validating the circle and rectangle width height and radius
 bool checkRange(float number){
 
     if (number < 0) return false;
-    if (isinf(number) || isnan(number)) return false;
+    if (checkInvalid(number) == false) return false;
     return true;
 
+}
+
+// for validating the validity of a floating point number
+bool checkInvalid(float number){
+
+    if (isinf(number) || isnan(number)) return false;
+    return true;
 }
 
 // for validating list contents
@@ -539,6 +553,29 @@ bool isListEmpty(List* list){
 
     if (getLength(list) == 0) return 1; // 1 means true, it is empty
     return 0; // 0 indicate that it is NOT empty
+}
+
+// changes an x/y coordinate, validates the change
+bool changeCoor(float* coor, char value[]){
+
+    float tempCoor = 0.0;
+    char units[50];
+    int found = numberWithUnits(&(tempCoor), units, value); // since units dont need ot be updated, the funciton will not update it
+    if (found == 0) return false; // could not parse the number or number is not valid
+    *coor = tempCoor;
+    return true;
+}
+
+// changes a width/height/radius, validates the change
+bool changeDimen(float* dimen, char value[]){
+
+    float tempDimen = 0.0;
+    char units[50];
+    // temp width since we do not know if it is valid, temp unit since we do not need to change it
+    int found = numberWithUnits(&(tempDimen), units, value);
+    if ((found == 0) || (checkRange(tempDimen) == false)) return false; // check for a valid range for new value
+    *dimen = tempDimen; // it is valid
+    return true;
 }
 
 /*
@@ -561,7 +598,7 @@ bool changeValueInAttr (List* attrList, Attribute* newAttribute){
         Attribute* attr = (Attribute*) elem;
         if (strcasecmp(attr->name, newAttribute->name) == 0){
             found = true;
-            if (validAttrStruct(newAttribute) == false) return false;
+            if (validAttrStruct(newAttribute) == false) return false; // must check if the attribute is valid. if return is false do not need to free attribute
             strcpy(attr->value, newAttribute->value);
             deleteAttribute((void*) newAttribute);
             break;
@@ -574,13 +611,13 @@ bool changeValueInAttr (List* attrList, Attribute* newAttribute){
     return true;
 }
 
+
 // loops through rectangles to change the value. if not present, checks other attributes list
 bool changeValueInRect (List* rectList, int index, Attribute* newAttribute){
 
     if (rectList == NULL || newAttribute == NULL) return false;
 
     int i = 0;
-    bool found = false;
     void* elem;
     ListIterator iter = createIterator(rectList); // traverse through the rects
     while ((elem = nextElement(&iter)) != NULL){
@@ -589,33 +626,36 @@ bool changeValueInRect (List* rectList, int index, Attribute* newAttribute){
         // reached the index of the rect struct that we want to adjust
         if (i == index){
             if (strcasecmp(newAttribute->name, "x") == 0){
-                found = numberWithUnits(&(rect->x), rect->units, newAttribute->value); // since units dont need ot be updated, the funciton will not update it
+                bool valid = changeCoor(&(rect->x), newAttribute->value);
+                if (valid == false) return false;
                 deleteAttribute((void*) newAttribute);
             }
             else if (strcasecmp(newAttribute->name, "y") == 0){
-                found = numberWithUnits(&(rect->y), rect->units, newAttribute->value);
+                bool valid = changeCoor(&(rect->y), newAttribute->value);
+                if (valid == false) return false;
                 deleteAttribute((void*) newAttribute);
             }
             else if (strcasecmp(newAttribute->name, "width") == 0){
-                found = numberWithUnits(&(rect->width), rect->units, newAttribute->value);
-                // must also check if it is valid number?
-                // if (rect->width < 0) return false;
+                bool valid = changeDimen(&(rect->width), newAttribute->value);
+                if (valid == false) return false;
                 deleteAttribute((void*) newAttribute);
             }
             else if (strcasecmp(newAttribute->name, "height") == 0){
-                found = numberWithUnits(&(rect->height), rect->units, newAttribute->value);
-                // if (rect->height < 0) return false;
+                bool valid = changeDimen(&(rect->height), newAttribute->value);
+                if (valid == false) return false;
                 deleteAttribute((void*) newAttribute);
             }
             else{
-                found = changeValueInAttr(rect->otherAttributes, newAttribute);
+                bool valid = changeValueInAttr(rect->otherAttributes, newAttribute);
+                if (valid == false) return false;
+                //changeValueInAttr is in charge of freeing the attribute depending on whther it is changed or appended
             }
             break;
         }
         ++i;
     }
 
-    return found;
+    return true;
 }
 
 // loops through circles to change the value. if not present, checks other attributes list
@@ -624,7 +664,6 @@ bool changeValueInCirc (List* circList, int index, Attribute* newAttribute){
     if (circList == NULL || newAttribute == NULL) return false;
 
     int i = 0;
-    bool found = false;
     void* elem;
     ListIterator iter = createIterator(circList); // traverse through the circle
     while ((elem = nextElement(&iter)) != NULL){
@@ -633,27 +672,30 @@ bool changeValueInCirc (List* circList, int index, Attribute* newAttribute){
         // reached the index of the circle struct that we want to adjust
         if (i == index){
             if (strcasecmp(newAttribute->name, "cx") == 0){
-                found = numberWithUnits(&(circ->cx), circ->units, newAttribute->value); // since units dont need ot be updated, the funciton will not update it
+                bool valid = changeCoor(&(circ->cx), newAttribute->value);
+                if (valid == false) return false;
                 deleteAttribute((void*) newAttribute);
             }
             else if (strcasecmp(newAttribute->name, "cy") == 0){
-                found = numberWithUnits(&(circ->cy), circ->units, newAttribute->value);
+                bool valid = changeCoor(&(circ->cy), newAttribute->value);
+                if (valid == false) return false;
                 deleteAttribute((void*) newAttribute);
             }
             else if (strcasecmp(newAttribute->name, "r") == 0){
-                found = numberWithUnits(&(circ->r), circ->units, newAttribute->value);
-                // if (circ->r < 0) return false;
+                bool valid = changeDimen(&(circ->r), newAttribute->value);
+                if (valid == false) return false;
                 deleteAttribute((void*) newAttribute);
             }
             else{
-                found = changeValueInAttr(circ->otherAttributes, newAttribute);
+                bool valid = changeValueInAttr(circ->otherAttributes, newAttribute);
+                if (valid == false) return false;
             }
             break;
         }
         ++i;
     }
 
-    return found;
+    return true;
 }
 
 // loops through paths to change the value. if not present, checks other attributes list
@@ -662,7 +704,6 @@ bool changeValueInPath (List* pathList, int index, Attribute* newAttribute){
     if (pathList == NULL || newAttribute == NULL) return false;
 
     int i = 0;
-    bool found = false;
     void* elem;
     ListIterator iter = createIterator(pathList); // traverse through the path
     while ((elem = nextElement(&iter)) != NULL){
@@ -671,19 +712,21 @@ bool changeValueInPath (List* pathList, int index, Attribute* newAttribute){
         // reached the index of the path struct that we want to adjust
         if (i == index){
             if (strcasecmp(newAttribute->name, "d") == 0){
-                found = true;
+                // check for validity
+                if (checkString(path->data) == false) return false; // may be empty, may not be null
                 strcpy(path->data, newAttribute->value);
                 deleteAttribute((void*) newAttribute);
             }
             else{
-                found = changeValueInAttr(path->otherAttributes, newAttribute);
+                bool valid = changeValueInAttr(path->otherAttributes, newAttribute);
+                if (valid == false) return false;
             }
             break;
         }
         ++i;
     }
 
-    return found;
+    return true;
 }
 
 // loops through groups other attributes list to change the value. if not present, appends to list

@@ -10,6 +10,7 @@
 #include <libxml/tree.h>
 
 #include "SVGHelper.h"
+#include "SVGHelperA2.h"
 #include "SVGParser.h"
 
 #define DELIMITERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !@#$%^&*()_~`{}|[]:\";',/<>?"
@@ -349,12 +350,20 @@ int numberWithUnits(float* number, char* units, char* value){
 
     char* token = strtok(value, DELIMITERS);
 
-    if (token == NULL) return 0; // no number found
+    if (token == NULL){
+        free(cpy);
+        return 0; // no number found
+    }
 
     *number = atof (token); // if the number happens to be just '.', then the atof function will return 0.0
 
     token = strtok(cpy, NUMDELIMITERS);
     if (token != NULL) strcpy(units, token); // token not being null means there is a character specified after a number
+
+    if (checkInvalid(*number) == false){
+        free(cpy);
+        return 0;
+    }
 
     free(cpy);
     return 1; // valid
