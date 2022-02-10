@@ -167,26 +167,35 @@ void addComponent(SVG* img, elementType type, void* newElement){
 
     // 1. determine component type
     if (type == RECT){
+        if (img->rectangles == NULL) return;
         Rectangle* newRect = (Rectangle*) newElement;
         // 2. check if component is valid
         bool valid = validRectStruct(newRect);
-        if (valid == false) return;
-        if (img->rectangles == NULL) return;
+        if (valid == false){
+            deleteRectangle(newRect);
+            return;
+        }
         // 3. add comopnent to the end of the list
         insertBack(img->rectangles, (void*)newRect);
     }
     else if (type == CIRC){
+        if (img->circles == NULL) return;
         Circle* newCirc = (Circle*) newElement;
         bool valid = validCircStruct(newCirc);
-        if (valid == false) return;
-        if (img->circles == NULL) return;
+        if (valid == false){
+            deleteCircle(newCirc);
+            return;
+        }
         insertBack(img->circles, (void*)newCirc);
     }
     else if (type == PATH){
+        if (img->paths == NULL) return;
         Path* newPath = (Path*) newElement;
         bool valid = validPathStruct(newPath);
-        if (valid == false) return;
-        if (img->paths == NULL) return;
+        if (valid == false){
+            deletePath(newPath);
+            return;
+        }
         insertBack(img->paths, (void*)newPath);
     }
 

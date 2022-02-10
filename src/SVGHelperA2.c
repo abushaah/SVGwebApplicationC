@@ -456,8 +456,9 @@ bool validPathStruct(Path* path){
 
     if (path == NULL) return false;
 
-    // check for initialized units
+    // check for initialized data and non empty data (specifications say cannot be null)
     if (checkString(path->data) == false) return false;
+    if (strcmp(path->data, "") == 0) return false;
 
     // initialized list?
     if (path->otherAttributes == NULL) return false;
