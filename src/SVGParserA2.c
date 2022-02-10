@@ -23,91 +23,62 @@
 #define LIBXML_SCHEMAS_ENABLED
 
 /*
-    createValidSVG first validates the svg file against the schema file,
-    then calls create svg for the svg file to create an svg struct
+    createValidSVG first creates an xml tree, then validates the svg file against the schema file,
+    then calls create svg for the svg file to create an svg struct if the file is valid
 */
 SVG* createValidSVG(const char* fileName, const char* schemaFile){
 
-    if (fileName == NULL || schemaFile == NULL) return false;
-    bool valid = validateFileSVG(fileName, schemaFile);
-    if (valid == false) return NULL;
+    if (fileName == NULL || schemaFile == NULL) return NULL;
 
-    // negative values in the width/height will not be considered invalid,
-    // so funcion "validateSVG" will test the svg against the constraints specified in SVGParser.h
+    // 1. parse the file and get the DOM
+    xmlDocPtr doc = NULL;
+    doc = xmlReadFile(fileName, NULL, 0);
+    if (doc == NULL){
+        xmlCleanupParser(); // free global variables allocated by parser in the validateFileSVG() function
+        return NULL;
+    }
+
+    // 2. validates the svg against the schema file
+    bool valid = validateFileSVG(doc, schemaFile);
+    if (valid == false){
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
+        return NULL;
+    }
+
+    xmlFreeDoc(doc);
+    xmlCleanupParser(); // free global variables allocated by parser in the validateFileSVG() function
+
+    // 3. create the svg, that is valid?
     SVG* svg = createSVG(fileName);
-    if (svg == NULL) return NULL;
+    if (svg == NULL){
+        return NULL;
+    }
 
     return svg;
 }
 
 /*
     writes an svg struct to a file in the svg format
-    assumes that the struct has been validated
+    assumes that the struct has been validated!
 */
 bool writeSVG(const SVG* img, const char* fileName){
 
     if (img == NULL || fileName == NULL) return false;
 
-    FILE* file = fopen(fileName, "w");
-    if (file == NULL){
-        return false;
-    }
-
-    xmlDocPtr doc = NULL; // document pointer
-    xmlNodePtr root_node = NULL; // root of tree
-
-    LIBXML_TEST_VERSION;
-
-    // 1. convert the SVG to an XML by creating a new document, a node and set it as a root node
-    doc = xmlNewDoc(BAD_CAST "1.0");
-    root_node = xmlNewNode(NULL, BAD_CAST "svg");
-    xmlDocSetRootElement(doc, root_node);
-
-    // 2. set the namespace, title, and description using the xmlNewText
-    xmlNsPtr nameSpace = xmlNewNs(root_node, (const xmlChar*) img->namespace, NULL); // prefix = NULL
-    if (nameSpace == NULL){
-        fclose(file);
-        xmlFreeDoc(doc);
+    // 1. create the xml doc from the svg
+    xmlDocPtr doc = createXMLFromStruct(img);
+    if (doc == NULL){
         xmlCleanupParser();
-        xmlMemoryDump();
         return false;
     }
-    xmlSetNs(root_node, nameSpace); // set the namespace for the root node
 
-    if (strlen(img->title) != 0){
-        xmlNodePtr titleNode = xmlNewNode(NULL, BAD_CAST "title");
-        xmlNodePtr titleNodeTxt = xmlNewText(BAD_CAST img->title);
-        xmlAddChild(titleNode, titleNodeTxt);
-        xmlAddChild(root_node, titleNode);
-    }
-    if (strlen(img->description) != 0){
-        xmlNodePtr descNode = xmlNewNode(NULL, BAD_CAST "desc");
-        xmlNodePtr descNodeTxt = xmlNewText(BAD_CAST img->description);
-        xmlAddChild(descNode, descNodeTxt);
-        xmlAddChild(root_node, descNode);
-    }
-
-    /* 3.
-       calling functions that will loop through list (other attributes, rect, circ, path, groups),
-       and adds items to the parent, root_node svg
-       these functions will be used for both the svg children and the group children
-    */
-    addAttrListToParentNode(img->otherAttributes, &root_node); // ask: first or last?
-    addRectListToParentNode(img->rectangles, &root_node);
-    addCircListToParentNode(img->circles, &root_node);
-    addPathListToParentNode(img->paths, &root_node);
-    addGroupListToParentNode(img->groups, &root_node);
-
-    // 4. save contents to a file
+    // 2. save contents to a file
     xmlSaveFormatFileEnc(fileName, doc, "UTF-8", 1);
-    fclose(file);
 
-    // 5. free the document, global variables that may have been allocated by the parser
+    // 3. free the document
     xmlFreeDoc(doc);
-    xmlCleanupParser();
-
-    // debug memory for regression tests
-    xmlMemoryDump();
+    xmlCleanupParser(); // free global variables allocated by parser in the createXMLFromStruct() function
 
     return true;
 }
@@ -119,13 +90,25 @@ bool validateSVG(const SVG* img, const char* schemaFile){
 
     if (img == NULL || schemaFile == NULL) return false;
 
-    // 1. Convert the svg to an xml file using write to file
-    bool valid = writeSVG(img, "validatingFile.svg");
-    if (valid == false) return false;
+    // 1. Convert the svg to an xml doc using write to file
+    xmlDocPtr doc = createXMLFromStruct(img);
+    if (doc == NULL){
+        xmlCleanupParser();
+        return false;
+    }
 
-    // 2. Validate the file against the schema similar to the create valid svg function
-    valid = validateFileSVG("validatingFile.svg", schemaFile);
-    if (valid == false) return false;
+    xmlCleanupParser(); // free global variables allocated by parser in the createXMLFromStruct() function
+
+    // 2. Validate the xml doc against the schema similar to the create valid svg function
+    bool valid = validateFileSVG(doc, schemaFile);
+    if (valid == false){
+        xmlFreeDoc(doc);
+        xmlCleanupParser(); // free global variables allocated by parser in the validateFileSVG() function
+        return false;
+    }
+
+    xmlFreeDoc(doc);
+    xmlCleanupParser(); // free global variables allocated by parser in the validateFileSVG() function
 
     // 3. Validate the svg struct against the svgparser.h specifications
     valid = validSVGStruct(img);

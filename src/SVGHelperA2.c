@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <string.h>
+#include <math.h>
 
 #include <libxml/xmlschemastypes.h>
 #include <libxml/parser.h>
@@ -28,12 +29,14 @@
     will validate the file against the schema file
     if any function is not valid or the file validation is not successful, will return false
     if all functions succeed and the file validation is successful, will return true
+    NOTE: THE CALLER MUST CALL xmlCleanupParser() AFTER THIS FUNCTION IS CALLED OR THERE WILL BE MEMORY LEAKS!!!
 */
-bool validateFileSVG(const char* fileName, const char* schemaFile){
+bool validateFileSVG(xmlDocPtr doc, const char* schemaFile){
 
-    if (fileName == NULL || schemaFile == NULL) return false;
+    LIBXML_TEST_VERSION;
 
-    xmlDocPtr doc;
+    if (doc == NULL || schemaFile == NULL) return false;
+
     xmlSchemaPtr schema = NULL;
     xmlSchemaParserCtxtPtr pCtxt;
 
@@ -46,46 +49,95 @@ bool validateFileSVG(const char* fileName, const char* schemaFile){
     xmlSchemaSetParserErrors(pCtxt, (xmlSchemaValidityErrorFunc) fprintf, (xmlSchemaValidityWarningFunc) fprintf, stderr);
 
     schema = xmlSchemaParse(pCtxt);
-    if (schema == NULL) return false; // error parsing schema file
+    if (schema == NULL){
+        xmlSchemaFreeParserCtxt(pCtxt);
+        return false; // error parsing schema file
+    }
 
     xmlSchemaFreeParserCtxt(pCtxt);
 
-    // tree parsing for the svg file
-    doc = xmlReadFile(fileName, NULL, 0);
-    if (doc == NULL) return false; // error parsing svg file
-
     xmlSchemaValidCtxtPtr vCtxt;
-    int ret;
 
     // validate the schema against the svg tree
     vCtxt = xmlSchemaNewValidCtxt(schema);
-    if (vCtxt == NULL) return false; // error creating context
+    if (vCtxt == NULL){
+        xmlSchemaFreeValidCtxt(vCtxt);
+        if (schema != NULL) xmlSchemaFree(schema);
+        xmlSchemaFree(schema);
+        xmlSchemaCleanupTypes();
+        return false; // error creating context
+    }
 
     xmlSchemaSetValidErrors(vCtxt, (xmlSchemaValidityErrorFunc) fprintf, (xmlSchemaValidityWarningFunc) fprintf, stderr);
-    ret = xmlSchemaValidateDoc(vCtxt, doc);
+    int ret = xmlSchemaValidateDoc(vCtxt, doc);
 
     // xmlSchemaValidateDoc returns 0 if the document is schemas valid, any other number indicates fail
     if (ret != 0){
         xmlSchemaFreeValidCtxt(vCtxt);
-        xmlFreeDoc(doc);
         if (schema != NULL) xmlSchemaFree(schema);
+        xmlSchemaFree(schema);
         xmlSchemaCleanupTypes();
-        xmlCleanupParser();
-        xmlMemoryDump();
         return false;
     }
 
     // ret == 0, the file is valid, can create a valid svg
+    // free the resources
     xmlSchemaFreeValidCtxt(vCtxt);
-    xmlFreeDoc(doc);
-    // free the resource
     if (schema != NULL) xmlSchemaFree(schema);
-
     xmlSchemaCleanupTypes();
-    xmlCleanupParser();
-    xmlMemoryDump();
 
     return true;
+
+}
+
+/*
+    This function will convert an svg structure into an xml document
+    it will call all helper functions that add each shape to the root_node
+    it will return an xmlDocPtr
+    NOTE: THE CALLER MUST CALL xmlCleanupParser() AFTER THIS FUNCTION IS CALLED OR THERE WILL BE MEMORY LEAKS!!!
+*/
+xmlDocPtr createXMLFromStruct(const SVG* img){
+
+    LIBXML_TEST_VERSION;
+
+    xmlDocPtr doc = NULL; // document pointer
+    xmlNodePtr root_node = NULL; // root of tree
+
+    // 1. convert the SVG to an XML by creating a new document, a node and set it as a root node
+    doc = xmlNewDoc(BAD_CAST "1.0");
+    root_node = xmlNewNode(NULL, BAD_CAST "svg");
+    xmlDocSetRootElement(doc, root_node);
+
+    // 2. set the namespace, title, and description using the xmlNewText
+    xmlNsPtr nameSpace = xmlNewNs(root_node, (const xmlChar*) img->namespace, NULL); // prefix = NULL
+    if (nameSpace == NULL){
+        return NULL;
+    }
+    xmlSetNs(root_node, nameSpace); // set the namespace for the root node
+
+    if (strlen(img->title) != 0){
+        xmlNodePtr titleNode = xmlNewChild(root_node, NULL, BAD_CAST "title", NULL);
+        xmlNodePtr titleNodeTxt = xmlNewText(BAD_CAST img->title);
+        xmlAddChild(titleNode, titleNodeTxt);
+    }
+    if (strlen(img->description) != 0){
+        xmlNodePtr descNode = xmlNewChild(root_node, NULL, BAD_CAST "desc", NULL);
+        xmlNodePtr descNodeTxt = xmlNewText(BAD_CAST img->description);
+        xmlAddChild(descNode, descNodeTxt);
+    }
+
+    /* 3.
+       calling functions that will loop through list (other attributes, rect, circ, path, groups),
+       and adds items to the parent, root_node svg
+       these functions will be used for both the svg children and the group children
+    */
+    addRectListToParentNode(img->rectangles, &root_node);
+    addCircListToParentNode(img->circles, &root_node);
+    addPathListToParentNode(img->paths, &root_node);
+    addGroupListToParentNode(img->groups, &root_node);
+    addAttrListToParentNode(img->otherAttributes, &root_node);
+
+    return doc;
 
 }
 
@@ -234,11 +286,11 @@ void addGroupListToParentNode(List* groupList, xmlNodePtr* parent){
 
         // 2. call the other attribute rect, circle, path, functions with the
         // node as the parent in this case parent is a group node
-        addAttrListToParentNode(group->otherAttributes, &node); // ask: first or last?
         addRectListToParentNode(group->rectangles, &node);
         addCircListToParentNode(group->circles, &node);
         addPathListToParentNode(group->paths, &node);
         addGroupListToParentNode(group->groups, &node);
+        addAttrListToParentNode(group->otherAttributes, &node);
     }
 
 }
@@ -271,7 +323,7 @@ char* unitsWithNumber(float number, char units[]){
     - Lists must not be NULL
     - Loops through items in lists and validates each struct in those lists
 */
-bool validSVGStruct(const SVG* svg){
+bool validSVGStruct(const SVG* svg){ // const means it cannot be changes
 
     if (svg == NULL) return false;
 
@@ -290,11 +342,11 @@ bool validSVGStruct(const SVG* svg){
     if (emptyString((char*)svg->namespace) == 0) return false;
 
     // 3. if not empty, are the list contents valid?
-    if ((isListEmpty(svg->otherAttributes) == 0) && (validAttrListStruct(svg->otherAttributes) == false)) return false;
     if ((isListEmpty(svg->rectangles) == 0) && (validRectListStruct(svg->rectangles) == false)) return false;
     if ((isListEmpty(svg->circles) == 0) && (validCircListStruct(svg->circles) == false)) return false;
     if ((isListEmpty(svg->paths) == 0) && (validPathListStruct(svg->paths) == false)) return false;
     if ((isListEmpty(svg->groups) == 0) && (validGroupListStruct(svg->groups) == false)) return false;
+    if ((isListEmpty(svg->otherAttributes) == 0) && (validAttrListStruct(svg->otherAttributes) == false)) return false;
 
     // 4. success
     return true;
@@ -446,11 +498,11 @@ bool validGroupStruct(Group* group){
 
     // 2. list contents valid?
     // if the list is not empty, check if the content is valid
-    if ((isListEmpty(group->otherAttributes) == 0) && (validAttrListStruct(group->otherAttributes) == false)) return false;
     if ((isListEmpty(group->rectangles) == 0) && (validRectListStruct(group->rectangles) == false)) return false;
     if ((isListEmpty(group->circles) == 0) && (validCircListStruct(group->circles) == false)) return false;
     if ((isListEmpty(group->paths) == 0) && (validPathListStruct(group->paths) == false)) return false;
     if ((isListEmpty(group->groups) == 0) && (validGroupListStruct(group->groups) == false)) return false;
+    if ((isListEmpty(group->otherAttributes) == 0) && (validAttrListStruct(group->otherAttributes) == false)) return false;
 
     return true;
 }
@@ -477,7 +529,7 @@ bool validGroupListStruct(List* groupList){
 bool checkRange(float number){
 
     if (number < 0) return false;
-    //do we have to check for range in a floating point number? isfinate?
+    if (isinf(number) || isnan(number)) return false;
     return true;
 
 }
