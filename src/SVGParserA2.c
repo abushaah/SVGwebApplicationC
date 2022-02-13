@@ -200,3 +200,227 @@ void addComponent(SVG* img, elementType type, void* newElement){
     }
 
 }
+
+char* attrToJSON(const Attribute *a){ // const means it cannot be changed and it is safe to use
+
+    if (a == NULL){
+        char* attrString = malloc(strlen("{}") + 1);
+        sprintf(attrString, "{}");
+        return attrString;
+    }
+
+    // assuming that these attributes are validated using the validate svg function and that they are not NULL and are initialized
+    char* attrString = malloc(strlen(a->name) + strlen(a->value) + 31); // 31 characters for words, quotes, commas, semicolons, \0
+    sprintf(attrString, "{\"name\":\"%s\",\"value\":\"%s\"}", a->name, a->value);
+    return attrString;
+
+}
+
+char* circleToJSON(const Circle *c){
+
+    if (c == NULL){
+        char* circString = malloc(strlen("{}") + 1);
+        sprintf(circString, "{}");
+        return circString;
+    }
+
+    // 3 floats, 35 characters each, 1 int, 10 characters, 41 characters for words, quotes, commas, semicolons, \0
+    char* circString = malloc(strlen(c->units) + 156);
+    sprintf(circString, "{\"cx\":%.2f,\"cy\":%.2f,\"r\":%.2f,\"numAttr\":%d,\"units\":\"%s\"}", c->cx, c->cy, c->r, getLength(c->otherAttributes), c->units);
+    return circString;
+
+}
+
+char* rectToJSON(const Rectangle *r){
+
+    if (r == NULL){
+        char* rectString = malloc(strlen("{}") + 1);
+        sprintf(rectString, "{}");
+        return rectString;
+    }
+
+    // 4 floats, 35 characters each, 1 int, 10 characters, 44 characters for words, quotes, commas, semicolons, \0
+    char* rectString = malloc(strlen(r->units) + 194);
+    sprintf(rectString, "{\"x\":%.2f,\"y\":%.2f,\"w\":%.2f,\"h\":%.2f,\"numAttr\":%d,\"units\":\"%s\"}", r->x, r->y, r->width, r->height, getLength(r->otherAttributes), r->units);
+    return rectString;
+
+
+}
+
+char* pathToJSON(const Path *p){
+
+    if (p == NULL){
+        char* pathString = malloc(strlen("{}") + 1);
+        sprintf(pathString, "{}");
+        return pathString;
+    }
+
+    char* tempData = malloc(65);
+    strncpy(tempData, p->data, 64);
+
+    // 1 int, 10 characters, 21 characters for words, quotes, commas, semicolons, \0
+    char* pathString = malloc(64 + 31);
+    sprintf(pathString, "{\"d\":\"%s\",\"numAttr\":%d}", tempData, getLength(p->otherAttributes));
+    free(tempData);
+
+    return pathString;
+
+}
+
+char* groupToJSON(const Group *g){
+
+    if (g == NULL){
+        char* groupString = malloc(strlen("{}") + 1);
+        sprintf(groupString, "{}");
+        return groupString;
+    }
+
+    // 2 int, 10 characters, 25 characters for words, quotes, commas, semicolons, \0
+    char* groupString = malloc(20 + 25);
+    sprintf(groupString, "{\"children\":%d,\"numAttr\":%d}", (getLength(g->rectangles) + getLength(g->circles) + getLength(g->paths) + getLength(g->groups)), getLength(g->otherAttributes));
+    return groupString;
+
+}
+
+char* SVGtoJSON(const SVG* img){
+
+    if (img == NULL){
+        char* svgString = malloc(strlen("{}") + 1);
+        sprintf(svgString, "{}");
+        return svgString;
+    }
+
+    List* rectList = getRects(img);
+    int numRect = getLength(rectList);
+    freeList(rectList);
+
+    List* circList = getCircles(img);
+    int numCirc = getLength(circList);
+    freeList(circList);
+
+    List* pathList = getPaths(img);
+    int numPaths = getLength(pathList);
+    freeList(pathList);
+
+    List* groupList = getGroups(img);
+    int numGroups = getLength(groupList);
+    freeList(groupList);
+
+    // 4 int, 10 characters, 49 characters for words, quotes, commas, semicolons, \0
+    char* svgString = malloc(40 + 49);
+    sprintf(svgString, "{\"numRect\":%d,\"numCirc\":%d,\"numPaths\":%d,\"numGroups\":%d}", numRect, numCirc, numPaths, numGroups);
+
+    return svgString;
+
+}
+
+char* attrListToJSON(const List *list){
+
+    if (list == NULL){
+        char* attrListString = malloc(strlen("[]") + 1);
+        sprintf(attrListString, "[]");
+        return attrListString;
+    }
+
+    // 1. initialize the string
+    char* attrListString = malloc(strlen("[]") + 1);
+    int size = 2; // so far the number of characters in the string is 2 for the '[]'
+    strcpy(attrListString, "[");
+
+    int index = 0; // index of the element to know when to add a comma
+
+    // 2. traverse through the list
+    List* attrList = (List *) list;
+
+    void* elem;
+    ListIterator iter = createIterator(attrList);
+    while ((elem = nextElement(&iter)) != NULL){
+
+        // 3. for each attribute, get the string
+        Attribute* attr = (Attribute*) elem;
+        char* currAttr = attrToJSON(attr);
+
+        // 4. update the size of the number of characters that are to be in the list string
+        size += strlen(currAttr) + 1; // 1 for the comma
+
+        // 5. reallocate for the new size, 1 for null character
+        attrListString = realloc(attrListString, size + 1);
+
+        // 6. add the attribute string and the comma
+        if (index > 0){
+            strcat(attrListString, ",");
+        }
+        strcat(attrListString, currAttr);
+
+        // 7. done with the current attribute
+        free(currAttr);
+        ++index;
+    }
+
+    // 8. add the ending bracket
+    strcat(attrListString, "]");
+
+    return attrListString;
+
+}
+
+char* circListToJSON(const List *list){
+
+    if (list == NULL){
+        char* circListString = malloc(strlen("[]") + 1);
+        sprintf(circListString, "[]");
+        return circListString;
+    }
+
+    // 1. initialize the string
+    char* circListString = malloc(strlen("[]") + 1);
+    int size = 2; // so far the number of characters in the string is 2 for the '[]'
+    strcpy(circListString, "[");
+
+    int index = 0; // index of the element to know when to add a comma
+
+    // 2. traverse through the list
+    List* circList = (List *) list;
+
+    void* elem;
+    ListIterator iter = createIterator(circList);
+    while ((elem = nextElement(&iter)) != NULL){
+
+        // 3. for each attribute, get the string
+        Circle* circ = (Circle*) elem;
+        char* currCirc = circleToJSON(circ);
+
+        // 4. update the size of the number of characters that are to be in the list string
+        size += strlen(currCirc) + 1; // 1 for the comma
+
+        // 5. reallocate for the new size, 1 for null character
+        circListString = realloc(circListString, size + 1);
+
+        // 6. add the attribute string and the comma
+        if (index > 0){
+            strcat(circListString, ",");
+        }
+        strcat(circListString, currCirc);
+
+        // 7. done with the current attribute
+        free(currCirc);
+        ++index;
+    }
+
+    // 8. add the ending bracket
+    strcat(circListString, "]");
+
+    return circListString;
+
+}
+
+char* rectListToJSON(const List *list);
+char* pathListToJSON(const List *list);
+char* groupListToJSON(const List *list);
+
+/*
+// Bonus
+SVG* JSONtoSVG(const char* svgString);
+Rect* JSONtoRect(const char* svgString);
+Circle* JSONtoCircle(const char* svgString);
+*/

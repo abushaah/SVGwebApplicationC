@@ -44,4 +44,9 @@ int getGroupAttrLen(List* list);
 
 int compareInGroups(List *group, bool (*customCompare)(const void* first, const void* second), const void* searchRecord, char* type);
 
+void dummyDeleteRectangle(void* data);
+void dummyDeleteCircle(void* data);
+void dummyDeletePath(void* data);
+void dummyDeleteGroup(void* data);
+
 #endif

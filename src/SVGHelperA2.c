@@ -304,7 +304,7 @@ void addGroupListToParentNode(List* groupList, xmlNodePtr* parent){
 */
 char* unitsWithNumber(float number, char units[]){
 
-    char* numWithUnits = numWithUnits = malloc(50 + (strlen(units)) + 1); // max length of float, units, and \0
+    char* numWithUnits = malloc(50 + (strlen(units)) + 1); // max length of float, units, and \0
 
     sprintf(numWithUnits, "%f", number);
 
