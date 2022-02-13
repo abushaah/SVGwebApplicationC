@@ -255,13 +255,9 @@ char* pathToJSON(const Path *p){
         return pathString;
     }
 
-    char* tempData = malloc(65);
-    strncpy(tempData, p->data, 64);
-
     // 1 int, 10 characters, 21 characters for words, quotes, commas, semicolons, \0
-    char* pathString = malloc(64 + 31);
-    sprintf(pathString, "{\"d\":\"%s\",\"numAttr\":%d}", tempData, getLength(p->otherAttributes));
-    free(tempData);
+    char* pathString = malloc(strlen(p->data) + 31);
+    sprintf(pathString, "{\"d\":\"%.64s\",\"numAttr\":%d}", p->data, getLength(p->otherAttributes));
 
     return pathString;
 
@@ -396,13 +392,13 @@ char* circListToJSON(const List *list){
         // 5. reallocate for the new size, 1 for null character
         circListString = realloc(circListString, size + 1);
 
-        // 6. add the attribute string and the comma
+        // 6. add the circle string and the comma
         if (index > 0){
             strcat(circListString, ",");
         }
         strcat(circListString, currCirc);
 
-        // 7. done with the current attribute
+        // 7. done with the current circle
         free(currCirc);
         ++index;
     }
@@ -414,12 +410,158 @@ char* circListToJSON(const List *list){
 
 }
 
-char* rectListToJSON(const List *list);
-char* pathListToJSON(const List *list);
-char* groupListToJSON(const List *list);
+char* rectListToJSON(const List *list){
+
+    if (list == NULL){
+        char* rectListString = malloc(strlen("[]") + 1);
+        sprintf(rectListString, "[]");
+        return rectListString;
+    }
+
+    // 1. initialize the string
+    char* rectListString = malloc(strlen("[]") + 1);
+    int size = 2; // so far the number of characters in the string is 2 for the '[]'
+    strcpy(rectListString, "[");
+
+    int index = 0; // index of the element to know when to add a comma
+
+    // 2. traverse through the list
+    List* rectList = (List *) list;
+
+    void* elem;
+    ListIterator iter = createIterator(rectList);
+    while ((elem = nextElement(&iter)) != NULL){
+
+        // 3. for each attribute, get the string
+        Rectangle* rect = (Rectangle*) elem;
+        char* currRect = rectToJSON(rect);
+
+        // 4. update the size of the number of characters that are to be in the list string
+        size += strlen(currRect) + 1; // 1 for the comma
+
+        // 5. reallocate for the new size, 1 for null character
+        rectListString = realloc(rectListString, size + 1);
+
+        // 6. add the rectangle string and the comma
+        if (index > 0){
+            strcat(rectListString, ",");
+        }
+        strcat(rectListString, currRect);
+
+        // 7. done with the current rectangle
+        free(currRect);
+        ++index;
+    }
+
+    // 8. add the ending bracket
+    strcat(rectListString, "]");
+
+    return rectListString;
+
+}
+
+char* pathListToJSON(const List *list){
+
+    if (list == NULL){
+        char* pathListString = malloc(strlen("[]") + 1);
+        sprintf(pathListString, "[]");
+        return pathListString;
+    }
+
+    // 1. initialize the string
+    char* pathListString = malloc(strlen("[]") + 1);
+    int size = 2; // so far the number of characters in the string is 2 for the '[]'
+    strcpy(pathListString, "[");
+
+    int index = 0; // index of the element to know when to add a comma
+
+    // 2. traverse through the list
+    List* pathList = (List *) list;
+
+    void* elem;
+    ListIterator iter = createIterator(pathList);
+    while ((elem = nextElement(&iter)) != NULL){
+
+        // 3. for each attribute, get the string
+        Path* path = (Path*) elem;
+        char* currPath = pathToJSON(path);
+
+        // 4. update the size of the number of characters that are to be in the list string
+        size += strlen(currPath) + 1; // 1 for the comma
+
+        // 5. reallocate for the new size, 1 for null character
+        pathListString = realloc(pathListString, size + 1);
+
+        // 6. add the path string and the comma
+        if (index > 0){
+            strcat(pathListString, ",");
+        }
+        strcat(pathListString, currPath);
+
+        // 7. done with the current path
+        free(currPath);
+        ++index;
+    }
+
+    // 8. add the ending bracket
+    strcat(pathListString, "]");
+
+    return pathListString;
+
+}
+
+char* groupListToJSON(const List *list){
+
+    if (list == NULL){
+        char* groupListString = malloc(strlen("[]") + 1);
+        sprintf(groupListString, "[]");
+        return groupListString;
+    }
+
+    // 1. initialize the string
+    char* groupListString = malloc(strlen("[]") + 1);
+    int size = 2; // so far the number of characters in the string is 2 for the '[]'
+    strcpy(groupListString, "[");
+
+    int index = 0; // index of the element to know when to add a comma
+
+    // 2. traverse through the list
+    List* groupList = (List *) list;
+
+    void* elem;
+    ListIterator iter = createIterator(groupList);
+    while ((elem = nextElement(&iter)) != NULL){
+
+        // 3. for each attribute, get the string
+        Group* group = (Group*) elem;
+        char* currGroup = groupToJSON(group);
+
+        // 4. update the size of the number of characters that are to be in the list string
+        size += strlen(currGroup) + 1; // 1 for the comma
+
+        // 5. reallocate for the new size, 1 for null character
+        groupListString = realloc(groupListString, size + 1);
+
+        // 6. add the group string and the comma
+        if (index > 0){
+            strcat(groupListString, ",");
+        }
+        strcat(groupListString, currGroup);
+
+        // 7. done with the current group
+        free(currGroup);
+        ++index;
+    }
+
+    // 8. add the ending bracket
+    strcat(groupListString, "]");
+
+    return groupListString;
+
+}
 
 /*
-// Bonus
+// Bonus functions
 SVG* JSONtoSVG(const char* svgString);
 Rect* JSONtoRect(const char* svgString);
 Circle* JSONtoCircle(const char* svgString);
