@@ -642,12 +642,14 @@ SVG* JSONtoSVG(const char* svgString){
 
     if (svgString == NULL) return NULL;
 
+    // 1. create a new struct
     SVG* svg = (SVG*) (malloc(sizeof(SVG)));
     if (svg == NULL) return NULL;
 
+    // 2. parse the string given and add/initialize the values for the struct
     char* tempSVGString = malloc(strlen(svgString) + 1); // temp string since strtok is destrutive
     if (tempSVGString == NULL){
-        free(svg);
+        deleteSVG(svg);
         return NULL; // cannot allocate string
     }
     strcpy(tempSVGString, svgString);
@@ -656,11 +658,25 @@ SVG* JSONtoSVG(const char* svgString){
 
     strcpy(svg->namespace, "http://www.w3.org/2000/svg");
 
+    char *tmpStr;
+
     strtok(tempSVGString, ":");
-    strcpy(svg->title, strtok(NULL, "\""));
+    tmpStr = strtok(NULL, "\"");
+    if ((tmpStr == NULL) || (strcmp(tmpStr, "}") == 0) || (checkString(tmpStr) == false)){ // no value in string
+        strcpy(svg->title, "");
+    }
+    else{
+        strcpy(svg->title, tmpStr);
+    }
 
     strtok(NULL, ":");
-    strcpy(svg->description, strtok(NULL, "\""));
+    tmpStr = strtok(NULL, "\"");
+    if ((tmpStr == NULL) || (strcmp(tmpStr, "}") == 0) || (checkString(tmpStr) == false)){ // no value in string
+        strcpy(svg->description, "");
+    }
+    else{
+        strcpy(svg->description, tmpStr);
+    }
 
     svg->rectangles = initializeList(&rectangleToString, &deleteRectangle, &compareRectangles);
     svg->circles = initializeList(&circleToString, &deleteCircle, &compareCircles);
@@ -669,6 +685,14 @@ SVG* JSONtoSVG(const char* svgString){
     svg->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
 
     free(tempSVGString);
+
+    // 3. Validate the svg struct against the svgparser.h specifications using the helper fuctions
+    bool valid = validSVGStruct(svg);
+    if (valid == false){
+        deleteSVG(svg);
+        return NULL;
+    }
+
     return svg;
 
 }
@@ -677,43 +701,86 @@ Rectangle* JSONtoRect(const char* svgString){
 
     if (svgString == NULL) return NULL;
 
+    // 1. create a new rectangle struct
     Rectangle* rect = (Rectangle*) (malloc(sizeof(Rectangle)));
     if (rect == NULL) return NULL;
 
+    // 2. parse the string and add/initialize values
     char* tempSVGString = malloc(strlen(svgString) + 1);
     if (tempSVGString == NULL){
-        free(rect);
+        deleteRectangle(rect);
         return NULL; // cannot allocate string
     }
     strcpy(tempSVGString, svgString);
 
     // based on format: {"x":xVal,"y":yVal,"w":wVal,"h":hVal,"units":"unitStr"}
 
+    char* tmpStr;
+
     strtok(tempSVGString, ":");
-    float x = atof(strtok(NULL, ","));
-    rect->x = x;
+    tmpStr = strtok(NULL, ",");
+    if (tmpStr == NULL){ // no value in string
+        free(tempSVGString);
+        deleteRectangle(rect);
+        return NULL;
+    }
+    else{
+        rect->x = atof(tmpStr);
+    }
 
     strtok(NULL, ":");
-    float y = atof(strtok(NULL, ","));
-    rect->y = y;
+    tmpStr = strtok(NULL, ",");
+    if (tmpStr == NULL){ // no value in string
+        free(tempSVGString);
+        deleteRectangle(rect);
+        return NULL;
+    }
+    else{
+        rect->y = atof(tmpStr);
+    }
 
     strtok(NULL, ":");
-    float w = atof(strtok(NULL, ","));
-    rect->width = w;
+    tmpStr = strtok(NULL, ",");
+    if (tmpStr == NULL){ // no value in string
+        free(tempSVGString);
+        deleteRectangle(rect);
+        return NULL;
+    }
+    else{
+        rect->width = atof(tmpStr);
+    }
 
     strtok(NULL, ":");
-    float h = atof(strtok(NULL, ","));
-    rect->height = h;
+    tmpStr = strtok(NULL, ",");
+    if (tmpStr == NULL){ // no value in string
+        free(tempSVGString);
+        deleteRectangle(rect);
+        return NULL;
+    }
+    else{
+        rect->height = atof(tmpStr);
+    }
 
     strtok(NULL, ":");
-    strcpy(rect->units, strtok(NULL, "\""));
-    if (strcmp(rect->units, "}") == 0){ // no value in string
+    tmpStr = strtok(NULL, "\"");
+    if ((tmpStr == NULL) || (strcmp(tmpStr, "}") == 0) || (checkString(tmpStr) == false)){ // no value in string
         strcpy(rect->units, "");
+    }
+    else{
+        strcpy(rect->units, tmpStr);
     }
 
     rect->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
 
     free(tempSVGString);
+
+    // 3. Validate the rect struct against the svgparser.h specifications using the helper function
+    bool valid = validRectStruct(rect);
+    if (valid == false){
+        deleteRectangle(rect);
+        return NULL;
+    }
+
     return rect;
 
 }
@@ -722,39 +789,75 @@ Circle* JSONtoCircle(const char* svgString){
 
     if (svgString == NULL) return NULL;
 
+    // 1. create circle struct
     Circle* circ = (Circle*) (malloc(sizeof(Circle)));
     if (circ == NULL) return NULL;
 
+    // 2. parse the string and add/initialize appropriate values
     char* tempSVGString = malloc(strlen(svgString) + 1);
     if (tempSVGString == NULL){
-        free(circ);
+        deleteCircle(circ);
         return NULL; // cannot allocate string
     }
     strcpy(tempSVGString, svgString);
 
     // based on format: {"cx":xVal,"cy":yVal,"r":rVal,"units":"unitStr"}
 
+    char* tmpStr;
+
     strtok(tempSVGString, ":");
-    float cx = atof(strtok(NULL, ","));
-    circ->cx = cx;
+    tmpStr = strtok(NULL, ",");
+    if (tmpStr == NULL){ // no value in string
+        free(tempSVGString);
+        deleteCircle(circ);
+        return NULL;
+    }
+    else{
+        circ->cx = atof(tmpStr);
+    }
 
     strtok(NULL, ":");
-    float cy = atof(strtok(NULL, ","));
-    circ->cy = cy;
+    tmpStr = strtok(NULL, ",");
+    if (tmpStr == NULL){ // no value in string
+        free(tempSVGString);
+        deleteCircle(circ);
+        return NULL;
+    }
+    else{
+        circ->cy = atof(tmpStr);
+    }
 
     strtok(NULL, ":");
-    float r = atof(strtok(NULL, ","));
-    circ->r = r;
+    tmpStr = strtok(NULL, ",");
+    if (tmpStr == NULL){ // no value in string
+        free(tempSVGString);
+        deleteCircle(circ);
+        return NULL;
+    }
+    else{
+        circ->r = atof(tmpStr);
+    }
 
     strtok(NULL, ":");
-    strcpy(circ->units, strtok(NULL, "\""));
-    if (strcmp(circ->units, "}") == 0){ // no value in string
+    tmpStr = strtok(NULL, "\"");
+    if ((tmpStr == NULL) || (strcmp(tmpStr, "}") == 0) || (checkString(tmpStr) == false)){ // no value in string
         strcpy(circ->units, "");
+    }
+    else{
+        strcpy(circ->units, tmpStr);
     }
 
     circ->otherAttributes = initializeList(&attributeToString, &deleteAttribute, &compareAttributes);
 
     free(tempSVGString);
+
+    // 3. Validate the cricle struct against the svgparser.h specifications using the helper function
+    bool valid = validCircStruct(circ);
+    if (valid == false){
+        deleteCircle(circ);
+        return NULL;
+    }
+
     return circ;
 
 }
