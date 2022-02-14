@@ -1,9 +1,10 @@
 // Name: Haifaa Abushaaban [1146372]
 
-#ifndef SVGHELPER2_H
-#define SVGHELPER2_H
+#ifndef SVGHELPERA2_H
+#define SVGHELPERA2_H
 
 #include "SVGParser.h"
+#include "SVGHelper.h"
 
 // Module 1 helper functions:
 

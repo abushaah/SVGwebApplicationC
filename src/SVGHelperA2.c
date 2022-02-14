@@ -75,7 +75,6 @@ bool validateFileSVG(xmlDocPtr doc, const char* schemaFile){
     if (ret != 0){
         xmlSchemaFreeValidCtxt(vCtxt);
         if (schema != NULL) xmlSchemaFree(schema);
-        xmlSchemaFree(schema);
         xmlSchemaCleanupTypes();
         return false;
     }
@@ -340,6 +339,8 @@ bool validSVGStruct(const SVG* svg){ // const means it cannot be changes
     // 2. empty strings?
     if (validChar((char*)svg->namespace) == 0) return false;
     if (emptyString((char*)svg->namespace) == 0) return false;
+    if (checkString((char*)svg->title) == false) return false; // null but not empty
+    if (checkString((char*)svg->description) == false) return false;
 
     // 3. if not empty, are the list contents valid?
     if ((isListEmpty(svg->rectangles) == 0) && (validRectListStruct(svg->rectangles) == false)) return false;
@@ -356,7 +357,11 @@ bool validSVGStruct(const SVG* svg){ // const means it cannot be changes
 // validates single attribute structure
 bool validAttrStruct(Attribute* attr){
     if (attr == NULL) return false;
-    if (checkString(attr->name) == false || checkString(attr->value) == false) return false; // may be empty, may not be null
+    bool validName = checkString(attr->name);
+    bool validValue = checkString(attr->value);
+    if (validName == false || validValue == false) return false; // may be empty, may not be null
+
+//    if (checkString(attr->name) == false || checkString(attr->value) == false) return false; // may be empty, may not be null
     return true;
 }
 
@@ -529,6 +534,7 @@ bool validGroupListStruct(List* groupList){
 // validates that a string is initialized and may be empty
 bool checkString(char* string){
 
+    if (string == NULL) return false;
     if ((validChar(string) == 0) && (strcmp(string, "") != 0)) return false; // may be empty, may not be null
     return true;
 }
