@@ -662,7 +662,7 @@ SVG* JSONtoSVG(const char* svgString){
 
     strtok(tempSVGString, ":");
     tmpStr = strtok(NULL, "\"");
-    if ((tmpStr == NULL) || (strcmp(tmpStr, "}") == 0) || (checkString(tmpStr) == false)){ // no value in string
+    if ((tmpStr == NULL) || (strcmp(tmpStr, ",") == 0) || (checkString(tmpStr) == false)){ // no value in string
         strcpy(svg->title, "");
     }
     else{
