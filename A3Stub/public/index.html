@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SVG PARSER</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="SVG Parser">
+    <meta name="keywords" content="SVG XML C Images">
+    <meta name="author" content="Haifaa Abushaaban">
+    <!-- Load jquery, bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <!-- Custom CSS End -->
+</head>
+<body>
+
+<!--
+    <h3>Download test</h3>
+    If the A3 stub is running and rects.svg exists in the uploads/ directory on the server, then clicking on the link below will download it from the server.<br>
+    <a href="rects.svg" download>rects.svg</a>
+    <p></p>
+
+    <hr>
+    <div id="blah">I am blah</div>
+    <hr>
+    <form ref='someform'
+          id='someform'>
+          <div class="form-group">
+                <label for="entryBox">Last Name</label>
+                <input type="text" class="form-control" id="entryBox" value="Value" placeholder="Placeholder">
+          </div>
+        <div class="form-group">
+            <input type='submit' class="btn btn-secondary">
+        </div>
+    </form>
+
+    <form ref='uploadForm'
+		id='uploadForm'
+      action='/upload'
+      method='post'
+      encType="multipart/form-data">
+      <div class="form-group">
+      	<input type="file" name="uploadFile" class="btn btn-secondary">
+      	<input type='submit' value='Upload' class="btn btn-secondary">
+      </div>
+    </form>
+-->
+
+    <!-- START OF MY CODE -->
+    <div class="fileLogPanel">
+        <h1>File Log Panel</h1>
+        <div class="responsiveTable">
+            <table border="1" cellpadding = "5%" cellspacing = "0">
+                <tr>
+                    <td>Image<br>(click to download)</td>
+                    <td>File name<br>(click to download)</td>
+                    <td>File size</td>
+                    <td>Number of rectangles</td>
+                    <td>Number of circles </td>
+                    <td>Number of paths</td>
+                    <td>Number of paths</td>
+                    <td>Number of groups</td>
+                </tr>
+                <tr>
+                    <td><div class="image" id="getFile"> <!-- THIS PART NEEDS TO BE DYNAMIC -->
+                    <a href="rects.svg" download>
+                        <img src="rects.svg"/>
+                    </a>
+                    </div></td>
+                    <td><div class="link" id="getFile">
+                        <a href="rects.svg" download>rects.svg</a>
+                    </div></td>
+                    <td><div class="number" id="getSize"></div></td>
+                    <td><div class="number" id="numRect"></div></td>
+                    <td><div class="number" id="numCirc"></div></td>
+                    <td><div class="number" id="numPath"></div></td>
+                    <td><div class="number" id="numGroup"></div></td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        <div>
+            <form ref='uploadForm' id='uploadForm' action='/upload' method='post' encType="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" name="uploadFile" class="btn btn-secondary">
+                    <input type='submit' value='Upload' class="btn btn-secondary">
+                </div>
+            </form>
+        </div>
+        <br>
+    </div>
+    <hr>
+    <div class="svgViewPanel">
+        <h1>SVG View Panel</h1>
+
+        <label for="svgFiles">Choose a File</label>
+        <select name="svgFiles" id="svgFiles"></select>
+
+        <div class="responsiveTable">
+            <table border="1" cellpadding = "0%" cellspacing = "0">
+                <tr>
+                    <td><div class="image">Image</div></td>
+                </tr>
+                <tr>
+                    <td>
+                        <table border="1" cellpadding = "5%" cellspacing = "0" class="full">
+                            <tr>
+                                <td>Title</td>
+                                <td>Description</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div id="title">  
+                                        <span id="titleText">&lt;Title text&gt;</span>  
+                                        <a id="titleform" href="#">
+                                            <span class="editT">Edit</span>  
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div id="description">  
+                                        <span id="descText">&lt;Description text&gt;</span> 
+                                        <a id="descform" href="#">
+                                            <span class="editD">Edit</span>  
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table border="1" cellpadding = "5%" cellspacing = "0" class="full">
+                            <tr>
+                                <td>Component</td>
+                                <td>Summary</td>
+                                <td>Other Attributes</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">&lt;Component name&gt;</td>
+                                <td>&lt;Summary Text&gt;</td>
+                                <td>&lt;Other Attributes number&gt;<br><button id="viewAttr" class="btn btn-secondary">View</button> <button id="aAttr" class="btn btn-secondary">Add</button></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div id="showOtherAttr"> 
+                                        <span id="attrText">&lt;Other Attributes text&gt;</span> 
+                                        <a id="attrform" href="#">
+                                            <span class="editA">Edit</span>  
+                                        </a>
+                                    </div>
+                                    <form ref='attrform' id='addAttrform'>
+                                        <div class="form-group">
+                                            <br>
+                                            <input type="text" class="form-control" id="nameAttr" value="Name of new Attribute" placeholder="Placeholder">
+                                            <input type="text" class="form-control" id="valueAttr" value="Value of new Attribute" placeholder="Placeholder">
+                                            <br>
+                                            <input type='submit' class="btn btn-secondary" id="attrSubmit">
+                                        </div>
+                                    </form>
+                                    <!--Row for showing other attributes. It will only allow to edit and make button visible if the user clicked Edit-->
+                                    <br>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <form ref='scaleform' id='scaleform'>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="entryBox" value="Scale Factor" placeholder="Placeholder">
+                                        </div>
+                                        <div class="form-group">
+                                            <button id="sRect" class="btn btn-secondary">Scale Rectangles</button>
+                                            <button id="sCirc" class="btn btn-secondary">Scale Circles</button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>                 
+                </tr>
+            </table>
+        </div>
+    </div>
+    <hr>
+    <div class="functionalityPanel">
+        <h1>Functionality Panel</h1>
+        <ul>
+            <li>Create an SVG</li>
+            <li>Add a shape
+                <p>Drop down menu here to choose the file to add a shape to</p>
+            </li>
+        </ul>
+    </div>
+
+    <!-- END OF MY CODE -->
+
+    <!-- Leave me at the bottom of body -->
+    <script src="/index.js"></script>
+</body>
+</html>
