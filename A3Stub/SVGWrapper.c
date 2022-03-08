@@ -24,7 +24,7 @@ int getNumber(char* componentType, char* filename){
 }
 
 /**
-    The getNumber function is created for the svg view panel
+    The editAddImgFile function is created for the svg view panel
     in order to change an element in an svg file
 */
 int editAddImgFile(char* componentType, int componentNumber, char* newName, char* newValue, char* filename){
@@ -36,7 +36,7 @@ int editAddImgFile(char* componentType, int componentNumber, char* newName, char
     if (img == NULL) return FAIL;
 
     elementType elem;
-    if (strcasecmp(componentType, "Attribute") == 0) elem = SVG_IMG;
+    if (strcasecmp(componentType, "Attribute") == 0) elem = SVG_IMG; // from string on the page
     else if (strcasecmp(componentType, "Rectangle") == 0) elem = RECT;
     else if (strcasecmp(componentType, "Circle") == 0) elem = CIRC;
     else if (strcasecmp(componentType, "Path") == 0) elem = PATH;
@@ -47,7 +47,7 @@ int editAddImgFile(char* componentType, int componentNumber, char* newName, char
     bool valid = setAttribute(img, elem, componentNumber, newAttribute);
     if (valid == false) return FAIL;
 
-    // d. memory management ouuu
+    // d. memory management
     deleteSVG(img);
 
     return SUCCESS;

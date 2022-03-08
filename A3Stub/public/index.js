@@ -15,7 +15,7 @@ jQuery(document).ready(function() {
                 so we do not need to parse it on the server.
                 JavaScript really does handle JSONs seamlessly
             */
-            jQuery('#blah').html("On page load, received string '"+data.somethingElse+"' from server");
+            jQuery('#blah').html("On page load, received string " + data.somethingElse + " from server");
             //We write the object to the console to show that the request was successful
             console.log(data);
 

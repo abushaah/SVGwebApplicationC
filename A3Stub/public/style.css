@@ -43,7 +43,6 @@ input[type=submit], button {
     }
 }
 
-
 /* START OF MY CODE */
 hr{
     color: #434343;
@@ -64,18 +63,13 @@ td, th{
     text-align: center;
     border-collapse: collapse;
 }
-table.full{
-    width: 100%;
-}
 div.responsiveTable{
     margin-left: auto;
     margin-right: auto;
     width: 90%;
-    overflow: scroll;
-}
-div.image{
-    border-style: solid;
-    border-color: #434343;
+    max-height: 400px;
+    overflow-y: scroll;
+    overflow-x: scroll;
 }
 ul{
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
