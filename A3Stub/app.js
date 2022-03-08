@@ -82,5 +82,20 @@ app.get('/endpoint1', function(req , res){
   );
 });
 
+app.get('/endpointAttr', function(req , res){ // add or edit attribute functionality
+
+  // req is an object of string values corresponding for arguments
+  let retStr = req.query.data1 + " " + req.query.data2;
+
+
+
+  res.send( // this will send the error return values
+    {
+      somethingElse: retStr
+    }
+  );
+
+});
+
 app.listen(portNum);
 console.log('Running app at localhost: ' + portNum);
