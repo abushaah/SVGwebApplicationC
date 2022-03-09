@@ -71,29 +71,48 @@ app.get('/uploads/:name', function(req , res){
 
 //******************** Your code goes here ********************/
 
-let sharedLib = ffi.Library('./parser', {
-  'printFunc': [ 'void', [ ] ],		//return type first, argument list second
-									//for void input type, leave argument list is empty
-  'addTwo': [ 'int', [ 'int' ] ],	//int return, int argument
-  'putDesc' : [ 'void', [ 'string' ] ],
-  'getDesc' : [ 'string', [] ]
+let sharedLib = ffi.Library('./libsvgparser', {
+  'validFile' : [ 'bool', [ 'string' ] ],
+  'getNumber' : [ 'int', [ 'string', 'string' ] ]
 });
 
 app.get('/fileInfo', function(req , res){ // get all the file information
 
   let files = [];
+  let data = [];
   let i = 0;
 
-  // 1. get all valid files
+  // 1. get all valid files, place in an array
   fs.readdirSync('./uploads').forEach(file => {
-      files[i] = file;
-      ++i;
+      let extension = file.split('.').pop();
+      let filename = "uploads/" + file;
+      if ((extension == 'svg') && (sharedLib.validFile(filename) == true)){ // if the file is valid
+          files[i] = filename;
+          ++i;
+      }
   });
+
+  // 2. get all the information we need
+  let size = 0;
+  while (size < i){
+
+    // a. get the numbers
+    let image = {};
+    image.filename = files[size];
+    image.numRects = sharedLib.getNumber("rect", files[size]);
+    image.numCircs = sharedLib.getNumber("circ", files[size]);
+    image.numPaths = sharedLib.getNumber("path", files[size]);
+    image.numGroups = sharedLib.getNumber("group", files[size]);
+
+    // d. lastly, push into the data array
+    data.push(image);
+    ++size;
+  }
 
   // 2. send the valid files
   res.send( // this will send the error return values
     {
-      info: files
+      info: data
     }
   );
 

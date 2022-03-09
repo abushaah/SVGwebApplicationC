@@ -9,6 +9,9 @@
 #include <libxml/xmlschemastypes.h>
 #include "LinkedListAPI.h"
 
+int getNumber(char* componentType, char* filename);
+bool validFile (char* filename);
+
 typedef enum COMP{
     SVG_IMG, CIRC, RECT, PATH, GROUP
 } elementType;

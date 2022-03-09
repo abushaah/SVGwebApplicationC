@@ -8,8 +8,7 @@ jQuery(document).ready(function() {
           info: ""
         },
         success: function (data) {
-            jQuery('#blah').html("On page load, received string " + data.info + " from server");
-            console.log(data.info);
+            jQuery('#blah').html("On page load, received string " + data.info[0].filename + " " + data.info[0].numRects);
         },
         fail: function(error) {
             $('#blah').html("On page load, received error from server");
