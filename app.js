@@ -71,24 +71,39 @@ app.get('/uploads/:name', function(req , res){
 
 //******************** Your code goes here ********************/
 
-//Sample endpoint
-app.get('/endpoint1', function(req , res){
-  let retStr = req.query.data1 + " " + req.query.data2;
-
-  res.send(
-    {
-      somethingElse: retStr
-    }
-  );
+let sharedLib = ffi.Library('./parser', {
+  'printFunc': [ 'void', [ ] ],		//return type first, argument list second
+									//for void input type, leave argument list is empty
+  'addTwo': [ 'int', [ 'int' ] ],	//int return, int argument
+  'putDesc' : [ 'void', [ 'string' ] ],
+  'getDesc' : [ 'string', [] ]
 });
 
+app.get('/fileInfo', function(req , res){ // get all the file information
+
+  let files = [];
+  let i = 0;
+
+  // 1. get all valid files
+  fs.readdirSync('./uploads').forEach(file => {
+      files[i] = file;
+      ++i;
+  });
+
+  // 2. send the valid files
+  res.send( // this will send the error return values
+    {
+      info: files
+    }
+  );
+
+});
+
+/*
 app.get('/endpointAttr', function(req , res){ // add or edit attribute functionality
 
   // req is an object of string values corresponding for arguments
   let retStr = req.query.data1 + " " + req.query.data2;
-
-
-
   res.send( // this will send the error return values
     {
       somethingElse: retStr
@@ -96,6 +111,7 @@ app.get('/endpointAttr', function(req , res){ // add or edit attribute functiona
   );
 
 });
+*/
 
 app.listen(portNum);
 console.log('Running app at localhost: ' + portNum);

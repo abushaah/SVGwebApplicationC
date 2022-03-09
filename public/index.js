@@ -1,27 +1,17 @@
 // Put all onload AJAX calls here, and event listeners
 jQuery(document).ready(function() {
-    // On page-load AJAX Example
     jQuery.ajax({
         type: 'get',            //Request type
         dataType: 'json',       //Data type - we will use JSON for almost everything
-        url: '/endpoint1',   //The server endpoint we are connecting to
+        url: '/fileInfo',   //The server endpoint we are connecting to
         data: {
-            data1: "Value 1",
-            data2:1234.56
+          info: ""
         },
         success: function (data) {
-            /*  Do something with returned object
-                Note that what we get is an object, not a string,
-                so we do not need to parse it on the server.
-                JavaScript really does handle JSONs seamlessly
-            */
-            jQuery('#blah').html("On page load, received string " + data.somethingElse + " from server");
-            //We write the object to the console to show that the request was successful
-            console.log(data);
-
+            jQuery('#blah').html("On page load, received string " + data.info + " from server");
+            console.log(data.info);
         },
         fail: function(error) {
-            // Non-200 return, do something with error
             $('#blah').html("On page load, received error from server");
             console.log(error);
         }
