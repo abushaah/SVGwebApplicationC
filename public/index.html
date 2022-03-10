@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SVG PARSER</title>
+    <title>SVG Image Viewer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="SVG Parser">
@@ -52,7 +52,7 @@
 
     <!-- START OF MY CODE -->
     <div class="fileLogPanel">
-        <h1>File Log Panel</h1>
+        <h1>File Log</h1>
         <div class="responsiveTable">
             <table border="1" cellpadding = "5%" cellspacing = "0" id = "fileLog">
                 <thead>
@@ -83,10 +83,12 @@
     </div>
     <hr>
     <div class="svgViewPanel">
-        <h1>SVG View Panel</h1>
+        <h1>SVG View</h1>
 
-        <label for="svgFiles">Choose a File</label>
-        <select name="svgFiles" id="svgFiles"></select>
+        <div id="svgFiles">
+            <label for="svgLabel">Choose a file: </label>
+        </div>
+        <button id="viewFile" class="btn btn-secondary">View SVG</button><br><br>
 
         <div class="responsiveTable">
             <table border="1" cellpadding = "0%" cellspacing = "0">
@@ -159,7 +161,7 @@
                                 <td colspan="3">
                                     <form ref='scaleform' id='scaleform'>
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="entryBox" value="Scale Factor" placeholder="Placeholder">
+                                            <input type="text" class="form-control" id="scaleValue" value="Scale Factor" placeholder="Placeholder">
                                         </div>
                                         <div class="form-group">
                                             <button id="sRect" class="btn btn-secondary">Scale Rectangles</button>
@@ -176,13 +178,12 @@
     </div>
     <hr>
     <div class="functionalityPanel">
-        <h1>Functionality Panel</h1>
-        <ul>
-            <li>Create an SVG</li>
-            <li>Add a shape
-                <p>Drop down menu here to choose the file to add a shape to</p>
-            </li>
-        </ul>
+        <h1>Functionality</h1>
+        <button id="createNewSVG" class="btn btn-secondary">Create SVG</button><br><br>
+        <div id="svgFilesAddShape">
+            <label for="svgLabel">Choose a file: </label>
+        </div>
+            <button id="addShape" class="btn btn-secondary">Add a shape</button><br><br>
     </div>
 
     <!-- END OF MY CODE -->

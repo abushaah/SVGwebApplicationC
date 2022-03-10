@@ -90,6 +90,9 @@ app.get('/fileInfo', function(req , res){ // get all the file information
           files[i] = filename;
           ++i;
       }
+      else{
+          console.log(filename + " not a valid svg file and not added to the file log panel");
+      }
   });
 
   // 2. get all the information we need
@@ -101,12 +104,21 @@ app.get('/fileInfo', function(req , res){ // get all the file information
 
     image.fileName = files[size];
     let currFile = fs.statSync(files[size]);
-    image.fileSize = ((currFile.size) / 1024).toPrecision(3); // size in kilobytes
+    image.fileSize = (Math.round((currFile.size) / 1024)); // size in kilobytes
     image.numRects = sharedLib.getNumber("rect", files[size]);
     image.numCircs = sharedLib.getNumber("circ", files[size]);
     image.numPaths = sharedLib.getNumber("path", files[size]);
     image.numGroups = sharedLib.getNumber("group", files[size]);
 
+    // b. for each shape, get all info
+/*
+    image.title = ;
+    image.decsription = ;
+    image.rectangles = [];
+    image.rectangles = [];
+    image.rectangles = [];
+    image.rectangles = [];
+*/
     // d. lastly, push into the data array
     data.push(image);
     ++size;

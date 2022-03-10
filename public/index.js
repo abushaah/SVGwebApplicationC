@@ -9,77 +9,67 @@ jQuery(document).ready(function() {
           info: ""
         },
         success: function (data) {
-
-            // Fill in the file log panel and the drop down menu
-            for (let i = 0; i < data.info.length; ++i) {
-                let file = data.info[i].fileName.split('/').pop();
-                let newRow = "<tr><td><a href=\"" + data.info[i].fileName + "\" download><img src=\"" + data.info[i].fileName + "\" class=\"logImage\" /></a></td><td><a href=\"" + data.info[i].fileName + "\" download>" + file + "</a></td><td>" + data.info[i].fileSize + "KB</td><td>" + data.info[i].numRects + "</td><td>" + data.info[i].numCircs + "</td><td>" + data.info[i].numPaths + "</td><td>" + data.info[i].numGroups+ "</td></tr>";
-                jQuery("#fileLog").append(newRow);
-            }
+            loadFileLog(data);
         },
         fail: function(error) {
-            $('#blah').html("On page load, received error from server");
             console.log(error);
         }
     });
 
-    // Event listener form example , we can use this instead explicitly listening for events
-    // No redirects if possible
-    $('#someform').submit(function(e){
-        $('#blah').html("Form has data: "+$('#entryBox').val());
-        e.preventDefault();
-        //Pass data to the Ajax call, so it gets passed to the server
-        $.ajax({
-            //Create an object for connecting to another waypoint
-        });
-    });
-
-    // START OF MY CODE Default: hidden objects
+    // hidden objects
     document.getElementById("addAttrform").style.display="none";
     document.getElementById("showOtherAttr").style.display="none";
 
+    // action listeners aka callback functions in order of appearance
+    document.getElementById('viewFile').onclick = function () {
+        let selectedVal = jQuery("#svg").children("option:selected").val();
+        console.log("User clicked on view file for " + selectedVal);
+    };
+
     document.getElementById('titleform').onclick = function () {
-        let role = $(this).find('.editT');
-        let value = $(this).siblings(); // search DOM
+        console.log("user clicked edit for title");
+        let role = jQuery(this).find('.editT');
+        let value = jQuery(this).siblings(); // search DOM
         let values = value.text();
 
         let newTitle = value.find('.titleTextBox').val();
 
         if (role.html() == "Edit") {
             role.html("Save");
-            $(this).siblings().html('<input type="textbox" class="titleTextBox" value="" placeholder="' + values + '">');
+            jQuery(this).siblings().html('<input type="textbox" class="titleTextBox" value="" placeholder="' + values + '">');
             values = "";
         }
         else {
             if (newTitle != "") {
-                $(this).siblings().html('<span id="titleText">' + newTitle + '</span>');
+                jQuery(this).siblings().html('<span id="titleText">' + newTitle + '</span>');
                 role.html("Edit");
             }
             else {
-                alert("Please Fill the field");
+                alert("Invalid, please fill the field");
             }
         }
     };
 
     document.getElementById('descform').onclick = function () {
-        let role = $(this).find('.editD');
-        let value = $(this).siblings(); // search DOM
+        console.log("user clicked edit for description");
+        let role = jQuery(this).find('.editD');
+        let value = jQuery(this).siblings(); // search DOM
         let values = value.text();
 
         let newDesc = value.find('.descTextBox').val();
 
         if (role.html() == "Edit") {
             role.html("Save");
-            $(this).siblings().html('<input type="textbox" class="descTextBox" value="" placeholder="' + values + '">');
+            jQuery(this).siblings().html('<input type="textbox" class="descTextBox" value="" placeholder="' + values + '">');
             values = "";
         }
         else {
             if (newDesc != "") {
-                $(this).siblings().html('<span id="descText">' + newDesc + '</span>');
+                jQuery(this).siblings().html('<span id="descText">' + newDesc + '</span>');
                 role.html("Edit");
             }
             else {
-                alert("Please Fill the field");
+                alert("Invalid, please fill the field");
             }
         }
     };
@@ -89,24 +79,25 @@ jQuery(document).ready(function() {
     };
 
     document.getElementById('attrform').onclick = function () {
-        let role = $(this).find('.editA');
-        let value = $(this).siblings(); // search DOM
+        console.log("user clicked edit for attribute");
+        let role = jQuery(this).find('.editA');
+        let value = jQuery(this).siblings(); // search DOM
         let values = value.text();
 
         let newAttr = value.find('.attrTextBox').val();
 
         if (role.html() == "Edit") {
             role.html("Save");
-            $(this).siblings().html('<input type="textbox" class="attrTextBox" value="" placeholder="' + values + '">');
+            jQuery(this).siblings().html('<input type="textbox" class="attrTextBox" value="" placeholder="' + values + '">');
             values = "";
         }
         else {
             if (newAttr != "") {
-                $(this).siblings().html('<span id="attrText">' + newAttr + '</span>');
+                jQuery(this).siblings().html('<span id="attrText">' + newAttr + '</span>');
                 role.html("Edit");
             }
             else {
-                alert("Please Fill the field");
+                alert("Invalid, please fill the field");
             }
         }
     };
@@ -116,10 +107,73 @@ jQuery(document).ready(function() {
         let newName = document.getElementById('nameAttr').value;
         let newValue = document.getElementById('valueAttr').value;
         document.getElementById('attrSubmit').onclick = function (){
-            console.log("got this element: " + newName + " " + newValue);
+            console.log("Submitted this element to add to other attributes: " + newName + " " + newValue);
         };
     };
 
-    // END OF MY CODE
+    document.getElementById('sRect').onclick = function () {
+        let newScale = document.getElementById('scaleValue').value;
+        console.log("Submitted scaling rectangles by: " + newScale);
+    };
+
+    document.getElementById('sCirc').onclick = function () {
+        let newScale = document.getElementById('scaleValue').value;
+        console.log("Submitted scaling circles by: " + newScale);
+    };
+
+    document.getElementById('createNewSVG').onclick = function () {
+        console.log("User clicked on create a new SVG");
+    };
+
+    document.getElementById('addShape').onclick = function () {
+        let selectedVal = jQuery("#svgShape").children("option:selected").val();
+        console.log("User clicked on add a shape for " + selectedVal);
+    };
+
+    jQuery(document).on ('change', '#svg', function () {
+        let selectedVal = jQuery(this).children("option:selected").val();
+        console.log("User selected option " + selectedVal + " from SVG View drop down menu");
+    });
+
+    jQuery(document).on ('change', '#svgShape', function () {
+        let selectedVal = jQuery(this).children("option:selected").val();
+        console.log("User selected option " + selectedVal + " from funcitonality drop down menu");
+    });
 
 });
+
+// This function will fill in the file log panel and the drop down menu
+function loadFileLog(data){
+
+    // create the drop down menus for both svg view panel and funcitonality panel
+    let selectionSV = "<select id=\"svg\"></select>";
+    jQuery("#svgFiles").append(selectionSV);
+
+    let selectionF = "<select id=\"svgShape\"></select>";
+    jQuery("#svgFilesAddShape").append(selectionF);
+
+    // if no files, display no files
+    if (data.info.length == 0){
+        let newRow = "<tr><td colspan=\"7\">No files</td></tr>";
+        jQuery("#fileLog").append(newRow);
+    }
+    else{
+
+        // for each valid file ...
+        for (let i = 0; i < data.info.length; ++i) {
+
+            // a. get the file name without the path
+            let file = data.info[i].fileName.split('/').pop();
+
+            // b. place in the drop down menus
+            let newOption = "<option value=\"" + file + "\">" + file + "</option>";
+            jQuery("#svg").append(newOption);
+            jQuery("#svgShape").append(newOption);
+
+            // c. place in a row in a table
+            let newRow = "<tr><td><a href=\"" + data.info[i].fileName + "\" download><img src=\"" + data.info[i].fileName + "\" class=\"logImage\" /></a></td><td><a href=\"" + data.info[i].fileName + "\" download>" + file + "</a></td><td>" + data.info[i].fileSize + "KB</td><td>" + data.info[i].numRects + "</td><td>" + data.info[i].numCircs + "</td><td>" + data.info[i].numPaths + "</td><td>" + data.info[i].numGroups+ "</td></tr>";
+            jQuery("#fileLog").append(newRow);
+        }
+    }
+
+}
