@@ -131,7 +131,6 @@ app.get('/fileNum', function(req , res){ // get all the file information
 app.get('/fileInfo', function(req , res){ // get all the file information
 
   let file = req.query.info;
-console.log(file);
   let image = {};
 
   // 1. get all the information we need

@@ -172,7 +172,7 @@ function loadFileLog(data){
 
 function viewSVG(fileName){
 
-    let newFile = "uploads/quad01.svg";
+    let newFile = "uploads/rects.svg";
 
     // 1. ajax call to get the file information
     jQuery.ajax({
@@ -187,26 +187,15 @@ function viewSVG(fileName){
             console.log(data.info.title);
             console.log(data.info.description);
 
-            console.log("data: " + data.info.paths[0].d);
             // to access:
-            for (let i = 0; i < data.info.paths.length; ++i){
+            let index = 1;
+            for (let i of data.info.rectangles){
 
-                console.log(data.info.paths.length);
+                let data = "x = " + i.x + i.units + " y = " + i.y + i.units + " width = " + i.w + i.units + " height = " + i.h + i.units;
+                console.log(data);
+                let otherAttrNum = i.numAttr;
 
-                let index = i + 1;
-                console.log("index: " + index);
-                console.log("i: " + i);
-
-                console.log("data: " + data.info.paths[i].d);
-
-                let data = data.info.paths[i].d;
-
-                console.log("data made it here");
-                console.log("data: " + data);
-                let otherAttrNum = data.info.paths[i].numAttr;
-                console.log("other attr num: " + otherAttrNum);
-
-                let newRow = "<tr><td>Path " + index + "</td><td>path data = " + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                let newRow = "<tr><td>Rectangle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
                 jQuery("#fileView").append(newRow);
 /*
                                     <form ref='attrform' id='addAttrform'>
@@ -219,6 +208,7 @@ function viewSVG(fileName){
                                         </div>
                                     </form>
 */
+                ++index;
 
             }
         },
