@@ -9,7 +9,7 @@
 #include <libxml/xmlschemastypes.h>
 #include "LinkedListAPI.h"
 
-int getNumber(char* componentType, char* filename);
+char* getNumber(char* filename);
 bool validFile (char* filename);
 
 typedef enum COMP{

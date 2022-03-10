@@ -162,7 +162,7 @@ function loadFileLog(data){
             jQuery("#svgShape").append(newOption);
 
             // c. place in a row in a table
-            let newRow = "<tr><td><a href=\"" + data.info[i].fileName + "\" download><img src=\"" + data.info[i].fileName + "\" class=\"logImage\" /></a></td><td><a href=\"" + data.info[i].fileName + "\" download>" + file + "</a></td><td>" + data.info[i].fileSize + "KB</td><td>" + data.info[i].numRects + "</td><td>" + data.info[i].numCircs + "</td><td>" + data.info[i].numPaths + "</td><td>" + data.info[i].numGroups+ "</td></tr>";
+            let newRow = "<tr><td><a href=\"" + data.info[i].fileName + "\" download><img src=\"" + data.info[i].fileName + "\" class=\"logImage\" /></a></td><td><a href=\"" + data.info[i].fileName + "\" download>" + file + "</a></td><td>" + data.info[i].fileSize + "KB</td><td>" + data.info[i].numbers.numRect + "</td><td>" + data.info[i].numbers.numCirc + "</td><td>" + data.info[i].numbers.numPaths + "</td><td>" + data.info[i].numbers.numGroups + "</td></tr>";
             jQuery("#fileLog").append(newRow);
         }
     }

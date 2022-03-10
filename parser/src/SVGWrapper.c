@@ -10,42 +10,15 @@
 /**
     The getNumber function is created for the file log panel
 */
-int getNumber(char* componentType, char* filename){
+char* getNumber(char* filename){
 
     SVG* img = createValidSVG(filename, "uploads/svg.xsd");
-    if (img == NULL) return FAIL;
+    if (img == NULL) return NULL;
 
-    if (strcmp(componentType, "rect") == 0){
-        List* rectList = getRects(img);
-        int numRects = getLength(rectList);
-        deleteSVG(img);
-        freeList(rectList);
-        return (numRects);
-    }
-    else if (strcmp(componentType, "circ") == 0){
-        List* circList = getCircles(img);
-        int numCircs = getLength(circList);
-        deleteSVG(img);
-        freeList(circList);
-        return (numCircs);
-    }
-    else if (strcmp(componentType, "path") == 0){
-        List* pathList = getPaths(img);
-        int numPaths = getLength(pathList);
-        deleteSVG(img);
-        freeList(pathList);
-        return (numPaths);
-    }
-    else if (strcmp(componentType, "groups") == 0){
-        List* groupList = getGroups(img);
-        int numGroups = getLength(groupList);
-        deleteSVG(img);
-        freeList(groupList);
-        return (numGroups);
-    }
+    char* numbers = SVGtoJSON(img);
 
     deleteSVG(img);
-    return FAIL;
+    return numbers;
 }
 
 bool validFile (char* filename){

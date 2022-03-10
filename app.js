@@ -73,7 +73,7 @@ app.get('/uploads/:name', function(req , res){
 
 let sharedLib = ffi.Library('./libsvgparser', {
   'validFile' : [ 'bool', [ 'string' ] ],
-  'getNumber' : [ 'int', [ 'string', 'string' ] ]
+  'getNumber' : [ 'string', [ 'string'] ]
 });
 
 app.get('/fileInfo', function(req , res){ // get all the file information
@@ -105,19 +105,17 @@ app.get('/fileInfo', function(req , res){ // get all the file information
     image.fileName = files[size];
     let currFile = fs.statSync(files[size]);
     image.fileSize = (Math.round((currFile.size) / 1024)); // size in kilobytes
-    image.numRects = sharedLib.getNumber("rect", files[size]);
-    image.numCircs = sharedLib.getNumber("circ", files[size]);
-    image.numPaths = sharedLib.getNumber("path", files[size]);
-    image.numGroups = sharedLib.getNumber("group", files[size]);
+    image.numbers = JSON.parse(sharedLib.getNumber(files[size]));
 
     // b. for each shape, get all info
 /*
-    image.title = ;
-    image.decsription = ;
-    image.rectangles = [];
-    image.rectangles = [];
-    image.rectangles = [];
-    image.rectangles = [];
+    let titleDesc = sharedLib.getTitleDesc(files[size]);
+    image.title = titleDesc[0];
+    image.description = titleDesc[1];
+    image.rectangles = {};
+    image.circles = {};
+    image.paths = {};
+    image.groups = {};
 */
     // d. lastly, push into the data array
     data.push(image);
