@@ -131,6 +131,7 @@ app.get('/fileNum', function(req , res){ // get all the file information
 app.get('/fileInfo', function(req , res){ // get all the file information
 
   let file = req.query.info;
+console.log(file);
   let image = {};
 
   // 1. get all the information we need
@@ -143,7 +144,7 @@ app.get('/fileInfo', function(req , res){ // get all the file information
   image.paths = JSON.parse(sharedLib.getPathsJSON(file));
   image.groups = JSON.parse(sharedLib.getGroupsJSON(file));
 
-  // 2. send the valid files
+  // 2. send the valid object
   res.send( // this will send the error return values
     {
       info: image

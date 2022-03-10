@@ -18,8 +18,8 @@ jQuery(document).ready(function() {
     });
 
     // hidden objects
-    document.getElementById("addAttrform").style.display="none";
-    document.getElementById("showOtherAttr").style.display="none";
+//    document.getElementById("addAttrform").style.display="none";
+//    document.getElementById("showOtherAttr").style.display="none";
 
     // action listeners aka callback functions in order of appearance
     document.getElementById('viewFile').onclick = function () {
@@ -75,6 +75,7 @@ jQuery(document).ready(function() {
         }
     };
 
+/*
     document.getElementById('viewAttr').onclick = function () {
         document.getElementById("showOtherAttr").style.display="block";
     };
@@ -111,7 +112,7 @@ jQuery(document).ready(function() {
             alert("Submitted this element to add to other attributes: " + newName + " " + newValue);
         };
     };
-
+*/
     document.getElementById('sRect').onclick = function () {
         let newScale = document.getElementById('scaleValue').value;
         alert("Submitted scaling rectangles by: " + newScale);
@@ -171,21 +172,54 @@ function loadFileLog(data){
 
 function viewSVG(fileName){
 
+    let newFile = "uploads/quad01.svg";
+
     // 1. ajax call to get the file information
     jQuery.ajax({
         type: 'get',            //Request type
         dataType: 'json',       //Data type - we will use JSON for almost everything
         url: '/fileInfo',       //The server endpoint we are connecting to
         data: {
-          info: fileName
+          info: newFile
         },
         success: function (data) {
             // 1. place a table
             console.log(data.info.title);
             console.log(data.info.description);
+
+            console.log("data: " + data.info.paths[0].d);
             // to access:
             for (let i = 0; i < data.info.paths.length; ++i){
-                console.log("path " + data.info.paths[i].d);
+
+                console.log(data.info.paths.length);
+
+                let index = i + 1;
+                console.log("index: " + index);
+                console.log("i: " + i);
+
+                console.log("data: " + data.info.paths[i].d);
+
+                let data = data.info.paths[i].d;
+
+                console.log("data made it here");
+                console.log("data: " + data);
+                let otherAttrNum = data.info.paths[i].numAttr;
+                console.log("other attr num: " + otherAttrNum);
+
+                let newRow = "<tr><td>Path " + index + "</td><td>path data = " + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                jQuery("#fileView").append(newRow);
+/*
+                                    <form ref='attrform' id='addAttrform'>
+                                        <div class="form-group">
+                                            <br>
+                                            <input type="text" class="form-control" id="nameAttr" value="Name of new Attribute" placeholder="Placeholder">
+                                            <input type="text" class="form-control" id="valueAttr" value="Value of new Attribute" placeholder="Placeholder">
+                                            <br>
+                                            <input type='submit' class="btn btn-secondary" id="attrSubmit">
+                                        </div>
+                                    </form>
+*/
+
             }
         },
         fail: function(error) {
