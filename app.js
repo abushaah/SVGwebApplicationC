@@ -98,7 +98,10 @@ app.get('/fileInfo', function(req , res){ // get all the file information
 
     // a. get the numbers
     let image = {};
-    image.filename = files[size];
+
+    image.fileName = files[size];
+    let currFile = fs.statSync(files[size]);
+    image.fileSize = ((currFile.size) / 1024).toPrecision(3); // size in kilobytes
     image.numRects = sharedLib.getNumber("rect", files[size]);
     image.numCircs = sharedLib.getNumber("circ", files[size]);
     image.numPaths = sharedLib.getNumber("path", files[size]);

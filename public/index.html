@@ -51,37 +51,23 @@
 -->
 
     <!-- START OF MY CODE -->
-
-    <div id="blah">I am blah</div>
-
     <div class="fileLogPanel">
         <h1>File Log Panel</h1>
         <div class="responsiveTable">
-            <table border="1" cellpadding = "5%" cellspacing = "0">
-                <tr>
-                    <td>Image<br>(click to download)</td>
-                    <td>File name<br>(click to download)</td>
-                    <td>File size</td>
-                    <td>Number of rectangles</td>
-                    <td>Number of circles </td>
-                    <td>Number of paths</td>
-                    <td>Number of groups</td>
-                </tr>
-                <tr>
-                    <td><div id="getFile"> <!-- THIS PART NEEDS TO BE DYNAMIC -->
-                    <a href="rects.svg" download>
-                        <img src="rects.svg" class="logImage"/>
-                    </a>
-                    </div></td>
-                    <td><div class="link" id="getFile">
-                        <a href="rects.svg" download>rects.svg</a>
-                    </div></td>
-                    <td><div class="number" id="getSize"></div></td>
-                    <td><div class="number" id="numRect"></div></td>
-                    <td><div class="number" id="numCirc"></div></td>
-                    <td><div class="number" id="numPath"></div></td>
-                    <td><div class="number" id="numGroup"></div></td>
-                </tr>
+            <table border="1" cellpadding = "5%" cellspacing = "0" id = "fileLog">
+                <thead>
+                    <tr>
+                        <td>Image<br>(click to download)</td>
+                        <td>File name<br>(click to download)</td>
+                        <td>File size</td>
+                        <td>Number of rectangles</td>
+                        <td>Number of circles </td>
+                        <td>Number of paths</td>
+                        <td>Number of groups</td>
+                    </tr>
+                </thead>
+                <tbody> <!-- THIS PART NEEDS TO BE DYNAMIC -->
+                </tbody>
             </table>
         </div>
         <br>

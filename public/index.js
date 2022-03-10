@@ -1,14 +1,21 @@
 // Put all onload AJAX calls here, and event listeners
 jQuery(document).ready(function() {
+
     jQuery.ajax({
         type: 'get',            //Request type
         dataType: 'json',       //Data type - we will use JSON for almost everything
-        url: '/fileInfo',   //The server endpoint we are connecting to
+        url: '/fileInfo',       //The server endpoint we are connecting to
         data: {
           info: ""
         },
         success: function (data) {
-            jQuery('#blah').html("On page load, received string " + data.info[0].filename + " " + data.info[0].numRects);
+
+            // Fill in the file log panel and the drop down menu
+            for (let i = 0; i < data.info.length; ++i) {
+                let file = data.info[i].fileName.split('/').pop();
+                let newRow = "<tr><td><a href=\"" + data.info[i].fileName + "\" download><img src=\"" + data.info[i].fileName + "\" class=\"logImage\" /></a></td><td><a href=\"" + data.info[i].fileName + "\" download>" + file + "</a></td><td>" + data.info[i].fileSize + "KB</td><td>" + data.info[i].numRects + "</td><td>" + data.info[i].numCircs + "</td><td>" + data.info[i].numPaths + "</td><td>" + data.info[i].numGroups+ "</td></tr>";
+                jQuery("#fileLog").append(newRow);
+            }
         },
         fail: function(error) {
             $('#blah').html("On page load, received error from server");
