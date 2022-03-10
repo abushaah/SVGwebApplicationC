@@ -16,10 +16,10 @@ bool validFile (char* filename);
 char* getNumber(char* filename);
 char* getTitle(char* filename);
 char* getDescr(char* filename);
-char* getRects(char* filename);
-char* getCircs(char* filename);
-char* getPaths(char* filename);
-char* getGroups(char* filename);
+char* getRectsJSON(char* filename);
+char* getCircsJSON(char* filename);
+char* getPathsJSON(char* filename);
+char* getGroupsJSON(char* filename);
 
 // END OF WRAPPER FUNCTIONS
 

@@ -75,11 +75,11 @@ let sharedLib = ffi.Library('./libsvgparser', {
   'validFile' : [ 'bool', [ 'string' ] ],
   'getNumber' : [ 'string', [ 'string'] ],
   'getTitle' : [ 'string', [ 'string'] ],
-  'getDescr' : [ 'string', [ 'string'] ]
-  'getRects' : [ 'string', [ 'string'] ]
-  'getCircs' : [ 'string', [ 'string'] ]
-  'getPaths' : [ 'string', [ 'string'] ]
-  'getGroups' : [ 'string', [ 'string'] ]
+  'getDescr' : [ 'string', [ 'string'] ],
+  'getRectsJSON' : [ 'string', [ 'string'] ],
+  'getCircsJSON' : [ 'string', [ 'string'] ],
+  'getPathsJSON' : [ 'string', [ 'string'] ],
+  'getGroupsJSON' : [ 'string', [ 'string'] ]
 //  'getAttributes' : [ 'string', [ 'string'] ]
 });
 
@@ -130,7 +130,7 @@ app.get('/fileNum', function(req , res){ // get all the file information
 
 app.get('/fileInfo', function(req , res){ // get all the file information
 
-  let file = req.query.fileName;
+  let file = req.query.info;
   let image = {};
 
   // 1. get all the information we need
@@ -138,10 +138,10 @@ app.get('/fileInfo', function(req , res){ // get all the file information
   image.description = sharedLib.getDescr(file);
 
   // 2. for each shape, get all info on the shapes
-  image.rectangles = JSON.parse(sharedLib.getRects(file));
-  image.circles = JSON.parse(sharedLib.getCircs(file));
-  image.paths = JSON.parse(sharedLib.getPaths(file));
-  image.groups = JSON.parse(sharedLib.getGroups(file));
+  image.rectangles = JSON.parse(sharedLib.getRectsJSON(file));
+  image.circles = JSON.parse(sharedLib.getCircsJSON(file));
+  image.paths = JSON.parse(sharedLib.getPathsJSON(file));
+  image.groups = JSON.parse(sharedLib.getGroupsJSON(file));
 
   // 2. send the valid files
   res.send( // this will send the error return values

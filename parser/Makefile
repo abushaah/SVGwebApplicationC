@@ -53,4 +53,3 @@ $(BIN)StructListDemo.o: $(SRC)StructListDemo.c
 #This is the target for the in-class XML example
 SVGParser: $(SRC)SVGParser.c
 	$(CC) $(CFLAGS) -I$(XML_PATH) $(SRC)SVGParser.c -lxml2 -o $(BIN)SVGParser
-

@@ -10,7 +10,7 @@ jQuery(document).ready(function() {
         },
         success: function (data) {
             loadFileLog(data);
-            viewSVG(data.info[0].filename); // first file
+            viewSVG(data.info[0].fileName); // first file
         },
         fail: function(error) {
             alert(error);
@@ -183,6 +183,10 @@ function viewSVG(fileName){
             // 1. place a table
             console.log(data.info.title);
             console.log(data.info.description);
+            // to access:
+            for (let i = 0; i < data.info.paths.length; ++i){
+                console.log("path " + data.info.paths[i].d);
+            }
         },
         fail: function(error) {
             alert(error);

@@ -69,7 +69,7 @@ char* getDescr(char* filename){
 
 }
 
-char* getRects(char* filename){
+char* getRectsJSON(char* filename){
 
     SVG* img = createValidSVG(filename, "uploads/svg.xsd");
     if (img == NULL) return NULL;
@@ -82,20 +82,20 @@ char* getRects(char* filename){
 
 }
 
-char* getCircs(char* filename){
+char* getCircsJSON(char* filename){
 
     SVG* img = createValidSVG(filename, "uploads/svg.xsd");
     if (img == NULL) return NULL;
 
     char* circsString = circListToJSON(img->circles);
-    if (circString == NULL) return NULL;
+    if (circsString == NULL) return NULL;
 
     deleteSVG(img);
     return circsString;
 
 }
 
-char* getPaths(char* filename){
+char* getPathsJSON(char* filename){
 
     SVG* img = createValidSVG(filename, "uploads/svg.xsd");
     if (img == NULL) return NULL;
@@ -108,7 +108,7 @@ char* getPaths(char* filename){
 
 }
 
-char* getGroups(char* filename){
+char* getGroupsJSON(char* filename){
 
     SVG* img = createValidSVG(filename, "uploads/svg.xsd");
     if (img == NULL) return NULL;
