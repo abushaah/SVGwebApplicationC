@@ -9,8 +9,19 @@
 #include <libxml/xmlschemastypes.h>
 #include "LinkedListAPI.h"
 
-char* getNumber(char* filename);
+// WRAPPER FUNCTIONS HERE
+
 bool validFile (char* filename);
+
+char* getNumber(char* filename);
+char* getTitle(char* filename);
+char* getDescr(char* filename);
+char* getRects(char* filename);
+char* getCircs(char* filename);
+char* getPaths(char* filename);
+char* getGroups(char* filename);
+
+// END OF WRAPPER FUNCTIONS
 
 typedef enum COMP{
     SVG_IMG, CIRC, RECT, PATH, GROUP

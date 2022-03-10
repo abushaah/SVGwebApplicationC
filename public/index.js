@@ -4,13 +4,13 @@ jQuery(document).ready(function() {
     jQuery.ajax({
         type: 'get',            //Request type
         dataType: 'json',       //Data type - we will use JSON for almost everything
-        url: '/fileInfo',       //The server endpoint we are connecting to
+        url: '/fileNum',       //The server endpoint we are connecting to
         data: {
           info: ""
         },
         success: function (data) {
             loadFileLog(data);
-            viewSVG(data.info[0]);
+            viewSVG(data.info[0].filename); // first file
         },
         fail: function(error) {
             alert(error);
@@ -169,9 +169,25 @@ function loadFileLog(data){
 
 }
 
-function viewSVG(fileObject){
+function viewSVG(fileName){
 
-    // 1. place a table
+    // 1. ajax call to get the file information
+    jQuery.ajax({
+        type: 'get',            //Request type
+        dataType: 'json',       //Data type - we will use JSON for almost everything
+        url: '/fileInfo',       //The server endpoint we are connecting to
+        data: {
+          info: fileName
+        },
+        success: function (data) {
+            // 1. place a table
+            console.log(data.info.title);
+            console.log(data.info.description);
+        },
+        fail: function(error) {
+            alert(error);
+        }
+    });
 
 
 }

@@ -73,10 +73,17 @@ app.get('/uploads/:name', function(req , res){
 
 let sharedLib = ffi.Library('./libsvgparser', {
   'validFile' : [ 'bool', [ 'string' ] ],
-  'getNumber' : [ 'string', [ 'string'] ]
+  'getNumber' : [ 'string', [ 'string'] ],
+  'getTitle' : [ 'string', [ 'string'] ],
+  'getDescr' : [ 'string', [ 'string'] ]
+  'getRects' : [ 'string', [ 'string'] ]
+  'getCircs' : [ 'string', [ 'string'] ]
+  'getPaths' : [ 'string', [ 'string'] ]
+  'getGroups' : [ 'string', [ 'string'] ]
+//  'getAttributes' : [ 'string', [ 'string'] ]
 });
 
-app.get('/fileInfo', function(req , res){ // get all the file information
+app.get('/fileNum', function(req , res){ // get all the file information
 
   let files = [];
   let data = [];
@@ -107,17 +114,7 @@ app.get('/fileInfo', function(req , res){ // get all the file information
     image.fileSize = (Math.round((currFile.size) / 1024)); // size in kilobytes
     image.numbers = JSON.parse(sharedLib.getNumber(files[size]));
 
-    // b. for each shape, get all info
-/*
-    let titleDesc = sharedLib.getTitleDesc(files[size]);
-    image.title = titleDesc[0];
-    image.description = titleDesc[1];
-    image.rectangles = {};
-    image.circles = {};
-    image.paths = {};
-    image.groups = {};
-*/
-    // d. lastly, push into the data array
+    // b. lastly, push into the data array
     data.push(image);
     ++size;
   }
@@ -126,6 +123,30 @@ app.get('/fileInfo', function(req , res){ // get all the file information
   res.send( // this will send the error return values
     {
       info: data
+    }
+  );
+
+});
+
+app.get('/fileInfo', function(req , res){ // get all the file information
+
+  let file = req.query.fileName;
+  let image = {};
+
+  // 1. get all the information we need
+  image.title = sharedLib.getTitle(file);
+  image.description = sharedLib.getDescr(file);
+
+  // 2. for each shape, get all info on the shapes
+  image.rectangles = JSON.parse(sharedLib.getRects(file));
+  image.circles = JSON.parse(sharedLib.getCircs(file));
+  image.paths = JSON.parse(sharedLib.getPaths(file));
+  image.groups = JSON.parse(sharedLib.getGroups(file));
+
+  // 2. send the valid files
+  res.send( // this will send the error return values
+    {
+      info: image
     }
   );
 

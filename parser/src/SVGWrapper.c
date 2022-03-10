@@ -24,6 +24,7 @@ char* getNumber(char* filename){
 bool validFile (char* filename){
 
     SVG* svg = createValidSVG(filename, "uploads/svg.xsd");
+    // should always evaluate to true since we only load valid ones (unless there is something wrong in memory)
     if (svg == NULL){
         return false;
     }
@@ -36,6 +37,87 @@ bool validFile (char* filename){
 
     deleteSVG(svg);
     return true;
+
+}
+
+char* getTitle(char* filename){
+
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return NULL;
+
+    char* svgString = malloc(strlen(img->title) + 1);
+    if (svgString == NULL) return NULL;
+
+    strcpy(svgString, img->title);
+
+    deleteSVG(img);
+    return svgString;
+}
+
+char* getDescr(char* filename){
+
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return NULL;
+
+    char* svgString = malloc(strlen(img->description) + 1);
+    if (svgString == NULL) return NULL;
+
+    strcpy(svgString, img->description);
+
+    deleteSVG(img);
+    return svgString;
+
+}
+
+char* getRects(char* filename){
+
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return NULL;
+
+    char* rectsString = rectListToJSON(img->rectangles);
+    if (rectsString == NULL) return NULL;
+
+    deleteSVG(img);
+    return rectsString;
+
+}
+
+char* getCircs(char* filename){
+
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return NULL;
+
+    char* circsString = circListToJSON(img->circles);
+    if (circString == NULL) return NULL;
+
+    deleteSVG(img);
+    return circsString;
+
+}
+
+char* getPaths(char* filename){
+
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return NULL;
+
+    char* pathsString = pathListToJSON(img->paths);
+    if (pathsString == NULL) return NULL;
+
+    deleteSVG(img);
+    return pathsString;
+
+}
+
+char* getGroups(char* filename){
+
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return NULL;
+
+    char* groupsString = circListToJSON(img->groups);
+    if (groupsString == NULL) return NULL;
+
+    deleteSVG(img);
+    return groupsString;
 
 }
 
