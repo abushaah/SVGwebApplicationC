@@ -10,6 +10,7 @@ jQuery(document).ready(function() {
         },
         success: function (data) {
             loadFileLog(data);
+            viewSVG(data.info[0]);
         },
         fail: function(error) {
             alert(error);
@@ -165,5 +166,12 @@ function loadFileLog(data){
             jQuery("#fileLog").append(newRow);
         }
     }
+
+}
+
+function viewSVG(fileObject){
+
+    // 1. place a table
+
 
 }
