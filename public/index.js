@@ -12,7 +12,7 @@ jQuery(document).ready(function() {
             loadFileLog(data);
         },
         fail: function(error) {
-            console.log(error);
+            alert(error);
         }
     });
 
@@ -23,11 +23,11 @@ jQuery(document).ready(function() {
     // action listeners aka callback functions in order of appearance
     document.getElementById('viewFile').onclick = function () {
         let selectedVal = jQuery("#svg").children("option:selected").val();
-        console.log("User clicked on view file for " + selectedVal);
+        alert("User clicked on view file for " + selectedVal);
     };
 
     document.getElementById('titleform').onclick = function () {
-        console.log("user clicked edit for title");
+        alert("user clicked edit for title");
         let role = jQuery(this).find('.editT');
         let value = jQuery(this).siblings(); // search DOM
         let values = value.text();
@@ -51,7 +51,7 @@ jQuery(document).ready(function() {
     };
 
     document.getElementById('descform').onclick = function () {
-        console.log("user clicked edit for description");
+        alert("user clicked edit for description");
         let role = jQuery(this).find('.editD');
         let value = jQuery(this).siblings(); // search DOM
         let values = value.text();
@@ -79,7 +79,7 @@ jQuery(document).ready(function() {
     };
 
     document.getElementById('attrform').onclick = function () {
-        console.log("user clicked edit for attribute");
+        alert("user clicked edit for attribute");
         let role = jQuery(this).find('.editA');
         let value = jQuery(this).siblings(); // search DOM
         let values = value.text();
@@ -107,38 +107,28 @@ jQuery(document).ready(function() {
         let newName = document.getElementById('nameAttr').value;
         let newValue = document.getElementById('valueAttr').value;
         document.getElementById('attrSubmit').onclick = function (){
-            console.log("Submitted this element to add to other attributes: " + newName + " " + newValue);
+            alert("Submitted this element to add to other attributes: " + newName + " " + newValue);
         };
     };
 
     document.getElementById('sRect').onclick = function () {
         let newScale = document.getElementById('scaleValue').value;
-        console.log("Submitted scaling rectangles by: " + newScale);
+        alert("Submitted scaling rectangles by: " + newScale);
     };
 
     document.getElementById('sCirc').onclick = function () {
         let newScale = document.getElementById('scaleValue').value;
-        console.log("Submitted scaling circles by: " + newScale);
+        alert("Submitted scaling circles by: " + newScale);
     };
 
     document.getElementById('createNewSVG').onclick = function () {
-        console.log("User clicked on create a new SVG");
+        alert("User clicked on create a new SVG");
     };
 
     document.getElementById('addShape').onclick = function () {
         let selectedVal = jQuery("#svgShape").children("option:selected").val();
-        console.log("User clicked on add a shape for " + selectedVal);
+        alert("User clicked on add a shape for " + selectedVal);
     };
-
-    jQuery(document).on ('change', '#svg', function () {
-        let selectedVal = jQuery(this).children("option:selected").val();
-        console.log("User selected option " + selectedVal + " from SVG View drop down menu");
-    });
-
-    jQuery(document).on ('change', '#svgShape', function () {
-        let selectedVal = jQuery(this).children("option:selected").val();
-        console.log("User selected option " + selectedVal + " from funcitonality drop down menu");
-    });
 
 });
 
