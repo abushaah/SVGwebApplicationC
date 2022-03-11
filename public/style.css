@@ -58,10 +58,16 @@ table{
     align-content: center;
     margin-left: auto;
     margin-right: auto;
-/*    word-break: break-all; */
 }
 td, th{
     text-align: center;
+}
+table.functionality{
+    table-layout: fixed;
+    align-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    width: 99%;
 }
 div.responsiveTable{
     margin-left: auto;
@@ -75,13 +81,6 @@ table.inner{
     width: 100%;
     table-layout: fixed;
     word-break: break-all;
-}
-ul{
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    text-align: left;
-    list-style-position: inside;
-    list-style-type: square;
-    color: #434343;
 }
 img.logImage{
     width: 200px;

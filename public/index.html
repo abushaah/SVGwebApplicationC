@@ -17,39 +17,6 @@
     <!-- Custom CSS End -->
 </head>
 <body>
-
-<!--
-    <h3>Download test</h3>
-    If the A3 stub is running and rects.svg exists in the uploads/ directory on the server, then clicking on the link below will download it from the server.<br>
-    <a href="rects.svg" download>rects.svg</a>
-    <p></p>
-
-    <hr>
-    <div id="blah">I am blah</div>
-    <hr>
-    <form ref='someform'
-          id='someform'>
-          <div class="form-group">
-                <label for="entryBox">Last Name</label>
-                <input type="text" class="form-control" id="entryBox" value="Value" placeholder="Placeholder">
-          </div>
-        <div class="form-group">
-            <input type='submit' class="btn btn-secondary">
-        </div>
-    </form>
-
-    <form ref='uploadForm'
-		id='uploadForm'
-      action='/upload'
-      method='post'
-      encType="multipart/form-data">
-      <div class="form-group">
-      	<input type="file" name="uploadFile" class="btn btn-secondary">
-      	<input type='submit' value='Upload' class="btn btn-secondary">
-      </div>
-    </form>
--->
-
     <!-- START OF MY CODE -->
     <div class="fileLogPanel">
         <h1>File Log</h1>
@@ -107,22 +74,10 @@
                             <tbody>
                                 <tr>
                                     <td>
-                                       <div id="title">  
-                                            <span id="titleText"></span>  
-                                            <br>
-                                            <a id="titleform" href="#">
-                                                <span class="editT">Edit</span>  
-                                            </a>
-                                        </div>
+                                       <div id="titleText"></div>
                                     </td>
                                     <td>
-                                        <div id="description">  
-                                            <span id="descText"></span> 
-                                            <br>
-                                            <a id="descform" href="#">
-                                                <span class="editD">Edit</span>  
-                                            </a>
-                                        </div>
+                                        <div id="descText"></div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -131,7 +86,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <table border="1" cellpadding = "5%" cellspacing = "0" class="inner" id = "fileView">
+                        <table border="1" cellpadding = "5%" cellspacing = "0" class="inner" id="fileView">
                             <thead>
                                 <tr>
                                     <td>Component</td>
@@ -139,64 +94,86 @@
                                     <td>Other Attributes</td>
                                 </tr>
                             </thead>
-                            <tbody id="dynamicBodySVG">
-<!--
-                            <tr>
-                                <td id="componentName"><span id="componentName">&lt;Component Name&gt;</span></td>
-                                <td><span id="summaryText">&lt;Summary Text&gt;</span></td>
-                                <td>
-                                    <span id="otherAttrNum">&lt;Other Attributes Number&gt;</span><br>
-                                    <button id="viewAttr" class="btn btn-secondary">View</button>
-                                    <button id="aAttr" class="btn btn-secondary">Add</button>
-                                    <div id="showOtherAttr"> 
-                                        <span id="attrText">&lt;Other Attributes text&gt;</span> 
-                                        <a id="attrform" href="#">
-                                            <span class="editA">Edit</span>  
-                                        </a>
-                                    </div>
-                                    <br>
-                                    <form ref='attrform' id='addAttrform'>
-                                        <div class="form-group">
-                                            <br>
-                                            <input type="text" class="form-control" id="nameAttr" value="Name of new Attribute" placeholder="Placeholder">
-                                            <input type="text" class="form-control" id="valueAttr" value="Value of new Attribute" placeholder="Placeholder">
-                                            <br>
-                                            <input type='submit' class="btn btn-secondary" id="attrSubmit">
-                                        </div>
-                                    </form>
-                                </td>
-                            </tr>
--->
+                            <tbody id="dynamicBodySVG"> <!-- DYNAMIC ROWS -->
                             </tbody>
                         </table>
                     </td>                 
                 </tr>
-                <tfoot>
-                    <tr>
-                        <td colspan="3">
-                            <form ref='scaleform' id='scaleform'>
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="scaleValue" value="Scale Factor" placeholder="Placeholder">
-                                </div>
-                                <div class="form-group">
-                                    <button id="sRect" class="btn btn-secondary">Scale Rectangles</button>
-                                    <button id="sCirc" class="btn btn-secondary">Scale Circles</button>
-                                </div>
-                            </form>
-                        </td>
-                    </tr>
-                </tfoot>
             </table>
         </div>
     </div>
+    <br>
+    <div class="functionalityFilePanel">
+        <h1 id="fileChange"></h1>
+        <div class="responsiveTable">
+            <table border="1" cellpadding = "5%" cellspacing = "0" class="functionality">
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <form ref='editTitleDescform' id='editTitleDescform'>
+                                <div class="form-group">
+                                    <br>
+                                    <input type="text" class="form-control" id="newTitleDesc" value="New Title or Description" placeholder="Placeholder">
+                                    <br>
+                                    <button id="editTitle" class="btn btn-secondary">Edit Title</button>
+                                    <button id="editDescr" class="btn btn-secondary">Edit Description</button>
+                                </div>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <form ref='scaleform' id='scaleform'>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="scaleValue" value="Scale Factor" placeholder="Placeholder">
+                                <br>
+                                <button id="sRect" class="btn btn-secondary">Scale Rectangles</button>
+                                <button id="sCirc" class="btn btn-secondary">Scale Circles</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="viewOtherAttr"></div>
+                        <div class="form-group">
+                            <button id="viewAttr" class="btn btn-secondary">View Other Attributes</button>
+                            <div id="showAttributes"></div>
+                            <form ref='attrform' id='addAttrform'>
+                                <div class="form-group">
+                                    <br>
+                                    <input type="text" class="form-control" id="nameAttr" value="Name of new Attribute" placeholder="Placeholder">
+                                    <input type="text" class="form-control" id="valueAttr" value="Value of new Attribute" placeholder="Placeholder">
+                                    <br>
+                                </div>
+                                <button id="addAttr" class="btn btn-secondary">Add Other Attributes</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <br>
     <hr>
     <div class="functionalityPanel">
         <h1>Functionality</h1>
-        <button id="createNewSVG" class="btn btn-secondary">Create SVG</button><br><br>
-        <div id="svgFilesAddShape">
-            <label for="svgLabel">Choose a file: </label>
+        <div class="responsiveTable">
+            <table border="1" cellpadding = "5%" cellspacing = "0" class="functionality">
+                <tr>
+                    <td><button id="createNewSVG" class="btn btn-secondary">Create SVG</button></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="svgFilesAddShape">
+                            <label for="svgLabel">Choose a file: </label>
+                        </div>
+                        <button id="addShape" class="btn btn-secondary">Add a shape</button>
+                    </td>
+                </tr>
+            </table>
         </div>
-            <button id="addShape" class="btn btn-secondary">Add a shape</button><br><br>
     </div>
 
     <!-- END OF MY CODE -->

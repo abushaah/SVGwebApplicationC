@@ -17,10 +17,6 @@ jQuery(document).ready(function() {
         }
     });
 
-    // hidden objects
-//    document.getElementById("addAttrform").style.display="none";
-//    document.getElementById("showOtherAttr").style.display="none";
-
     // action listeners aka callback functions in order of appearance
     document.getElementById('viewFile').onclick = function () {
         let selectedVal = jQuery("#svg").children("option:selected").val();
@@ -28,92 +24,22 @@ jQuery(document).ready(function() {
         viewSVG(fileName);
     };
 
-    document.getElementById('titleform').onclick = function () {
-        alert("user clicked edit for title");
-        let role = jQuery(this).find('.editT');
-        let value = jQuery(this).siblings(); // search DOM
-        let values = value.text();
-
-        let newTitle = value.find('.titleTextBox').val();
-
-        if (role.html() == "Edit") {
-            role.html("Save");
-            jQuery(this).siblings().html('<input type="textbox" class="titleTextBox" value="" placeholder="' + values + '">');
-            values = "";
-        }
-        else {
-            if (newTitle != "") {
-                jQuery(this).siblings().html('<span id="titleText">' + newTitle + '</span>');
-                role.html("Edit");
-            }
-            else {
-                alert("Invalid, please fill the field");
-            }
-        }
+    document.getElementById('editTitle').onclick = function () {
+        let newValue = document.getElementById('newTitleDesc').value;
+        alert("Submitted this element to edit title: " + newValue);
     };
 
-    document.getElementById('descform').onclick = function () {
-        alert("user clicked edit for description");
-        let role = jQuery(this).find('.editD');
-        let value = jQuery(this).siblings(); // search DOM
-        let values = value.text();
-
-        let newDesc = value.find('.descTextBox').val();
-
-        if (role.html() == "Edit") {
-            role.html("Save");
-            jQuery(this).siblings().html('<input type="textbox" class="descTextBox" value="" placeholder="' + values + '">');
-            values = "";
-        }
-        else {
-            if (newDesc != "") {
-                jQuery(this).siblings().html('<span id="descText">' + newDesc + '</span>');
-                role.html("Edit");
-            }
-            else {
-                alert("Invalid, please fill the field");
-            }
-        }
+    document.getElementById('editDescr').onclick = function () {
+        let newValue = document.getElementById('newTitleDesc').value;
+        alert("Submitted this element to edit description: " + newValue);
     };
 
-/*
-    document.getElementById('viewAttr').onclick = function () {
-        document.getElementById("showOtherAttr").style.display="block";
-    };
-
-    document.getElementById('attrform').onclick = function () {
-        alert("user clicked edit for attribute");
-        let role = jQuery(this).find('.editA');
-        let value = jQuery(this).siblings(); // search DOM
-        let values = value.text();
-
-        let newAttr = value.find('.attrTextBox').val();
-
-        if (role.html() == "Edit") {
-            role.html("Save");
-            jQuery(this).siblings().html('<input type="textbox" class="attrTextBox" value="" placeholder="' + values + '">');
-            values = "";
-        }
-        else {
-            if (newAttr != "") {
-                jQuery(this).siblings().html('<span id="attrText">' + newAttr + '</span>');
-                role.html("Edit");
-            }
-            else {
-                alert("Invalid, please fill the field");
-            }
-        }
-    };
-
-    document.getElementById('aAttr').onclick = function () {
-        document.getElementById("addAttrform").style.display="block";
+    document.getElementById('addAttr').onclick = function () {
         let newName = document.getElementById('nameAttr').value;
         let newValue = document.getElementById('valueAttr').value;
-        document.getElementById('attrSubmit').onclick = function (){
-            alert("Submitted this element to add to other attributes: " + newName + " " + newValue);
-        };
+        alert("Submitted this element to add to other attributes: " + newName + " " + newValue);
     };
-*/
+
     document.getElementById('sRect').onclick = function () {
         let newScale = document.getElementById('scaleValue').value;
         alert("Submitted scaling rectangles by: " + newScale);
@@ -138,21 +64,21 @@ jQuery(document).ready(function() {
 // This function will fill in the file log panel and the drop down menu
 function loadFileLog(data){
 
-    // create the drop down menus for both svg view panel and funcitonality panel
+    // 1. create the drop down menus for both svg view panel and funcitonality panel
     let selectionSV = "<select id=\"svg\"></select>";
     jQuery("#svgFiles").append(selectionSV);
 
     let selectionF = "<select id=\"svgShape\"></select>";
     jQuery("#svgFilesAddShape").append(selectionF);
 
-    // if no files, display no files
+    // 2. if no files, display no files
     if (data.info.length == 0){
         let newRow = "<tr><td colspan=\"7\">No files</td></tr>";
         jQuery("#fileLog").append(newRow);
     }
     else{
 
-        // for each valid file ...
+        // 3. for each valid file ...
         for (let i = 0; i < data.info.length; ++i) {
 
             // a. get the file name without the path
@@ -173,6 +99,8 @@ function loadFileLog(data){
 
 function viewSVG(fileName){
 
+    jQuery("#fileChange").html("Edit " + fileName.split('/').pop());
+
     // 1. ajax call to get the file information
     jQuery.ajax({
         type: 'get',            //Request type
@@ -192,53 +120,61 @@ function viewSVG(fileName){
             let table = "";
 
             // b. components to access
-            let index = 1;
+            let rectIndex = 1;
             for (let i of data.info.rectangles){
                 let data = "x = " + i.x + i.units + " y = " + i.y + i.units + " width = " + i.w + i.units + " height = " + i.h + i.units;
                 let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Rectangle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button>";
+                let newRow = "<tr><td>Rectangle " + rectIndex + "</td><td>" + data + "</td><td>" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
-/*
-               <div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>
-               <form ref='attrform' id='addAttrform'>
-                                        <div class="form-group">
-                                            <br>
-                                            <input type="text" class="form-control" id="nameAttr" value="Name of new Attribute" placeholder="Placeholder">
-                                            <input type="text" class="form-control" id="valueAttr" value="Value of new Attribute" placeholder="Placeholder">
-                                            <br>
-                                            <input type='submit' class="btn btn-secondary" id="attrSubmit">
-                                        </div>
-                                    </form>
-*/
-                ++index;
+                ++rectIndex;
 
             }
-            index = 1;
+            let circIndex = 1;
             for (let i of data.info.circles){
                 let data = "x = " + i.cx + i.units + " y = " + i.cy + i.units + " r = " + i.r + i.units;
                 let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Circle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button>";
+                let newRow = "<tr><td>Circle " + circIndex + "</td><td>" + data + "</td><td>" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
-                ++index;
+                ++circIndex;
             }
-            index = 1;
+            let pathIndex = 1;
             for (let i of data.info.paths){
                 let data = "path data = " + i.d;
                 let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Path " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button>";
+                let newRow = "<tr><td>Path " + pathIndex + "</td><td>" + data + "</td><td>" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
-                ++index;
+                ++pathIndex;
             }
-            index = 1;
+            let groupIndex = 1;
             for (let i of data.info.groups){
                 let data = i.children + " child elements";
                 let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Group " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button>";
+                let newRow = "<tr><td>Group " + groupIndex + "</td><td>" + data + "</td><td>" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
-                ++index;
+                ++groupIndex;
             }
 
             jQuery("#dynamicBodySVG").html(table);
+
+            // 3. for the functionality part of other attributes
+            let selectionOA = "<label for=\"componentLabel\">Choose a component: </label><select id=\"components\"></select>";
+            jQuery("#viewOtherAttr").html(selectionOA);
+            for (let i = 1; i < rectIndex; ++i){
+                let newOption = "<option value=\"rect" + i + "\">Rectangle " + i + "</option>";
+                jQuery("#components").append(newOption);
+            }
+            for (let i = 1; i < circIndex; ++i){
+                let newOption = "<option value=\"circ" + i + "\">Circle " + i + "</option>";
+                jQuery("#components").append(newOption);
+            }
+            for (let i = 1; i < pathIndex; ++i){
+                let newOption = "<option value=\"path" + i + "\">Path " + i + "</option>";
+                jQuery("#components").append(newOption);
+            }
+            for (let i = 1; i < groupIndex; ++i){
+                let newOption = "<option value=\"group" + i + "\">Group " + i + "</option>";
+                jQuery("#components").append(newOption);
+            }
 
         },
         fail: function(error) {
