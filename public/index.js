@@ -121,6 +121,13 @@ jQuery(document).ready(function() {
         });
     };
 
+    document.getElementById('viewAttr').onclick = function () {
+        let selectedVal = jQuery("#svg").children("option:selected").val();
+        let fileName = "uploads/" + selectedVal;
+        let component = (jQuery("#components").children("option:selected").text()).match(/[a-zA-Z]+/g); // regex from online
+        let componentNumber = (jQuery("#components").children("option:selected").text()).match(/\d+/g);
+    };
+
     document.getElementById('addAttr').onclick = function () {
         let newName = document.getElementById('nameAttr').value;
         let newValue = document.getElementById('valueAttr').value;

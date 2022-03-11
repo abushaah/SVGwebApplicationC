@@ -121,6 +121,64 @@ char* getGroupsJSON(char* filename){
 
 }
 
+char* getOtherAttributesJSON(char* filename, char* componentType, int index){
+
+    // 1. create the svg structure
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return NULL;
+
+    char* otherAttributesString;
+
+    // 2. for the component type, different iterators
+    if (strcasecmp(componentType, "Rectangle") == 0){
+        // 3. get the index of the element that we want
+        void* elem;
+        ListIterator iter = createIterator(img->rectangles);
+        int i = 0;
+        while (((elem = nextElement(&iter)) != NULL) && (i < index));
+        Rectangle* rect = (Rectangle*) elem;
+
+        // 4. get the list of other attributes
+        otherAttributesString = attrListToJSON(rect->otherAttributes);
+    }
+    else if (strcasecmp(componentType, "Circle") == 0){
+        void* elem;
+        ListIterator iter = createIterator(img->circles);
+        int i = 0;
+        while (((elem = nextElement(&iter)) != NULL) && (i < index));
+        Circle* circ = (Circle*) elem;
+
+        // 4. get the list of other attributes
+        otherAttributesString = attrListToJSON(circ->otherAttributes);
+    }
+    else if (strcasecmp(componentType, "Path") == 0){
+        // 3. get the index of the element that we want
+        void* elem;
+        ListIterator iter = createIterator(img->paths);
+        int i = 0;
+        while (((elem = nextElement(&iter)) != NULL) && (i < index));
+        Path* path = (Path*) elem;
+
+        // 4. get the list of other attributes
+        otherAttributesString = attrListToJSON(path->otherAttributes);
+    }
+    else if (strcasecmp(componentType, "Group") == 0){
+        // 3. get the index of the element that we want
+        void* elem;
+        ListIterator iter = createIterator(img->groups);
+        int i = 0;
+        while (((elem = nextElement(&iter)) != NULL) && (i < index));
+        Group* group = (Group*) elem;
+
+        // 4. get the list of other attributes
+        otherAttributesString = attrListToJSON(group->otherAttributes);
+    }
+
+    deleteSVG(img);
+    return otherAttributesString;
+
+}
+
 bool changeTitle(char* filename, char* newValue){
 
     if (newValue == NULL) return false;
