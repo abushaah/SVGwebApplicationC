@@ -165,6 +165,37 @@ bool changeDescr(char* filename, char* newValue){
     return valid;
 }
 
+bool scaleRectangles(char* filename, int scaleValue){
+
+    // 1. create svg
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return false;
+
+    // 2. get the rectangles and iterate through to scale
+    List* rectangles = getRects(img);
+    if (rectangles == NULL){
+        deleteSVG(img);
+        return false;
+    }
+
+    void* elem;
+    ListIterator iter = createIterator(rectangles);
+    while ((elem = nextElement(&iter)) != NULL){
+        Rectangle* rect = (Rectangle*) elem;
+        rect->x = rect->x * scaleValue;
+        rect->y = rect->y * scaleValue;
+    }
+
+    freeList(rectangles);
+
+    // 3. overwrite changes to file
+    bool valid = writeSVG(img, filename);
+
+    deleteSVG(img);
+    return valid;
+
+}
+
 /**
     The editAddImgFile function is created for the svg view panel
     in order to change an element in an svg file
