@@ -196,10 +196,11 @@ function viewSVG(fileName){
             for (let i of data.info.rectangles){
                 let data = "x = " + i.x + i.units + " y = " + i.y + i.units + " width = " + i.w + i.units + " height = " + i.h + i.units;
                 let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Rectangle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                let newRow = "<tr><td>Rectangle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button>";
                 table = table + newRow;
 /*
-                                    <form ref='attrform' id='addAttrform'>
+               <div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>
+               <form ref='attrform' id='addAttrform'>
                                         <div class="form-group">
                                             <br>
                                             <input type="text" class="form-control" id="nameAttr" value="Name of new Attribute" placeholder="Placeholder">
@@ -216,7 +217,7 @@ function viewSVG(fileName){
             for (let i of data.info.circles){
                 let data = "x = " + i.cx + i.units + " y = " + i.cy + i.units + " r = " + i.r + i.units;
                 let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Circle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                let newRow = "<tr><td>Circle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button>";
                 table = table + newRow;
                 ++index;
             }
@@ -224,7 +225,7 @@ function viewSVG(fileName){
             for (let i of data.info.paths){
                 let data = "path data = " + i.d;
                 let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Path " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                let newRow = "<tr><td>Path " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button>";
                 table = table + newRow;
                 ++index;
             }
@@ -232,7 +233,7 @@ function viewSVG(fileName){
             for (let i of data.info.groups){
                 let data = i.children + " child elements";
                 let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Group " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                let newRow = "<tr><td>Group " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button>";
                 table = table + newRow;
                 ++index;
             }
