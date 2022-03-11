@@ -113,7 +113,7 @@ char* getGroupsJSON(char* filename){
     SVG* img = createValidSVG(filename, "uploads/svg.xsd");
     if (img == NULL) return NULL;
 
-    char* groupsString = circListToJSON(img->groups);
+    char* groupsString = groupListToJSON(img->groups);
     if (groupsString == NULL) return NULL;
 
     deleteSVG(img);

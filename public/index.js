@@ -24,7 +24,8 @@ jQuery(document).ready(function() {
     // action listeners aka callback functions in order of appearance
     document.getElementById('viewFile').onclick = function () {
         let selectedVal = jQuery("#svg").children("option:selected").val();
-        alert("User clicked on view file for " + selectedVal);
+        let fileName = "uploads/" + selectedVal;
+        viewSVG(fileName);
     };
 
     document.getElementById('titleform').onclick = function () {
@@ -172,31 +173,31 @@ function loadFileLog(data){
 
 function viewSVG(fileName){
 
-    let newFile = "uploads/rects.svg";
-
     // 1. ajax call to get the file information
     jQuery.ajax({
         type: 'get',            //Request type
         dataType: 'json',       //Data type - we will use JSON for almost everything
         url: '/fileInfo',       //The server endpoint we are connecting to
         data: {
-          info: newFile
+          info: fileName
         },
         success: function (data) {
-            // 1. place a table
-            console.log(data.info.title);
-            console.log(data.info.description);
+            // 2. place a table
 
-            // to access:
+            // a. image, title description
+            let imageString = "<img src=\"" + fileName + "\" class=\"svgImage\"/>";
+            jQuery("#svgViewImg").html(imageString);
+            jQuery("#titleText").html(data.info.title);
+            jQuery("#descText").html(data.info.description);
+            let table = "";
+
+            // b. components to access
             let index = 1;
             for (let i of data.info.rectangles){
-
                 let data = "x = " + i.x + i.units + " y = " + i.y + i.units + " width = " + i.w + i.units + " height = " + i.h + i.units;
-                console.log(data);
                 let otherAttrNum = i.numAttr;
-
                 let newRow = "<tr><td>Rectangle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
-                jQuery("#fileView").append(newRow);
+                table = table + newRow;
 /*
                                     <form ref='attrform' id='addAttrform'>
                                         <div class="form-group">
@@ -211,6 +212,33 @@ function viewSVG(fileName){
                 ++index;
 
             }
+            index = 1;
+            for (let i of data.info.circles){
+                let data = "x = " + i.cx + i.units + " y = " + i.cy + i.units + " r = " + i.r + i.units;
+                let otherAttrNum = i.numAttr;
+                let newRow = "<tr><td>Circle " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                table = table + newRow;
+                ++index;
+            }
+            index = 1;
+            for (let i of data.info.paths){
+                let data = "path data = " + i.d;
+                let otherAttrNum = i.numAttr;
+                let newRow = "<tr><td>Path " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                table = table + newRow;
+                ++index;
+            }
+            index = 1;
+            for (let i of data.info.groups){
+                let data = i.children + " child elements";
+                let otherAttrNum = i.numAttr;
+                let newRow = "<tr><td>Group " + index + "</td><td>" + data + "</td><td>" + otherAttrNum + "<br><button id=\"viewAttrP\" class=\"btn btn-secondary\">View</button><button id=\"aAttrP\" class=\"btn btn-secondary\">Add</button><div id=\"showOtherAttrP\"><span id=\"attrTextP\"></span><a id=\"attrformP\" href=\"#\"><span class=\"editA\">Edit</span></a></div><br></td></tr>";
+                table = table + newRow;
+                ++index;
+            }
+
+            jQuery("#dynamicBodySVG").html(table);
+
         },
         fail: function(error) {
             alert(error);

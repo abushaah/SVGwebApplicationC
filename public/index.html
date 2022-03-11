@@ -93,7 +93,7 @@
         <div class="responsiveTable">
             <table border="1" cellpadding = "0%" cellspacing = "0">
                 <tr>
-                    <td><div><img src="uploads/quad01.svg" class="svgImage"/></div></td>
+                    <td><div id="svgViewImg"></div></td>
                 </tr>
                 <tr>
                     <td>
@@ -108,7 +108,8 @@
                                 <tr>
                                     <td>
                                        <div id="title">  
-                                            <span id="titleText">&lt;Title text&gt;</span>  
+                                            <span id="titleText"></span>  
+                                            <br>
                                             <a id="titleform" href="#">
                                                 <span class="editT">Edit</span>  
                                             </a>
@@ -116,7 +117,8 @@
                                     </td>
                                     <td>
                                         <div id="description">  
-                                            <span id="descText">&lt;Description text&gt;</span> 
+                                            <span id="descText"></span> 
+                                            <br>
                                             <a id="descform" href="#">
                                                 <span class="editD">Edit</span>  
                                             </a>
@@ -137,7 +139,7 @@
                                     <td>Other Attributes</td>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="dynamicBodySVG">
 <!--
                             <tr>
                                 <td id="componentName"><span id="componentName">&lt;Component Name&gt;</span></td>
