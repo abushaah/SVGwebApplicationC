@@ -83,7 +83,8 @@ let sharedLib = ffi.Library('./libsvgparser', {
 //  'getAttributes' : [ 'string', [ 'string'] ],
   'changeTitle' : [ 'bool', [ 'string', 'string' ] ],
   'changeDescr' : [ 'bool', [ 'string', 'string' ] ],
-  'scaleRectangles' : [ 'bool', [ 'string', 'int' ] ]
+  'scaleRectangles' : [ 'bool', [ 'string', 'float' ] ],
+  'scaleCircles' : [ 'bool', [ 'string', 'float' ] ]
 });
 
 app.get('/fileNum', function(req , res){ // get all the file information
@@ -184,11 +185,26 @@ app.get('/editDesc', function(req , res){ // same as title
 
 });
 
-app.get('/scaleRects', function(req , res){ // same as title
+app.get('/scaleRects', function(req , res){ // scaling rectangles by a factor
+
+  // get values
+  let file = req.query.info;
+  let newScale = req.query.newScale;
+  // call wrapper function
+  let valid = sharedLib.scaleRectangles(file, newScale);
+  res.send(
+    {
+      info: valid
+    }
+  );
+
+});
+
+app.get('/scaleCircs', function(req , res){ // same as rectangles
 
   let file = req.query.info;
   let newScale = req.query.newScale;
-  let valid = sharedLib.scaleRectangles(file, newScale);
+  let valid = sharedLib.scaleCircles(file, newScale);
   res.send(
     {
       info: valid

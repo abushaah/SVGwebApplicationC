@@ -102,7 +102,23 @@ jQuery(document).ready(function() {
 
     document.getElementById('sCirc').onclick = function () {
         let newScale = document.getElementById('scaleValue').value;
-        alert("Submitted scaling circles by: " + newScale);
+        let selectedVal = jQuery("#svg").children("option:selected").val();
+        let fileName = "uploads/" + selectedVal;
+        jQuery.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/scaleCircs',
+            data: {
+              info: fileName,
+              newScale: newScale
+            },
+            success: function (data) {
+                console.log("change successful");
+            },
+            fail: function(error) {
+                alert(error);
+            }
+        });
     };
 
     document.getElementById('addAttr').onclick = function () {

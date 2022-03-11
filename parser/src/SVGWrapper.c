@@ -165,7 +165,7 @@ bool changeDescr(char* filename, char* newValue){
     return valid;
 }
 
-bool scaleRectangles(char* filename, int scaleValue){
+bool scaleRectangles(char* filename, float scaleValue){
 
     // 1. create svg
     SVG* img = createValidSVG(filename, "uploads/svg.xsd");
@@ -187,6 +187,37 @@ bool scaleRectangles(char* filename, int scaleValue){
     }
 
     freeList(rectangles);
+
+    // 3. overwrite changes to file
+    bool valid = writeSVG(img, filename);
+
+    deleteSVG(img);
+    return valid;
+
+}
+
+bool scaleCircles(char* filename, float scaleValue){
+
+    // 1. create svg
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return false;
+
+    // 2. get the rectangles and iterate through to scale
+    List* circles = getCircles(img);
+    if (circles == NULL){
+        deleteSVG(img);
+        return false;
+    }
+
+    void* elem;
+    ListIterator iter = createIterator(circles);
+    while ((elem = nextElement(&iter)) != NULL){
+        Circle* circ = (Circle*) elem;
+        circ->cx = circ->cx * scaleValue;
+        circ->cy = circ->cy * scaleValue;
+    }
+
+    freeList(circles);
 
     // 3. overwrite changes to file
     bool valid = writeSVG(img, filename);

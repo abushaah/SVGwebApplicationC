@@ -23,7 +23,8 @@ char* getGroupsJSON(char* filename);
 
 bool changeTitle(char* filename, char* newValue);
 bool changedDescr(char* filename, char* newValue);
-bool scaleRectangles(char* filename, int scaleValue);
+bool scaleRectangles(char* filename, float scaleValue);
+bool scaleCircles(char* filename, float scaleValue);
 
 // END OF WRAPPER FUNCTIONS
 
