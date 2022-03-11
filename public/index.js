@@ -26,28 +26,89 @@ jQuery(document).ready(function() {
 
     document.getElementById('editTitle').onclick = function () {
         let newValue = document.getElementById('newTitleDesc').value;
-        alert("Submitted this element to edit title: " + newValue);
+        // enforce restrictions
+        if (newValue.length > 256){
+            alert(newValue + " is greater than 256 characters, the length restriction");
+        }
+        else{
+            // make an request to change the title
+            let selectedVal = jQuery("#svg").children("option:selected").val();
+            let fileName = "uploads/" + selectedVal;
+            jQuery.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/editTitle',
+                data: {
+                  info: fileName,
+                  newValue: newValue
+                },
+                success: function (data) {
+                    console.log("change successful");
+                },
+                fail: function(error) {
+                    alert(error);
+                }
+            });
+        }
     };
 
     document.getElementById('editDescr').onclick = function () {
         let newValue = document.getElementById('newTitleDesc').value;
-        alert("Submitted this element to edit description: " + newValue);
+        if (newValue.length > 256){
+            alert(newValue + " is greater than 256 characters, the length restriction");
+        }
+        else{
+            // make an request to change the title
+            let selectedVal = jQuery("#svg").children("option:selected").val();
+            let fileName = "uploads/" + selectedVal;
+            jQuery.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/editDesc',
+                data: {
+                  info: fileName,
+                  newValue: newValue
+                },
+                success: function (data) {
+                    console.log("change successful");
+                },
+                fail: function(error) {
+                    alert(error);
+                }
+            });
+        }
+    };
+
+    document.getElementById('sRect').onclick = function () {
+        let newScale = document.getElementById('scaleValue').value;
+        let selectedVal = jQuery("#svg").children("option:selected").val();
+        let fileName = "uploads/" + selectedVal;
+        jQuery.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/scaleRects',
+            data: {
+              info: fileName,
+              newScale: newScale
+            },
+            success: function (data) {
+                console.log("change successful");
+            },
+            fail: function(error) {
+                alert(error);
+            }
+        });
+    };
+
+    document.getElementById('sCirc').onclick = function () {
+        let newScale = document.getElementById('scaleValue').value;
+        alert("Submitted scaling circles by: " + newScale);
     };
 
     document.getElementById('addAttr').onclick = function () {
         let newName = document.getElementById('nameAttr').value;
         let newValue = document.getElementById('valueAttr').value;
         alert("Submitted this element to add to other attributes: " + newName + " " + newValue);
-    };
-
-    document.getElementById('sRect').onclick = function () {
-        let newScale = document.getElementById('scaleValue').value;
-        alert("Submitted scaling rectangles by: " + newScale);
-    };
-
-    document.getElementById('sCirc').onclick = function () {
-        let newScale = document.getElementById('scaleValue').value;
-        alert("Submitted scaling circles by: " + newScale);
     };
 
     document.getElementById('createNewSVG').onclick = function () {

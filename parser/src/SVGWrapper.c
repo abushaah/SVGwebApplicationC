@@ -121,6 +121,50 @@ char* getGroupsJSON(char* filename){
 
 }
 
+bool changeTitle(char* filename, char* newValue){
+
+    if (newValue == NULL) return false;
+
+    // 1. create svg
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return false;
+
+    // 2. validate the title. If valid, update the title
+    if (validChar(newValue) == 0){
+        deleteSVG(img);
+        return false;
+    }
+    strcpy(img->title, newValue);
+
+    // 3. overwrite changes to file
+    bool valid = writeSVG(img, filename);
+
+    deleteSVG(img);
+    return valid;
+}
+
+bool changeDescr(char* filename, char* newValue){
+
+    if (newValue == NULL) return false;
+
+    // 1. create svg
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return false;
+
+    // 2. validate the title. If valid, update the title
+    if (validChar(newValue) == 0){
+        deleteSVG(img);
+        return false;
+    }
+    strcpy(img->description, newValue);
+
+    // 3. overwrite changes to file
+    bool valid = writeSVG(img, filename);
+
+    deleteSVG(img);
+    return valid;
+}
+
 /**
     The editAddImgFile function is created for the svg view panel
     in order to change an element in an svg file

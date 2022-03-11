@@ -21,6 +21,9 @@ char* getCircsJSON(char* filename);
 char* getPathsJSON(char* filename);
 char* getGroupsJSON(char* filename);
 
+bool changeTitle(char* filename, char* newValue);
+bool changedDescr(char* filename, char* newValue);
+
 // END OF WRAPPER FUNCTIONS
 
 typedef enum COMP{

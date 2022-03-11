@@ -79,8 +79,11 @@ let sharedLib = ffi.Library('./libsvgparser', {
   'getRectsJSON' : [ 'string', [ 'string'] ],
   'getCircsJSON' : [ 'string', [ 'string'] ],
   'getPathsJSON' : [ 'string', [ 'string'] ],
-  'getGroupsJSON' : [ 'string', [ 'string'] ]
-//  'getAttributes' : [ 'string', [ 'string'] ]
+  'getGroupsJSON' : [ 'string', [ 'string'] ],
+//  'getAttributes' : [ 'string', [ 'string'] ],
+  'changeTitle' : [ 'bool', [ 'string', 'string' ] ],
+  'changeDescr' : [ 'bool', [ 'string', 'string' ] ],
+  'scaleRectangles' : [ 'bool', [ 'string', 'int' ] ]
 });
 
 app.get('/fileNum', function(req , res){ // get all the file information
@@ -147,6 +150,48 @@ app.get('/fileInfo', function(req , res){ // get all the file information
   res.send( // this will send the error return values
     {
       info: image
+    }
+  );
+
+});
+
+app.get('/editTitle', function(req , res){
+
+  // get the new value
+  let file = req.query.info;
+  let newValue = req.query.newValue;
+  // update
+  let valid = sharedLib.changeTitle(file, newValue);
+  // return status
+  res.send(
+    {
+      info: valid
+    }
+  );
+
+});
+
+app.get('/editDesc', function(req , res){ // same as title
+
+  let file = req.query.info;
+  let newValue = req.query.newValue;
+  let valid = sharedLib.changeDescr(file, newValue);
+  res.send(
+    {
+      info: valid
+    }
+  );
+
+});
+
+app.get('/scaleRects', function(req , res){ // same as title
+
+  let file = req.query.info;
+  let newScale = req.query.newScale;
+  let valid = sharedLib.scaleRectangles(file, newScale);
+  res.send(
+    {
+      info: valid
     }
   );
 
