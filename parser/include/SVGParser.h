@@ -26,6 +26,7 @@ bool changeTitle(char* filename, char* newValue);
 bool changedDescr(char* filename, char* newValue);
 bool scaleRectangles(char* filename, float scaleValue);
 bool scaleCircles(char* filename, float scaleValue);
+bool setNewAttributes(char* filename, char* componentType, int componentNumber, char* newName, char* newValue);
 
 // END OF WRAPPER FUNCTIONS
 

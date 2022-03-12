@@ -286,31 +286,48 @@ bool scaleCircles(char* filename, float scaleValue){
 }
 
 /**
-    The editAddImgFile function is created for the svg view panel
+    The setNewAttributes function is created for the svg view panel
     in order to change an element in an svg file
 */
-int editAddImgFile(char* componentType, int componentNumber, char* newName, char* newValue, char* filename){
+bool setNewAttributes(char* filename, char* componentType, int componentNumber, char* newName, char* newValue){
 
-    // 1. create new attribute value, svg image with filename
+    // 1. create new attribute value, and validate it
+    bool valid = true;
+
     Attribute* newAttribute = otherAttributes(newName, newValue);
-    if (newAttribute == NULL) return FAIL;
-    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
-    if (img == NULL) return FAIL;
+    if (newAttribute == NULL) return false;
+    if (validAttrStruct(newAttribute) == false){
+        deleteAttribute((void*)newAttribute);
+        return false;
+    }
 
+    // 2. create svg based on file
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL){
+        deleteAttribute((void*)newAttribute);
+        return false;
+    }
+
+    // 3. identify component type
     elementType elem;
-    if (strcasecmp(componentType, "Attribute") == 0) elem = SVG_IMG; // from string on the page
-    else if (strcasecmp(componentType, "Rectangle") == 0) elem = RECT;
+    if (strcasecmp(componentType, "Rectangle") == 0) elem = RECT;
     else if (strcasecmp(componentType, "Circle") == 0) elem = CIRC;
     else if (strcasecmp(componentType, "Path") == 0) elem = PATH;
     else if (strcasecmp(componentType, "Group") == 0) elem = GROUP;
 
-    // 2. call c function to set attribute value in the file
-    // 3. if the return vaue is false, will display error in the console
-    bool valid = setAttribute(img, elem, componentNumber, newAttribute);
-    if (valid == false) return FAIL;
+    // 4. call c function to set or add attribute value in the file
+    valid = setAttribute(img, elem, componentNumber, newAttribute);
+    if (valid == false){
+        deleteAttribute((void*)newAttribute);
+        deleteSVG(img);
+        return false;
+    }
 
-    // d. memory management
+    // 5. overwrite changes to file
+    valid = writeSVG(img, filename);
+
+    // 6. memory management
+    // 6. if the return vaue is false, will display error in the console
     deleteSVG(img);
-
-    return SUCCESS;
+    return valid;
 }

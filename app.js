@@ -84,7 +84,8 @@ let sharedLib = ffi.Library('./libsvgparser', {
   'changeTitle' : [ 'bool', [ 'string', 'string' ] ],
   'changeDescr' : [ 'bool', [ 'string', 'string' ] ],
   'scaleRectangles' : [ 'bool', [ 'string', 'float' ] ],
-  'scaleCircles' : [ 'bool', [ 'string', 'float' ] ]
+  'scaleCircles' : [ 'bool', [ 'string', 'float' ] ],
+  'setNewAttributes' : [ 'bool', [ 'string', 'string', 'int', 'string', 'string' ] ]
 });
 
 app.get('/fileNum', function(req , res){ // get all the file information
@@ -225,6 +226,25 @@ app.get('/viewAttrs', function(req , res){ // to get the other attributes of a c
   res.send(
     {
       info: otherAttributes
+    }
+  );
+
+});
+
+app.get('/addEditAttrs', function(req , res){
+
+  // 1. get info
+  let file = req.query.info;
+  let component = req.query.component;
+  let index = req.query.index;
+  let newName = req.query.name;
+  let newValue = req.query.value;
+
+  // 2. get other attibrutes
+  let valid = sharedLib.setNewAttributes(file, component, index, newName, newValue); // will validate the new attribute in the c function
+  res.send(
+    {
+      info: valid // returns the result
     }
   );
 

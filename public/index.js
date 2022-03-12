@@ -9,8 +9,13 @@ jQuery(document).ready(function() {
           info: ""
         },
         success: function (data) {
-            loadFileLog(data);
-            viewSVG(data.info[0].fileName); // first file
+            if (data.info == null){
+                console.log("Error on ready, files not generated");
+            }
+            else{
+                loadFileLog(data);
+                viewSVG(data.info[0].fileName); // first file
+            }
         },
         fail: function(error) {
             alert(error);
@@ -44,7 +49,12 @@ jQuery(document).ready(function() {
                   newValue: newValue
                 },
                 success: function (data) {
-                    alert("Change successful");
+                    if (data.info == false){
+                        alert("Change unsuccessful");
+                    }
+                    else{
+                        alert("Change successful");
+                    }
                 },
                 fail: function(error) {
                     alert(error);
@@ -71,7 +81,12 @@ jQuery(document).ready(function() {
                   newValue: newValue
                 },
                 success: function (data) {
-                    alert("Change successful");
+                    if (data.info == false){
+                        alert("Change unsuccessful");
+                    }
+                    else{
+                        alert("Change successful");
+                    }
                 },
                 fail: function(error) {
                     alert(error);
@@ -93,7 +108,12 @@ jQuery(document).ready(function() {
               newScale: newScale
             },
             success: function (data) {
-                alert("Change successful");
+                if (data.info == false){
+                    alert("Change unsuccessful");
+                }
+                else{
+                    alert("Change successful");
+                }
             },
             fail: function(error) {
                 alert(error);
@@ -114,7 +134,12 @@ jQuery(document).ready(function() {
               newScale: newScale
             },
             success: function (data) {
-                alert("Change successful");
+                if (data.info == false){
+                    alert("Change unsuccessful");
+                }
+                else{
+                    alert("Change successful");
+                }
             },
             fail: function(error) {
                 alert(error);
@@ -149,12 +174,17 @@ jQuery(document).ready(function() {
                   index: (componentNumber - 1)
                 },
                 success: function (data) {
-                    // 4. display the string in the div element
-                    let otherAttributes = "";
-                    for (let i = 0; i < data.info.length; ++i){
-                        otherAttributes = otherAttributes + "name: " + data.info[i].name + ", value: " + data.info[i].value + "<br>";
+                    if (data.info == null){
+                        console.log("Error getting the other attributes");
                     }
-                    jQuery("#showAttributes").html(otherAttributes);
+                    else{
+                        // 4. display the string in the div element
+                        let otherAttributes = "";
+                        for (let i = 0; i < data.info.length; ++i){
+                            otherAttributes = otherAttributes + "name: " + data.info[i].name + ", value: " + data.info[i].value + "<br>";
+                        }
+                        jQuery("#showAttributes").html(otherAttributes);
+                    }
                 },
                 fail: function(error) {
                     alert(error);
@@ -175,7 +205,7 @@ jQuery(document).ready(function() {
         jQuery.ajax({
             type: 'get',
             dataType: 'json',
-            url: '/addEditAttr',
+            url: '/addEditAttrs',
             data: {
               info: fileName,
               component: component,
@@ -184,7 +214,12 @@ jQuery(document).ready(function() {
               value: newValue
             },
             success: function (data) {
-                alert("Change successful");
+                if (data.info == false){
+                    alert("Change unsuccessful");
+                }
+                else{
+                    alert("Change successful");
+                }
             },
             fail: function(error) {
                 alert(error);
@@ -280,7 +315,7 @@ function viewSVG(fileName){
             }
             let circIndex = 1;
             for (let i of data.info.circles){
-                let data = "Centre: x = " + i.cx + i.units + ", y = " + i.cy + i.units + ", r = " + i.r + i.units;
+                let data = "Centre: cx = " + i.cx + i.units + ", cy = " + i.cy + i.units + ", r = " + i.r + i.units;
                 let otherAttrNum = i.numAttr;
                 let newRow = "<tr><td>Circle " + circIndex + "</td><td>" + data + "</td><td id=\"circ" + circIndex + "OA\">" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
@@ -291,7 +326,7 @@ function viewSVG(fileName){
             }
             let pathIndex = 1;
             for (let i of data.info.paths){
-                let data = "path data = " + i.d;
+                let data = "d = " + i.d;
                 let otherAttrNum = i.numAttr;
                 let newRow = "<tr><td>Path " + pathIndex + "</td><td>" + data + "</td><td id=\"path" + pathIndex + "OA\">" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
