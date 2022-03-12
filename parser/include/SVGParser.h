@@ -11,7 +11,7 @@
 
 // WRAPPER FUNCTIONS HERE
 
-bool validFile (char* filename);
+bool validFile(char* filename);
 
 char* getNumber(char* filename);
 char* getTitle(char* filename);

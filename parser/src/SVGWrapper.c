@@ -4,8 +4,18 @@
 #include "LinkedListAPI.h"
 #include <strings.h>
 
-#define SUCCESS 1
-#define FAIL 0
+bool validFile(char* filename){
+
+    bool valid = true;
+
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL) return false;
+
+    valid = validateSVG(img, "uploads/svg.xsd");
+
+    deleteSVG(img);
+    return valid;
+}
 
 /**
     The getNumber function is created for the file log panel
@@ -19,25 +29,6 @@ char* getNumber(char* filename){
 
     deleteSVG(img);
     return numbers;
-}
-
-bool validFile (char* filename){
-
-    SVG* svg = createValidSVG(filename, "uploads/svg.xsd");
-    // should always evaluate to true since we only load valid ones (unless there is something wrong in memory)
-    if (svg == NULL){
-        return false;
-    }
-
-    bool valid = validateSVG(svg, "uploads/svg.xsd");
-    if (valid == false){
-        deleteSVG(svg);
-        return false;
-    }
-
-    deleteSVG(svg);
-    return true;
-
 }
 
 char* getTitle(char* filename){
