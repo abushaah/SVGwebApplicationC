@@ -21,6 +21,7 @@ jQuery(document).ready(function() {
     document.getElementById('viewFile').onclick = function () {
         let selectedVal = jQuery("#svg").children("option:selected").val();
         let fileName = "uploads/" + selectedVal;
+        jQuery("#showAttributes").html(""); // reset status
         viewSVG(fileName);
     };
 
@@ -43,7 +44,7 @@ jQuery(document).ready(function() {
                   newValue: newValue
                 },
                 success: function (data) {
-                    console.log("change successful");
+                    alert("Change successful");
                 },
                 fail: function(error) {
                     alert(error);
@@ -70,7 +71,7 @@ jQuery(document).ready(function() {
                   newValue: newValue
                 },
                 success: function (data) {
-                    console.log("change successful");
+                    alert("Change successful");
                 },
                 fail: function(error) {
                     alert(error);
@@ -92,7 +93,7 @@ jQuery(document).ready(function() {
               newScale: newScale
             },
             success: function (data) {
-                console.log("change successful");
+                alert("Change successful");
             },
             fail: function(error) {
                 alert(error);
@@ -113,7 +114,7 @@ jQuery(document).ready(function() {
               newScale: newScale
             },
             success: function (data) {
-                console.log("change successful");
+                alert("Change successful");
             },
             fail: function(error) {
                 alert(error);
@@ -122,10 +123,34 @@ jQuery(document).ready(function() {
     };
 
     document.getElementById('viewAttr').onclick = function () {
+        // 1. get the variables, such as file name, component type, and component number (aka index in the file)
         let selectedVal = jQuery("#svg").children("option:selected").val();
         let fileName = "uploads/" + selectedVal;
-        let component = (jQuery("#components").children("option:selected").text()).match(/[a-zA-Z]+/g); // regex from online
-        let componentNumber = (jQuery("#components").children("option:selected").text()).match(/\d+/g);
+        let component = (jQuery("#components").children("option:selected").text()).match(/[a-zA-Z]+/g).toString(); // regex for getting component
+        let componentNumber = (jQuery("#components").children("option:selected").text()).match(/\d+/g); // regex for getting number
+
+        // 2. get request
+        jQuery.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/viewAttrs',
+            data: {
+              info: fileName,
+              component: component,
+              index: (componentNumber - 1)
+            },
+            success: function (data) {
+                // 3. display the string in the div element
+                let otherAttributes = "";
+                for (let i = 0; i < data.info.length; ++i){
+                    otherAttributes = otherAttributes + "name: " + data.info[i].name + ", value: " + data.info[i].value + "<br>";
+                }
+                jQuery("#showAttributes").html(otherAttributes);
+            },
+            fail: function(error) {
+                alert(error);
+            }
+        });
     };
 
     document.getElementById('addAttr').onclick = function () {
@@ -203,22 +228,36 @@ function viewSVG(fileName){
             jQuery("#descText").html(data.info.description);
             let table = "";
 
+            // 3. for the functionality part of other attributes
+            let selectionOA = "<label for=\"componentLabel\">Choose a component: </label><select id=\"components\"></select>";
+            jQuery("#viewOtherAttr").html(selectionOA);
+
             // b. components to access
             let rectIndex = 1;
             for (let i of data.info.rectangles){
-                let data = "x = " + i.x + i.units + " y = " + i.y + i.units + " width = " + i.w + i.units + " height = " + i.h + i.units;
+                let data = "Upper left corner: x = " + i.x + i.units + ", y = " + i.y + i.units + ", width = " + i.w + i.units + ", height = " + i.h + i.units;
                 let otherAttrNum = i.numAttr;
                 let newRow = "<tr><td>Rectangle " + rectIndex + "</td><td>" + data + "</td><td>" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
-                ++rectIndex;
 
+                // only add those that have components
+                if (otherAttrNum > 0){
+                    let newOption = "<option value=\"rect" + rectIndex + "\">Rectangle " + rectIndex + "</option>";
+                    jQuery("#components").append(newOption);
+                }
+                ++rectIndex;
             }
             let circIndex = 1;
             for (let i of data.info.circles){
-                let data = "x = " + i.cx + i.units + " y = " + i.cy + i.units + " r = " + i.r + i.units;
+                let data = "Centre: x = " + i.cx + i.units + ", y = " + i.cy + i.units + ", r = " + i.r + i.units;
                 let otherAttrNum = i.numAttr;
                 let newRow = "<tr><td>Circle " + circIndex + "</td><td>" + data + "</td><td>" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
+
+                if (otherAttrNum > 0){
+                    let newOption = "<option value=\"circ" + circIndex + "\">Circle " + circIndex + "</option>";
+                    jQuery("#components").append(newOption);
+                }
                 ++circIndex;
             }
             let pathIndex = 1;
@@ -227,6 +266,11 @@ function viewSVG(fileName){
                 let otherAttrNum = i.numAttr;
                 let newRow = "<tr><td>Path " + pathIndex + "</td><td>" + data + "</td><td>" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
+
+                if (otherAttrNum > 0){
+                    let newOption = "<option value=\"path" + pathIndex + "\">Path " + pathIndex + "</option>";
+                    jQuery("#components").append(newOption);
+                }
                 ++pathIndex;
             }
             let groupIndex = 1;
@@ -235,31 +279,15 @@ function viewSVG(fileName){
                 let otherAttrNum = i.numAttr;
                 let newRow = "<tr><td>Group " + groupIndex + "</td><td>" + data + "</td><td>" + otherAttrNum + "</td></tr>";
                 table = table + newRow;
+
+                if (otherAttrNum > 0){
+                    let newOption = "<option value=\"group" + groupIndex + "\">Group " + groupIndex + "</option>";
+                    jQuery("#components").append(newOption);
+                }
                 ++groupIndex;
             }
 
             jQuery("#dynamicBodySVG").html(table);
-
-            // 3. for the functionality part of other attributes
-            let selectionOA = "<label for=\"componentLabel\">Choose a component: </label><select id=\"components\"></select>";
-            jQuery("#viewOtherAttr").html(selectionOA);
-            for (let i = 1; i < rectIndex; ++i){
-                let newOption = "<option value=\"rect" + i + "\">Rectangle " + i + "</option>";
-                jQuery("#components").append(newOption);
-            }
-            for (let i = 1; i < circIndex; ++i){
-                let newOption = "<option value=\"circ" + i + "\">Circle " + i + "</option>";
-                jQuery("#components").append(newOption);
-            }
-            for (let i = 1; i < pathIndex; ++i){
-                let newOption = "<option value=\"path" + i + "\">Path " + i + "</option>";
-                jQuery("#components").append(newOption);
-            }
-            for (let i = 1; i < groupIndex; ++i){
-                let newOption = "<option value=\"group" + i + "\">Group " + i + "</option>";
-                jQuery("#components").append(newOption);
-            }
-
         },
         fail: function(error) {
             alert(error);

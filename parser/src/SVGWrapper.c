@@ -121,7 +121,7 @@ char* getGroupsJSON(char* filename){
 
 }
 
-char* getOtherAttributesJSON(char* filename, char* componentType, int index){
+char* getAttributesJSON(char* filename, char* componentType, int index){
 
     // 1. create the svg structure
     SVG* img = createValidSVG(filename, "uploads/svg.xsd");
@@ -135,7 +135,7 @@ char* getOtherAttributesJSON(char* filename, char* componentType, int index){
         void* elem;
         ListIterator iter = createIterator(img->rectangles);
         int i = 0;
-        while (((elem = nextElement(&iter)) != NULL) && (i < index));
+        while (((elem = nextElement(&iter)) != NULL) && (i < index)) ++i;
         Rectangle* rect = (Rectangle*) elem;
 
         // 4. get the list of other attributes
@@ -145,7 +145,7 @@ char* getOtherAttributesJSON(char* filename, char* componentType, int index){
         void* elem;
         ListIterator iter = createIterator(img->circles);
         int i = 0;
-        while (((elem = nextElement(&iter)) != NULL) && (i < index));
+        while (((elem = nextElement(&iter)) != NULL) && (i < index)) ++i;
         Circle* circ = (Circle*) elem;
 
         // 4. get the list of other attributes
@@ -156,7 +156,7 @@ char* getOtherAttributesJSON(char* filename, char* componentType, int index){
         void* elem;
         ListIterator iter = createIterator(img->paths);
         int i = 0;
-        while (((elem = nextElement(&iter)) != NULL) && (i < index));
+        while (((elem = nextElement(&iter)) != NULL) && (i < index)) ++i;
         Path* path = (Path*) elem;
 
         // 4. get the list of other attributes
@@ -167,7 +167,7 @@ char* getOtherAttributesJSON(char* filename, char* componentType, int index){
         void* elem;
         ListIterator iter = createIterator(img->groups);
         int i = 0;
-        while (((elem = nextElement(&iter)) != NULL) && (i < index));
+        while (((elem = nextElement(&iter)) != NULL) && (i < index)) ++i;
         Group* group = (Group*) elem;
 
         // 4. get the list of other attributes

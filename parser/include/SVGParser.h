@@ -20,6 +20,7 @@ char* getRectsJSON(char* filename);
 char* getCircsJSON(char* filename);
 char* getPathsJSON(char* filename);
 char* getGroupsJSON(char* filename);
+char* getAttributesJSON(char* filename, char* componentType, int index);
 
 bool changeTitle(char* filename, char* newValue);
 bool changedDescr(char* filename, char* newValue);

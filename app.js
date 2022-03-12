@@ -80,7 +80,7 @@ let sharedLib = ffi.Library('./libsvgparser', {
   'getCircsJSON' : [ 'string', [ 'string'] ],
   'getPathsJSON' : [ 'string', [ 'string'] ],
   'getGroupsJSON' : [ 'string', [ 'string'] ],
-//  'getAttributes' : [ 'string', [ 'string'] ],
+  'getAttributesJSON' : [ 'string', [ 'string', 'string', 'int'] ],
   'changeTitle' : [ 'bool', [ 'string', 'string' ] ],
   'changeDescr' : [ 'bool', [ 'string', 'string' ] ],
   'scaleRectangles' : [ 'bool', [ 'string', 'float' ] ],
@@ -208,6 +208,23 @@ app.get('/scaleCircs', function(req , res){ // same as rectangles
   res.send(
     {
       info: valid
+    }
+  );
+
+});
+
+app.get('/viewAttrs', function(req , res){ // to get the other attributes of a component
+
+  // 1. get info
+  let file = req.query.info;
+  let component = req.query.component;
+  let index = req.query.index;
+
+  // 2. get other attibrutes
+  let otherAttributes = JSON.parse(sharedLib.getAttributesJSON(file, component, index));
+  res.send(
+    {
+      info: otherAttributes
     }
   );
 
