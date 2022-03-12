@@ -10,6 +10,7 @@ jQuery(document).ready(function() {
         },
         success: function (data) {
             if (data.info == null){
+                alert("Error on ready, files not generated");
                 console.log("Error on ready, files not generated");
             }
             else{
@@ -50,7 +51,8 @@ jQuery(document).ready(function() {
                 },
                 success: function (data) {
                     if (data.info == false){
-                        alert("Change unsuccessful");
+                        console.log("Edit for title was not successful, no changes made to file");
+                        alert("Change not successful");
                     }
                     else{
                         alert("Change successful");
@@ -82,7 +84,8 @@ jQuery(document).ready(function() {
                 },
                 success: function (data) {
                     if (data.info == false){
-                        alert("Change unsuccessful");
+                        console.log("Edit for description was not successful, no changes made to file");
+                        alert("Change not successful");
                     }
                     else{
                         alert("Change successful");
@@ -109,7 +112,8 @@ jQuery(document).ready(function() {
             },
             success: function (data) {
                 if (data.info == false){
-                    alert("Change unsuccessful");
+                    console.log("Scaling rectangles was not successful, no changes made to file");
+                    alert("Change not successful");
                 }
                 else{
                     alert("Change successful");
@@ -135,7 +139,8 @@ jQuery(document).ready(function() {
             },
             success: function (data) {
                 if (data.info == false){
-                    alert("Change unsuccessful");
+                    console.log("Scaling circles was not successful, no changes made to file");
+                    alert("Change not successful");
                 }
                 else{
                     alert("Change successful");
@@ -153,7 +158,7 @@ jQuery(document).ready(function() {
         let value = "#" + jQuery("#components").children("option:selected").val() + "OA";
         if (jQuery(value).text() <= 0){
             jQuery("#showAttributes").html("No Attributes"); // reset
-//            alert("There are no attributes to show");
+            alert("There are no attributes to show");
         }
         else{
             // 2. get the variables, such as file name, component type, and component number (aka index in the file)
@@ -176,6 +181,7 @@ jQuery(document).ready(function() {
                 success: function (data) {
                     if (data.info == null){
                         console.log("Error getting the other attributes");
+                        alert("Reuqest failed");
                     }
                     else{
                         // 4. display the string in the div element
@@ -215,7 +221,8 @@ jQuery(document).ready(function() {
             },
             success: function (data) {
                 if (data.info == false){
-                    alert("Change unsuccessful");
+                    console.log("Attribute was not successful, no changes made to file");
+                    alert("Change not successful");
                 }
                 else{
                     alert("Change successful");
@@ -287,67 +294,73 @@ function viewSVG(fileName){
           info: fileName
         },
         success: function (data) {
-            // 2. place a table
 
-            // a. image, title description
-            let imageString = "<img src=\"" + fileName + "\" class=\"svgImage\"/>";
-            jQuery("#svgViewImg").html(imageString);
-            jQuery("#titleText").html(data.info.title);
-            jQuery("#descText").html(data.info.description);
-            let table = "";
-
-            // 3. for the functionality part of other attributes
-            let selectionOA = "<label for=\"componentLabel\">Choose a component: </label><select id=\"components\"></select>";
-            jQuery("#viewOtherAttr").html(selectionOA);
-
-            // b. components to access
-            let rectIndex = 1;
-            for (let i of data.info.rectangles){
-                let data = "Upper left corner: x = " + i.x + i.units + ", y = " + i.y + i.units + ", width = " + i.w + i.units + ", height = " + i.h + i.units;
-                let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Rectangle " + rectIndex + "</td><td>" + data + "</td><td id=\"rect" + rectIndex + "OA\">" + otherAttrNum + "</td></tr>";
-                table = table + newRow;
-
-                // only add those that have components
-                let newOption = "<option value=\"rect" + rectIndex + "\">Rectangle " + rectIndex + "</option>";
-                jQuery("#components").append(newOption);
-                ++rectIndex;
+            if (data.info == null){
+                alert("Error getting files, file contents not generated");
+                console.log("Error getting files, file contents not generated");
             }
-            let circIndex = 1;
-            for (let i of data.info.circles){
-                let data = "Centre: cx = " + i.cx + i.units + ", cy = " + i.cy + i.units + ", r = " + i.r + i.units;
-                let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Circle " + circIndex + "</td><td>" + data + "</td><td id=\"circ" + circIndex + "OA\">" + otherAttrNum + "</td></tr>";
-                table = table + newRow;
+            else{
+                // 2. place a table
+                // a. image, title description
+                let imageString = "<img src=\"" + fileName + "\" class=\"svgImage\"/>";
+                jQuery("#svgViewImg").html(imageString);
+                jQuery("#titleText").html(data.info.title);
+                jQuery("#descText").html(data.info.description);
+                let table = "";
 
-                let newOption = "<option value=\"circ" + circIndex + "\">Circle " + circIndex + "</option>";
-                jQuery("#components").append(newOption);
-                ++circIndex;
+                // 3. for the functionality part of other attributes
+                let selectionOA = "<label for=\"componentLabel\">Choose a component: </label><select id=\"components\"></select>";
+                jQuery("#viewOtherAttr").html(selectionOA);
+
+                // b. components to access
+                let rectIndex = 1;
+                for (let i of data.info.rectangles){
+                    let data = "Upper left corner: x = " + i.x + i.units + ", y = " + i.y + i.units + ", width = " + i.w + i.units + ", height = " + i.h + i.units;
+                    let otherAttrNum = i.numAttr;
+                    let newRow = "<tr><td>Rectangle " + rectIndex + "</td><td>" + data + "</td><td id=\"rect" + rectIndex + "OA\">" + otherAttrNum + "</td></tr>";
+                    table = table + newRow;
+
+                    // only add those that have components
+                    let newOption = "<option value=\"rect" + rectIndex + "\">Rectangle " + rectIndex + "</option>";
+                    jQuery("#components").append(newOption);
+                    ++rectIndex;
+                }
+                let circIndex = 1;
+                for (let i of data.info.circles){
+                    let data = "Centre: cx = " + i.cx + i.units + ", cy = " + i.cy + i.units + ", r = " + i.r + i.units;
+                    let otherAttrNum = i.numAttr;
+                    let newRow = "<tr><td>Circle " + circIndex + "</td><td>" + data + "</td><td id=\"circ" + circIndex + "OA\">" + otherAttrNum + "</td></tr>";
+                    table = table + newRow;
+
+                    let newOption = "<option value=\"circ" + circIndex + "\">Circle " + circIndex + "</option>";
+                    jQuery("#components").append(newOption);
+                    ++circIndex;
+                }
+                let pathIndex = 1;
+                for (let i of data.info.paths){
+                    let data = "d = " + i.d;
+                    let otherAttrNum = i.numAttr;
+                    let newRow = "<tr><td>Path " + pathIndex + "</td><td>" + data + "</td><td id=\"path" + pathIndex + "OA\">" + otherAttrNum + "</td></tr>";
+                    table = table + newRow;
+
+                    let newOption = "<option value=\"path" + pathIndex + "\">Path " + pathIndex + "</option>";
+                    jQuery("#components").append(newOption);
+                    ++pathIndex;
+                }
+                let groupIndex = 1;
+                for (let i of data.info.groups){
+                    let data = i.children + " child elements";
+                    let otherAttrNum = i.numAttr;
+                    let newRow = "<tr><td>Group " + groupIndex + "</td><td>" + data + "</td><td id=\"group" + groupIndex + "OA\">" + otherAttrNum + "</td></tr>";
+                    table = table + newRow;
+
+                    let newOption = "<option value=\"group" + groupIndex + "\">Group " + groupIndex + "</option>";
+                    jQuery("#components").append(newOption);
+                    ++groupIndex;
+                }
+
+                jQuery("#dynamicBodySVG").html(table);
             }
-            let pathIndex = 1;
-            for (let i of data.info.paths){
-                let data = "d = " + i.d;
-                let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Path " + pathIndex + "</td><td>" + data + "</td><td id=\"path" + pathIndex + "OA\">" + otherAttrNum + "</td></tr>";
-                table = table + newRow;
-
-                let newOption = "<option value=\"path" + pathIndex + "\">Path " + pathIndex + "</option>";
-                jQuery("#components").append(newOption);
-                ++pathIndex;
-            }
-            let groupIndex = 1;
-            for (let i of data.info.groups){
-                let data = i.children + " child elements";
-                let otherAttrNum = i.numAttr;
-                let newRow = "<tr><td>Group " + groupIndex + "</td><td>" + data + "</td><td id=\"group" + groupIndex + "OA\">" + otherAttrNum + "</td></tr>";
-                table = table + newRow;
-
-                let newOption = "<option value=\"group" + groupIndex + "\">Group " + groupIndex + "</option>";
-                jQuery("#components").append(newOption);
-                ++groupIndex;
-            }
-
-            jQuery("#dynamicBodySVG").html(table);
         },
         fail: function(error) {
             alert(error);
