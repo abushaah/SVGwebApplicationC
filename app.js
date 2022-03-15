@@ -164,6 +164,9 @@ app.get('/editTitle', function(req , res){
   let newValue = req.query.newValue;
   // update
   let valid = sharedLib.changeTitle(file, newValue);
+  if (valid == false){
+    console.log("Change unsucessful, title not changed in " + file);
+  }
   // return status
   res.send(
     {
@@ -178,6 +181,9 @@ app.get('/editDesc', function(req , res){ // same as title
   let file = req.query.info;
   let newValue = req.query.newValue;
   let valid = sharedLib.changeDescr(file, newValue);
+  if (valid == false){
+    console.log("Change unsucessful, description not changed in " + file);
+  }
   res.send(
     {
       info: valid
@@ -193,6 +199,9 @@ app.get('/scaleRects', function(req , res){ // scaling rectangles by a factor
   let newScale = req.query.newScale;
   // call wrapper function
   let valid = sharedLib.scaleRectangles(file, newScale);
+  if (valid == false){
+    console.log("Change unsucessful, scaling rectangles not changed in " + file);
+  }
   res.send(
     {
       info: valid
@@ -206,6 +215,9 @@ app.get('/scaleCircs', function(req , res){ // same as rectangles
   let file = req.query.info;
   let newScale = req.query.newScale;
   let valid = sharedLib.scaleCircles(file, newScale);
+  if (valid == false){
+    console.log("Change unsucessful, scaling circles not changed in " + file);
+  }
   res.send(
     {
       info: valid
@@ -242,6 +254,9 @@ app.get('/addEditAttrs', function(req , res){
 
   // 2. get other attibrutes
   let valid = sharedLib.setNewAttributes(file, component, index, newName, newValue); // will validate the new attribute in the c function
+  if (valid == false){
+    console.log("Change unsucessful, attribute not changed in " + file);
+  }
   res.send(
     {
       info: valid // returns the result

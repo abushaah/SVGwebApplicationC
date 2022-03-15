@@ -605,6 +605,7 @@ bool changeValueInAttr (List* attrList, Attribute* newAttribute){
         if (strcasecmp(attr->name, newAttribute->name) == 0){
             found = true;
             if (validAttrStruct(newAttribute) == false) return false; // must check if the attribute is valid. if return is false do not need to free attribute
+            if (strlen(newAttribute->value) > strlen(attr->value)) return false; // cannot reallocate
             strcpy(attr->value, newAttribute->value);
             deleteAttribute((void*) newAttribute);
             break;
@@ -720,6 +721,7 @@ bool changeValueInPath (List* pathList, int index, Attribute* newAttribute){
             if (strcasecmp(newAttribute->name, "d") == 0){
                 // check for validity
                 if (checkString(path->data) == false) return false; // may be empty, may not be null
+                if (strlen(newAttribute->value) > strlen(path->data)) return false; // cannot reallocate
                 strcpy(path->data, newAttribute->value);
                 deleteAttribute((void*) newAttribute);
             }

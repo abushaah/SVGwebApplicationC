@@ -162,10 +162,21 @@
         <div class="responsiveTable">
             <table border="1" cellpadding = "5%" cellspacing = "0" class="functionality">
                 <tr>
-                    <td><button id="createNewSVG" class="btn btn-secondary">Create SVG</button></td>
+                    <td>
+                        <h4>Create an SVG</h4>
+                        <form ref='attrform' id='addSVGform'>
+                            <div class="form-group">
+                                <br>
+                                <input type="text" class="form-control" id="fileName" value="Name of New SVG File" placeholder="Placeholder">
+                                <br>
+                            </div>
+                            <button id="createNewSVG" class="btn btn-secondary">Create SVG</button>
+                        </form>
+                    </td>
                 </tr>
                 <tr>
                     <td>
+                        <h4>Add a Shape to an Existing SVG</h4>
                         <div id="svgFilesAddShape">
                             <label for="svgLabel">Choose a file: </label>
                         </div>

@@ -179,7 +179,7 @@ bool changeTitle(char* filename, char* newValue){
     if (img == NULL) return false;
 
     // 2. validate the title. If valid, update the title
-    if (validChar(newValue) == 0){
+    if (validChar(newValue) == 0 || strlen(newValue) > 256){
         deleteSVG(img);
         return false;
     }
@@ -201,7 +201,7 @@ bool changeDescr(char* filename, char* newValue){
     if (img == NULL) return false;
 
     // 2. validate the title. If valid, update the title
-    if (validChar(newValue) == 0){
+    if (validChar(newValue) == 0 || strlen(newValue) > 256){
         deleteSVG(img);
         return false;
     }
