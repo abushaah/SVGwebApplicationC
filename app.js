@@ -265,6 +265,10 @@ app.get('/addEditAttrs', function(req , res){
 
 });
 
+// no overwriting existing files
+// valid file
+// valid creating of file
+
 /*
 app.get('/endpointAttr', function(req , res){ // add or edit attribute functionality
 

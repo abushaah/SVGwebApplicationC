@@ -235,7 +235,31 @@ jQuery(document).ready(function() {
     };
 
     document.getElementById('createNewSVG').onclick = function () {
-        alert("User clicked on create a new SVG");
+        let fileName = document.getElementById('fileName').value;
+        let title = document.getElementById('titleName').value;
+        let description = document.getElementById('descName').value;
+        jQuery.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/newFile',
+            data: {
+              info: fileName,
+              title: title,
+              description: description
+            },
+            success: function (data) {
+                if (data.info == false){
+                    console.log("SVG File creation was not successful, no changes made to uploads directory");
+                    alert("Change not successful");
+                }
+                else{
+                    alert("Change successful");
+                }
+            },
+            fail: function(error) {
+                alert(error);
+            }
+        });
     };
 
     document.getElementById('addShape').onclick = function () {
