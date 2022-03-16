@@ -99,7 +99,11 @@ jQuery(document).ready(function() {
     };
 
     document.getElementById('sRect').onclick = function () {
-        let newScale = document.getElementById('scaleValue').value;
+        let newScale = parseFloat(document.getElementById('scaleValue').value);
+        if (isNaN(newScale)){
+            alert("Not a number");
+            return;
+        }
         let selectedVal = jQuery("#svg").children("option:selected").val();
         let fileName = "uploads/" + selectedVal;
         jQuery.ajax({
@@ -126,7 +130,11 @@ jQuery(document).ready(function() {
     };
 
     document.getElementById('sCirc').onclick = function () {
-        let newScale = document.getElementById('scaleValue').value;
+        let newScale = parseFloat(document.getElementById('scaleValue').value);
+        if (isNaN(newScale)){
+            alert("Not a number");
+            return;
+        }
         let selectedVal = jQuery("#svg").children("option:selected").val();
         let fileName = "uploads/" + selectedVal;
         jQuery.ajax({
@@ -235,21 +243,27 @@ jQuery(document).ready(function() {
     };
 
     document.getElementById('createNewSVG').onclick = function () {
-        let fileName = document.getElementById('fileName').value;
-        let title = document.getElementById('titleName').value;
-        let description = document.getElementById('descName').value;
+        let fileName = document.getElementById('fileName').value + ".svg";
+        if (hasWhiteSpace(fileName)){
+            alert("Invalid file name, cannot have whitespace");
+            return;
+        }
+
+        let svg = {};
+        svg.title = document.getElementById('titleName').value;
+        svg.descr = document.getElementById('descName').value;
+
         jQuery.ajax({
             type: 'get',
             dataType: 'json',
-            url: '/newFile',
+            url: '/newSVGFile',
             data: {
               info: fileName,
-              title: title,
-              description: description
+              svg: svg
             },
             success: function (data) {
-                if (data.info == false){
-                    console.log("SVG File creation was not successful, no changes made to uploads directory");
+                if (data.success == false){
+                    console.log("SVG File creation was not successful due to invalid file, no changes made to uploads directory");
                     alert("Change not successful");
                 }
                 else{
@@ -391,5 +405,8 @@ function viewSVG(fileName){
         }
     });
 
+}
 
+function hasWhiteSpace(s) {
+  return (/\s/).test(s);
 }

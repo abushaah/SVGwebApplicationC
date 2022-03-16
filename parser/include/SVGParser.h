@@ -28,6 +28,8 @@ bool scaleRectangles(char* filename, float scaleValue);
 bool scaleCircles(char* filename, float scaleValue);
 bool setNewAttributes(char* filename, char* componentType, int componentNumber, char* newName, char* newValue);
 
+bool createFile(char* filename, char* svg);
+
 // END OF WRAPPER FUNCTIONS
 
 typedef enum COMP{

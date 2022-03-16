@@ -322,3 +322,25 @@ bool setNewAttributes(char* filename, char* componentType, int componentNumber, 
     deleteSVG(img);
     return valid;
 }
+
+bool createFile(char* filename, char* svg){
+
+    bool valid = true;
+
+    // 1. create the svg given the JSON string
+    SVG* img = JSONtoSVG(svg);
+    if (img == NULL) return false;
+
+    // 2. validate against restrictions
+    valid = validateSVG(img, "uploads/svg.xsd");
+    if (valid == false){
+        deleteSVG(img);
+        return false;
+    }
+
+    // 3. write to file
+    valid = writeSVG(img, filename);
+
+    deleteSVG(img);
+    return valid;
+}

@@ -85,7 +85,8 @@ let sharedLib = ffi.Library('./libsvgparser', {
   'changeDescr' : [ 'bool', [ 'string', 'string' ] ],
   'scaleRectangles' : [ 'bool', [ 'string', 'float' ] ],
   'scaleCircles' : [ 'bool', [ 'string', 'float' ] ],
-  'setNewAttributes' : [ 'bool', [ 'string', 'string', 'int', 'string', 'string' ] ]
+  'setNewAttributes' : [ 'bool', [ 'string', 'string', 'int', 'string', 'string' ] ],
+  'createFile' : [ 'bool', [ 'string', 'string' ] ]
 });
 
 app.get('/fileNum', function(req , res){ // get all the file information
@@ -265,23 +266,36 @@ app.get('/addEditAttrs', function(req , res){
 
 });
 
-// no overwriting existing files
-// valid file
-// valid creating of file
+app.get('/newSVGFile', function(req , res){
 
-/*
-app.get('/endpointAttr', function(req , res){ // add or edit attribute functionality
+  // 1. get info
+  let svgFile = req.query.info;
+  let svg = JSON.stringify(req.query.svg);
+  let valid = true;
 
-  // req is an object of string values corresponding for arguments
-  let retStr = req.query.data1 + " " + req.query.data2;
-  res.send( // this will send the error return values
+  // 2. validate file name
+  fs.readdirSync('./uploads').forEach(file => {
+      let filename = file;
+      if (filename == svgFile){ // if the file already exists
+          valid = false;
+      }
+  });
+
+  if (valid == false){
+    console.log("Change unsucessful, file name is duplicate " + svgFile);
+  }
+  else{
+    // 3. create the new file
+    svgFile = "uploads/" + svgFile;
+    valid = sharedLib.createFile(svgFile, svg); // will validate
+  }
+  res.send(
     {
-      somethingElse: retStr
+      success: valid // returns the result
     }
   );
 
 });
-*/
 
 app.listen(portNum);
 console.log('Running app at localhost: ' + portNum);
