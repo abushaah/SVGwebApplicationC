@@ -26,6 +26,8 @@ jQuery(document).ready(function() {
     // make certain compoenents not visible
     document.getElementById("addCircleForm").style.display="none";
     document.getElementById("addRectangleForm").style.display="none";
+    document.getElementById("addAttrForm").style.display="none";
+    document.getElementById("editShapeAttrSection").style.display="none";
 
     // action listeners aka callback functions in order of appearance
     document.getElementById('viewFile').onclick = function () {
@@ -211,41 +213,6 @@ jQuery(document).ready(function() {
         }
     };
 
-    document.getElementById('addAttr').onclick = function () {
-        // 1. get the variables, such as file name, component type, and component number (aka index in the file), and new attribute value
-        let selectedVal = jQuery("#svg").children("option:selected").val();
-        let fileName = "uploads/" + selectedVal;
-        let text = jQuery("#components").children("option:selected").text();
-        let component = text.match(/[a-zA-Z]+/g).toString(); // regex for getting component
-        let componentNumber = text.match(/\d+/g); // regex for getting number
-        let newName = document.getElementById('nameAttr').value;
-        let newValue = document.getElementById('valueAttr').value;
-        jQuery.ajax({
-            type: 'get',
-            dataType: 'json',
-            url: '/addEditAttrs',
-            data: {
-              info: fileName,
-              component: component,
-              index: (componentNumber - 1),
-              name: newName,
-              value: newValue
-            },
-            success: function (data) {
-                if (data.info == false){
-                    console.log("Attribute was not successful, no changes made to file");
-                    alert("Change not successful");
-                }
-                else{
-                    alert("Change successful");
-                }
-            },
-            fail: function(error) {
-                alert(error);
-            }
-        });
-    };
-
     document.getElementById('createNewSVG').onclick = function () {
         let fileName = document.getElementById('fileName').value + ".svg";
         if (hasWhiteSpace(fileName)){
@@ -376,6 +343,102 @@ jQuery(document).ready(function() {
         }
     };
 
+    document.getElementById('addShapeAttr').onclick = function () {
+        document.getElementById("addAttrForm").style.display="block";
+        document.getElementById('addAttr').onclick = function () {
+            // 1. get the variables, such as file name, component type, and component number (aka index in the file), and new attribute value
+            let selectedVal = jQuery("#svg").children("option:selected").val();
+            let fileName = "uploads/" + selectedVal;
+            let text = jQuery("#components").children("option:selected").text();
+            let component = text.match(/[a-zA-Z]+/g).toString(); // regex for getting component
+            let componentNumber = text.match(/\d+/g); // regex for getting number
+            let newName = document.getElementById('nameAttr').value;
+            let newValue = document.getElementById('valueAttr').value;
+            addEditShapeAttr(fileName, component, componentNumber, newName, newValue);
+        };
+    };
+
+    document.getElementById('editShapeAttr').onclick = function () {
+
+        // to make more user friendly, and less error prone, will fill in the required values for them
+        document.getElementById("editShapeAttrSection").style.display="block";
+
+        // 1. get the variables, such as file name, component type, and component number (aka index in the file), and new attribute value
+        let selectedVal = jQuery("#svg").children("option:selected").val();
+        let fileName = "uploads/" + selectedVal;
+        let text = jQuery("#components").children("option:selected").text();
+        let component = text.match(/[a-zA-Z]+/g).toString(); // regex for getting component
+        let componentNumber = text.match(/\d+/g); // regex for getting number
+
+        let value = "#" + jQuery("#components").children("option:selected").val() + "OA";
+
+        // 2. create a list of all the existing attributes that can be editable
+        let selection = "<label for=\"attrLabel\">Choose an attribute: </label><select id=\"editAttrList\"></select>";
+        jQuery("#editShapeAttrSection").html(selection);
+
+        let editable = [];
+        if (component == "Rectangle"){
+            editable.push("x");
+            editable.push("y");
+            editable.push("width");
+            editable.push("height");
+            editable.push("units");
+        }
+        else if (component == "Circle"){
+            editable.push("cx");
+            editable.push("cy");
+            editable.push("r");
+            editable.push("units");
+        }
+        else if (component == "Path"){
+            editable.push("d");
+        }
+
+        // 3. add the list to the drop down menu
+        for (let i = 0; i < editable.length; ++i) {
+            let newOption = "<option value=\"" + editable[i] + "\">" + editable[i] + "</option>";
+            jQuery("#editAttrList").append(newOption);
+        }
+
+        if (jQuery(value).text() > 0){
+            // 4. get request for other attributes - since idk how to return values for asynchronous functions :(
+            jQuery.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/viewAttrs',
+                data: {
+                  info: fileName,
+                  component: component,
+                  index: (componentNumber - 1)
+                },
+                success: function (data) {
+                    if (data.info != null){
+                        // add to list of existing, editable components
+                        for (let i = 0; i < data.info.length; ++i){
+                            let newOption = "<option value=\"" + data.info[i].name + "\">" + data.info[i].name + "</option>";
+                            jQuery("#editAttrList").append(newOption);
+                        }
+                    }
+                },
+                fail: function(error) {
+                    alert(error);
+                }
+            });
+        }
+
+        // 5. form to actually submit changes
+        let submit = "<input type=\"text\" class=\"form-control\" id=\"newEditAttr\" value=\"New Value\" placeholder=\"Placeholder\"><br><button id=\"submitChanges\" class=\"btn btn-secondary\">Submit</button>";
+        jQuery("#editShapeAttrSection").append(submit);
+
+        document.getElementById('submitChanges').onclick = function () {
+            let name = jQuery("#editAttrList").children("option:selected").val();
+            let newValue = document.getElementById('newEditAttr').value;
+            addEditShapeAttr(fileName, component, componentNumber, name, newValue);
+            reload = location.reload();
+       };
+
+    };
+
 });
 
 // This function will fill in the file log panel and the drop down menu
@@ -450,7 +513,7 @@ function viewSVG(fileName){
                 for (let i of data.info.rectangles){
                     let data = "Upper left corner: x = " + i.x + i.units + ", y = " + i.y + i.units + ", width = " + i.w + i.units + ", height = " + i.h + i.units;
                     let otherAttrNum = i.numAttr;
-                    let newRow = "<tr><td>Rectangle " + rectIndex + "</td><td>" + data + "</td><td id=\"rect" + rectIndex + "OA\">" + otherAttrNum + "</td></tr>";
+                    let newRow = "<tr><td>Rectangle " + rectIndex + "</td><td id=\"rect" + rectIndex + "D\">" + data + "</td><td id=\"rect" + rectIndex + "OA\">" + otherAttrNum + "</td></tr>";
                     table = table + newRow;
 
                     // only add those that have components
@@ -462,7 +525,7 @@ function viewSVG(fileName){
                 for (let i of data.info.circles){
                     let data = "Centre: cx = " + i.cx + i.units + ", cy = " + i.cy + i.units + ", r = " + i.r + i.units;
                     let otherAttrNum = i.numAttr;
-                    let newRow = "<tr><td>Circle " + circIndex + "</td><td>" + data + "</td><td id=\"circ" + circIndex + "OA\">" + otherAttrNum + "</td></tr>";
+                    let newRow = "<tr><td>Circle " + circIndex + "</td><td id=\"circ" + circIndex + "D\">" + data + "</td><td id=\"circ" + circIndex + "OA\">" + otherAttrNum + "</td></tr>";
                     table = table + newRow;
 
                     let newOption = "<option value=\"circ" + circIndex + "\">Circle " + circIndex + "</option>";
@@ -473,7 +536,7 @@ function viewSVG(fileName){
                 for (let i of data.info.paths){
                     let data = "d = " + i.d;
                     let otherAttrNum = i.numAttr;
-                    let newRow = "<tr><td>Path " + pathIndex + "</td><td>" + data + "</td><td id=\"path" + pathIndex + "OA\">" + otherAttrNum + "</td></tr>";
+                    let newRow = "<tr><td>Path " + pathIndex + "</td><td id=\"path" + pathIndex + "D\">" + data + "</td><td id=\"path" + pathIndex + "OA\">" + otherAttrNum + "</td></tr>";
                     table = table + newRow;
 
                     let newOption = "<option value=\"path" + pathIndex + "\">Path " + pathIndex + "</option>";
@@ -484,7 +547,7 @@ function viewSVG(fileName){
                 for (let i of data.info.groups){
                     let data = i.children + " child elements";
                     let otherAttrNum = i.numAttr;
-                    let newRow = "<tr><td>Group " + groupIndex + "</td><td>" + data + "</td><td id=\"group" + groupIndex + "OA\">" + otherAttrNum + "</td></tr>";
+                    let newRow = "<tr><td>Group " + groupIndex + "</td><td id=\"group" + groupIndex + "D\">" + data + "</td><td id=\"group" + groupIndex + "OA\">" + otherAttrNum + "</td></tr>";
                     table = table + newRow;
 
                     let newOption = "<option value=\"group" + groupIndex + "\">Group " + groupIndex + "</option>";
@@ -506,29 +569,31 @@ function hasWhiteSpace(s) {
   return (/\s/).test(s);
 }
 
+function addEditShapeAttr(fileName, component, componentNumber, newName, newValue){
 
-/*
-
-        let role = $(this).find('.editT');
-        let value = $(this).siblings(); // search DOM
-        let values = value.text();
-
-        let newTitle = value.find('.titleTextBox').val();
-
-        if (role.html() == "Edit") {
-            role.html("Save");
-            $(this).siblings().html('<input type="textbox" class="titleTextBox" value="" placeholder="' + values + '">');
-            values = "";
-        }
-        else {
-            if (newTitle != "") {
-                $(this).siblings().html('<span id="titleText">' + newTitle + '</span>');
-                role.html("Edit");
+    jQuery.ajax({
+        type: 'get',
+        dataType: 'json',
+        url: '/addEditAttrs',
+        data: {
+          info: fileName,
+          component: component,
+          index: (componentNumber - 1),
+          name: newName,
+          value: newValue
+        },
+        success: function (data) {
+            if (data.info == false){
+                console.log("Attribute was not successful, no changes made to file");
+                alert("Change not successful");
             }
-            else {
-                alert("Please Fill the field");
+            else{
+                alert("Change successful");
             }
+        },
+        fail: function(error) {
+            alert(error);
         }
+    });
 
-
-*/
+}
