@@ -291,6 +291,10 @@ jQuery(document).ready(function() {
                 return;
             }
             let units = document.getElementById('CU').value;
+            if (units == "Units"){
+                alert("Please enter a valid unit, or leave empty");
+                return;
+            }
             let circle = JSON.stringify({
                 "cx": x,
                 "cy": y,
@@ -335,6 +339,10 @@ jQuery(document).ready(function() {
                 return;
             }
             let units = document.getElementById('RU').value;
+            if (units == "Units"){
+                alert("Please enter a valid unit, or leave empty");
+                return;
+            }
             let rectangle = JSON.stringify({
                 "x": x,
                 "y": y,
