@@ -344,3 +344,67 @@ bool createFile(char* filename, char* svg){
     deleteSVG(img);
     return valid;
 }
+
+bool addCircle(char* filename, char* circle){
+
+    bool valid = true;
+
+    // 1. create the circle given the JSON string
+    Circle* circ = JSONtoCircle(circle);
+    if (circ == NULL) return false;
+
+    // 2. validate against restrictions
+    valid = validCircStruct(circ);
+    if (valid == false){
+        deleteCircle((void*)circ);
+        return false;
+    }
+
+    // 3. create svg based on file
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL){
+        deleteCircle((void*)circ);
+        return false;
+    }
+
+    // 4. add to svg
+    addComponent(img, CIRC, (void*)circ);
+
+    // 5. write updates to file
+    valid = writeSVG(img, filename);
+
+    deleteSVG(img);
+    return valid;
+}
+
+bool addRectangle(char* filename, char* rectangle){
+
+    bool valid = true;
+
+    // 1. create the circle given the JSON string
+    Rectangle* rect = JSONtoRect(rectangle);
+    if (rect == NULL) return false;
+
+    // 2. validate against restrictions
+    valid = validRectStruct(rect);
+    if (valid == false){
+        deleteRectangle((void*)rect);
+        return false;
+    }
+
+    // 3. create svg based on file
+    SVG* img = createValidSVG(filename, "uploads/svg.xsd");
+    if (img == NULL){
+        deleteRectangle((void*)rect);
+        return false;
+    }
+
+    // 4. add to svg
+    addComponent(img, RECT, (void*)rect);
+
+    // 5. write updates to file
+    valid = writeSVG(img, filename);
+
+    deleteSVG(img);
+    return valid;
+}

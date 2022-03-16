@@ -86,7 +86,9 @@ let sharedLib = ffi.Library('./libsvgparser', {
   'scaleRectangles' : [ 'bool', [ 'string', 'float' ] ],
   'scaleCircles' : [ 'bool', [ 'string', 'float' ] ],
   'setNewAttributes' : [ 'bool', [ 'string', 'string', 'int', 'string', 'string' ] ],
-  'createFile' : [ 'bool', [ 'string', 'string' ] ]
+  'createFile' : [ 'bool', [ 'string', 'string' ] ],
+  'addCircle' : [ 'bool', [ 'string', 'string' ] ],
+  'addRectangle' : [ 'bool', [ 'string', 'string' ] ]
 });
 
 app.get('/fileNum', function(req , res){ // get all the file information
@@ -289,6 +291,34 @@ app.get('/newSVGFile', function(req , res){
     svgFile = "uploads/" + svgFile;
     valid = sharedLib.createFile(svgFile, svg); // will validate
   }
+  res.send(
+    {
+      success: valid // returns the result
+    }
+  );
+
+});
+
+app.get('/newSVGCircle', function(req , res){
+
+  // 1. get info
+  let svgFile = req.query.info;
+  let circle = req.query.circle;
+  let valid = sharedLib.addCircle(svgFile, circle); // will validate
+  res.send(
+    {
+      success: valid // returns the result
+    }
+  );
+
+});
+
+app.get('/newSVGRectangle', function(req , res){
+
+  // 1. get info
+  let svgFile = req.query.info;
+  let rectangle = req.query.rectangle;
+  let valid = sharedLib.addRectangle(svgFile, rectangle); // will validate
   res.send(
     {
       success: valid // returns the result

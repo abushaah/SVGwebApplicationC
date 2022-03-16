@@ -23,6 +23,10 @@ jQuery(document).ready(function() {
         }
     });
 
+    // make certain compoenents not visible
+    document.getElementById("addCircleForm").style.display="none";
+    document.getElementById("addRectangleForm").style.display="none";
+
     // action listeners aka callback functions in order of appearance
     document.getElementById('viewFile').onclick = function () {
         let selectedVal = jQuery("#svg").children("option:selected").val();
@@ -276,9 +280,92 @@ jQuery(document).ready(function() {
         });
     };
 
-    document.getElementById('addShape').onclick = function () {
-        let selectedVal = jQuery("#svgShape").children("option:selected").val();
-        alert("User clicked on add a shape for " + selectedVal);
+    document.getElementById('addShapeCirc').onclick = function () {
+        document.getElementById("addCircleForm").style.display="block";
+        document.getElementById('addCirc').onclick = function () {
+            let x = Number.parseFloat(document.getElementById('CX').value);
+            let y = Number.parseFloat(document.getElementById('CY').value);
+            let r = Number.parseFloat(document.getElementById('CR').value);
+            if (isNaN(x) || isNaN(y) || isNaN(r)){
+                alert("Coordinates and Radius must be a number");
+                return;
+            }
+            let units = document.getElementById('CU').value;
+            let circle = JSON.stringify({
+                "cx": x,
+                "cy": y,
+                "r": r,
+                "units": units
+            });
+            let selectedVal = jQuery("#svgShape").children("option:selected").val();
+            let fileName = "uploads/" + selectedVal;
+            jQuery.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/newSVGCircle',
+                data: {
+                  info: fileName,
+                  circle: circle
+                },
+                success: function (data) {
+                    if (data.success == false){
+                        console.log("Circle creation was not successful due to invalid circle");
+                        alert("Change not successful");
+                    }
+                    else{
+                        alert("Change successful");
+                    }
+                },
+                fail: function(error) {
+                    alert(error);
+                }
+            });
+        }
+    };
+
+    document.getElementById('addShapeRect').onclick = function () {
+        document.getElementById("addRectangleForm").style.display="block";
+        document.getElementById('addRect').onclick = function () {
+            let x = Number.parseFloat(document.getElementById('RX').value);
+            let y = Number.parseFloat(document.getElementById('RY').value);
+            let width = Number.parseFloat(document.getElementById('RW').value);
+            let height = Number.parseFloat(document.getElementById('RH').value);
+            if (isNaN(x) || isNaN(y) || isNaN(width) || isNaN(height)){
+                alert("Coordinates and Dimensions must be a number");
+                return;
+            }
+            let units = document.getElementById('RU').value;
+            let rectangle = JSON.stringify({
+                "x": x,
+                "y": y,
+                "width": width,
+                "height": height,
+                "units": units
+            });
+            let selectedVal = jQuery("#svgShape").children("option:selected").val();
+            let fileName = "uploads/" + selectedVal;
+            jQuery.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/newSVGRectangle',
+                data: {
+                  info: fileName,
+                  rectangle: rectangle
+                },
+                success: function (data) {
+                    if (data.success == false){
+                        console.log("Rectangle creation was not successful due to invalid circle");
+                        alert("Change not successful");
+                    }
+                    else{
+                        alert("Change successful");
+                    }
+                },
+                fail: function(error) {
+                    alert(error);
+                }
+            });
+        }
     };
 
 });
@@ -410,3 +497,30 @@ function viewSVG(fileName){
 function hasWhiteSpace(s) {
   return (/\s/).test(s);
 }
+
+
+/*
+
+        let role = $(this).find('.editT');
+        let value = $(this).siblings(); // search DOM
+        let values = value.text();
+
+        let newTitle = value.find('.titleTextBox').val();
+
+        if (role.html() == "Edit") {
+            role.html("Save");
+            $(this).siblings().html('<input type="textbox" class="titleTextBox" value="" placeholder="' + values + '">');
+            values = "";
+        }
+        else {
+            if (newTitle != "") {
+                $(this).siblings().html('<span id="titleText">' + newTitle + '</span>');
+                role.html("Edit");
+            }
+            else {
+                alert("Please Fill the field");
+            }
+        }
+
+
+*/

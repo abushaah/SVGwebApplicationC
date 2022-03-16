@@ -29,6 +29,8 @@ bool scaleCircles(char* filename, float scaleValue);
 bool setNewAttributes(char* filename, char* componentType, int componentNumber, char* newName, char* newValue);
 
 bool createFile(char* filename, char* svg);
+bool addCircle(char* filename, char* circle);
+bool addRectangle(char* filename, char* rectangle);
 
 // END OF WRAPPER FUNCTIONS
 

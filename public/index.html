@@ -166,13 +166,12 @@
                         <h4>Create an SVG</h4>
                         <form ref='attrform' id='addSVGform'>
                             <div class="form-group">
-                                <br>
                                 <input type="text" class="form-control" id="fileName" value="Name of New SVG File" placeholder="Placeholder">
                                 <input type="text" class="form-control" id="titleName" value="Enter a title" placeholder="Placeholder">
                                 <input type="text" class="form-control" id="descName" value="Enter a description" placeholder="Placeholder">
-                                <br>
                             </div>
                             <button id="createNewSVG" class="btn btn-secondary">Create SVG</button>
+                            <br>
                         </form>
                     </td>
                 </tr>
@@ -182,7 +181,31 @@
                         <div id="svgFilesAddShape">
                             <label for="svgLabel">Choose a file: </label>
                         </div>
-                        <button id="addShape" class="btn btn-secondary">Add a shape</button>
+                        <button id="addShapeCirc" class="btn btn-secondary">Add a Circle</button>
+                        <button id="addShapeRect" class="btn btn-secondary">Add a Rectangle</button>
+                        <form ref='attrform' id='addCircleForm'>
+                            <br>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="CX" value="Circle X Coordinate" placeholder="Placeholder">
+                                <input type="text" class="form-control" id="CY" value="Circle Y Coordinate" placeholder="Placeholder">
+                                <input type="text" class="form-control" id="CR" value="Circle Radius" placeholder="Placeholder">
+                                <input type="text" class="form-control" id="CU" value="Units" placeholder="Placeholder">
+                            </div>
+                            <button id="addCirc" class="btn btn-secondary">Add Circle</button>
+                            <br>
+                        </form>
+                        <form ref='attrform' id='addRectangleForm'>
+                            <br>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="RX" value="Rectangle X Coordinate" placeholder="Placeholder">
+                                <input type="text" class="form-control" id="RY" value="Rectangle Y Coordinate" placeholder="Placeholder">
+                                <input type="text" class="form-control" id="RW" value="Rectangle Width" placeholder="Placeholder">
+                                <input type="text" class="form-control" id="RH" value="Rectangle Height" placeholder="Placeholder">
+                                <input type="text" class="form-control" id="RU" value="Units" placeholder="Placeholder">
+                            </div>
+                            <button id="addRect" class="btn btn-secondary">Add Rectangle</button>
+                            <br>
+                        </form>
                     </td>
                 </tr>
             </table>
@@ -195,3 +218,74 @@
     <script src="/index.js"></script>
 </body>
 </html>
+
+<!--
+                            <div class="form-group">
+                               <div>  
+                                   <label>Circle Centre X Coordinate</label>
+                                   <span id="CX"></span>
+                                   <a id="editCXL" href="#">
+                                       <span class="editCX">Edit</span>  
+                                   </a>
+                                </div>
+                               <div>  
+                                   <label>Circle Centre Y Coordinate</label>
+                                   <span id="CY"></span>
+                                   <a id="editCYL" href="#">
+                                       <span class="editCY">Edit</span>  
+                                   </a>
+                                </div>
+                               <div>  
+                                   <label>Circle Radius</label>
+                                   <span id="CR"></span>
+                                   <a id="editCRL" href="#">
+                                       <span class="editCR">Edit</span>  
+                                   </a>
+                                </div>
+                               <div>  
+                                   <label>Circle Units</label>
+                                   <span id="CU"></span>
+                                   <a id="editCUL" href="#">
+                                       <span class="editCU">Edit</span>  
+                                   </a>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                               <div>
+                                   <label>Rectangle Upper Left Corner X Coordinate</label>
+                                   <span id="RX"></span>
+                                   <a id="editRXL" href="#">
+                                       <span class="editRX">Edit</span>  
+                                   </a>
+                                </div>
+                               <div>  
+                                   <label>Rectangle Upper Left Corner Y Coordinate</label>
+                                   <span id="RY"></span>
+                                   <a id="editRYL" href="#">
+                                       <span class="editRY">Edit</span>
+                                   </a>
+                                </div>
+                               <div>  
+                                   <label>Rectangle Width</label>
+                                   <span id="RW"></span>
+                                   <a id="editRWL" href="#">
+                                       <span class="editRW">Edit</span>  
+                                   </a>
+                                </div>
+                               <div>  
+                                   <label>Rectangle Height</label>
+                                   <span id="RH"></span>
+                                   <a id="editRHL" href="#">
+                                       <span class="editRH">Edit</span>  
+                                   </a>
+                                </div>
+                               <div>  
+                                   <label>Rectangle Units</label>
+                                   <span id="RU"></span>
+                                   <a id="editRUL" href="#">
+                                       <span class="editRU">Edit</span>  
+                                   </a>
+                                </div>
+                            </div>
+-->
