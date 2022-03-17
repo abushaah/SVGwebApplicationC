@@ -262,6 +262,10 @@ jQuery(document).ready(function() {
                 alert("Please enter a valid unit, or leave empty");
                 return;
             }
+            else if (units.length > 50){
+                alert("Unit must be less than 50 characters");
+                return;
+            }
             let circle = JSON.stringify({
                 "cx": x,
                 "cy": y,
@@ -308,6 +312,10 @@ jQuery(document).ready(function() {
             let units = document.getElementById('RU').value;
             if (units == "Units"){
                 alert("Please enter a valid unit, or leave empty");
+                return;
+            }
+            else if (units.length > 50){
+                alert("Unit must be less than 50 characters");
                 return;
             }
             let rectangle = JSON.stringify({
@@ -382,13 +390,11 @@ jQuery(document).ready(function() {
             editable.push("y");
             editable.push("width");
             editable.push("height");
-            editable.push("units");
         }
         else if (component == "Circle"){
             editable.push("cx");
             editable.push("cy");
             editable.push("r");
-            editable.push("units");
         }
         else if (component == "Path"){
             editable.push("d");
@@ -508,6 +514,11 @@ function viewSVG(fileName){
                 let selectionOA = "<label for=\"componentLabel\">Choose a component: </label><select id=\"components\"></select>";
                 jQuery("#viewOtherAttr").html(selectionOA);
 
+/*
+                let svg = fileName.split('/').pop();
+                let newOption = "<option value=\"SVG\">" + svg + "</option>";
+                jQuery("#components").append(newOption);
+*/
                 // b. components to access
                 let rectIndex = 1;
                 for (let i of data.info.rectangles){
@@ -583,6 +594,7 @@ function addEditShapeAttr(fileName, component, componentNumber, newName, newValu
           value: newValue
         },
         success: function (data) {
+alert("return value: " + data.info);
             if (data.info == false){
                 console.log("Attribute was not successful, no changes made to file");
                 alert("Change not successful");
