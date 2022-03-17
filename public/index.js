@@ -56,7 +56,7 @@ jQuery(document).ready(function() {
                   newValue: newValue
                 },
                 success: function (data) {
-                    if (data.info == false){
+                    if (data.valid == false){
                         console.log("Edit for title was not successful, no changes made to file");
                         alert("Change not successful");
                     }
@@ -89,7 +89,7 @@ jQuery(document).ready(function() {
                   newValue: newValue
                 },
                 success: function (data) {
-                    if (data.info == false){
+                    if (data.valid == false){
                         console.log("Edit for description was not successful, no changes made to file");
                         alert("Change not successful");
                     }
@@ -121,7 +121,7 @@ jQuery(document).ready(function() {
               newScale: newScale
             },
             success: function (data) {
-                if (data.info == false){
+                if (data.valid == false){
                     console.log("Scaling rectangles was not successful, no changes made to file");
                     alert("Change not successful");
                 }
@@ -152,7 +152,7 @@ jQuery(document).ready(function() {
               newScale: newScale
             },
             success: function (data) {
-                if (data.info == false){
+                if (data.valid == false){
                     console.log("Scaling circles was not successful, no changes made to file");
                     alert("Change not successful");
                 }
@@ -193,15 +193,15 @@ jQuery(document).ready(function() {
                   index: (componentNumber - 1)
                 },
                 success: function (data) {
-                    if (data.info == null){
+                    if (data.otherAttributes == null){
                         console.log("Error getting the other attributes");
                         alert("Reuqest failed");
                     }
                     else{
                         // 4. display the string in the div element
                         let otherAttributes = "";
-                        for (let i = 0; i < data.info.length; ++i){
-                            otherAttributes = otherAttributes + "name: " + data.info[i].name + ", value: " + data.info[i].value + "<br>";
+                        for (let i = 0; i < data.otherAttributes.length; ++i){
+                            otherAttributes = otherAttributes + "name: " + data.otherAttributes[i].name + ", value: " + data.otherAttributes[i].value + "<br>";
                         }
                         jQuery("#showAttributes").html(otherAttributes);
                     }
@@ -362,7 +362,30 @@ jQuery(document).ready(function() {
             let componentNumber = text.match(/\d+/g); // regex for getting number
             let newName = document.getElementById('nameAttr').value;
             let newValue = document.getElementById('valueAttr').value;
-            addEditShapeAttr(fileName, component, componentNumber, newName, newValue);
+            jQuery.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/addEditAttrs',
+                data: {
+                  info: fileName,
+                  component: component,
+                  index: (componentNumber - 1),
+                  name: newName,
+                  value: newValue
+                },
+                success: function (data) {
+                    if (data.valid == false){
+                        console.log("Attribute was not successful, no changes made to file");
+                        alert("Change not successful");
+                    }
+                    else{
+                        alert("Change successful");
+                    }
+                },
+                fail: function(error) {
+                    alert(error);
+                }
+            });
         };
     };
 
@@ -418,10 +441,10 @@ jQuery(document).ready(function() {
                   index: (componentNumber - 1)
                 },
                 success: function (data) {
-                    if (data.info != null){
+                    if (data.otherAttributes != null){
                         // add to list of existing, editable components
-                        for (let i = 0; i < data.info.length; ++i){
-                            let newOption = "<option value=\"" + data.info[i].name + "\">" + data.info[i].name + "</option>";
+                        for (let i = 0; i < data.otherAttributes.length; ++i){
+                            let newOption = "<option value=\"" + data.otherAttributes[i].name + "\">" + data.otherAttributes[i].name + "</option>";
                             jQuery("#editAttrList").append(newOption);
                         }
                     }
@@ -439,10 +462,31 @@ jQuery(document).ready(function() {
         document.getElementById('submitChanges').onclick = function () {
             let name = jQuery("#editAttrList").children("option:selected").val();
             let newValue = document.getElementById('newEditAttr').value;
-            addEditShapeAttr(fileName, component, componentNumber, name, newValue);
-            reload = location.reload();
-       };
-
+            jQuery.ajax({
+                type: 'get',
+                dataType: 'json',
+                url: '/addEditAttrs',
+                data: {
+                  info: fileName,
+                  component: component,
+                  index: (componentNumber - 1),
+                  name: name,
+                  value: newValue
+                },
+                success: function (data) {
+                    if (data.valid == false){
+                        console.log("Attribute was not successful, no changes made to file");
+                        alert("Change not successful");
+                    }
+                    else{
+                        alert("Change successful");
+                    }
+                },
+                fail: function(error) {
+                    alert(error);
+                }
+            });
+        };
     };
 
 });
@@ -578,34 +622,4 @@ function viewSVG(fileName){
 
 function hasWhiteSpace(s) {
   return (/\s/).test(s);
-}
-
-function addEditShapeAttr(fileName, component, componentNumber, newName, newValue){
-
-    jQuery.ajax({
-        type: 'get',
-        dataType: 'json',
-        url: '/addEditAttrs',
-        data: {
-          info: fileName,
-          component: component,
-          index: (componentNumber - 1),
-          name: newName,
-          value: newValue
-        },
-        success: function (data) {
-alert("return value: " + data.info);
-            if (data.info == false){
-                console.log("Attribute was not successful, no changes made to file");
-                alert("Change not successful");
-            }
-            else{
-                alert("Change successful");
-            }
-        },
-        fail: function(error) {
-            alert(error);
-        }
-    });
-
 }

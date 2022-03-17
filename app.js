@@ -173,7 +173,7 @@ app.get('/editTitle', function(req , res){
   // return status
   res.send(
     {
-      info: valid
+      valid: valid
     }
   );
 
@@ -189,7 +189,7 @@ app.get('/editDesc', function(req , res){ // same as title
   }
   res.send(
     {
-      info: valid
+      valid: valid
     }
   );
 
@@ -207,7 +207,7 @@ app.get('/scaleRects', function(req , res){ // scaling rectangles by a factor
   }
   res.send(
     {
-      info: valid
+      valid: valid
     }
   );
 
@@ -223,7 +223,7 @@ app.get('/scaleCircs', function(req , res){ // same as rectangles
   }
   res.send(
     {
-      info: valid
+      valid: valid
     }
   );
 
@@ -240,7 +240,7 @@ app.get('/viewAttrs', function(req , res){ // to get the other attributes of a c
   let otherAttributes = JSON.parse(sharedLib.getAttributesJSON(file, component, index));
   res.send(
     {
-      info: otherAttributes
+      otherAttributes: otherAttributes
     }
   );
 
@@ -262,7 +262,7 @@ app.get('/addEditAttrs', function(req , res){
   }
   res.send(
     {
-      info: valid // returns the result
+      valid: valid // returns the result
     }
   );
 
