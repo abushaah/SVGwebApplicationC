@@ -208,7 +208,6 @@ jQuery(document).ready(function() {
                         }
                         jQuery("#showAttributes").html(otherAttributes);
                     }
-                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
