@@ -62,8 +62,8 @@ jQuery(document).ready(function() {
                     }
                     else{
                         alert("Change successful");
+                        location.reload(true);
                     }
-                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -96,8 +96,8 @@ jQuery(document).ready(function() {
                 }
                 else{
                     alert("Change successful");
+                    location.reload(true);
                 }
-                location.reload(true);
             },
             fail: function(error) {
                 alert(error);
@@ -128,8 +128,8 @@ jQuery(document).ready(function() {
                 }
                 else{
                     alert("Change successful");
+                    location.reload(true);
                 }
-                location.reload(true);
             },
             fail: function(error) {
                 alert(error);
@@ -160,8 +160,8 @@ jQuery(document).ready(function() {
                 }
                 else{
                     alert("Change successful");
+                    location.reload(true);
                 }
-                location.reload(true);
             },
             fail: function(error) {
                 alert(error);
@@ -242,8 +242,8 @@ jQuery(document).ready(function() {
                 }
                 else{
                     alert("Change successful");
+                    location.reload(true);
                 }
-                location.reload(true);
             },
             fail: function(error) {
                 alert(error);
@@ -293,8 +293,8 @@ jQuery(document).ready(function() {
                     }
                     else{
                         alert("Change successful");
+                        location.reload(true);
                     }
-                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -347,8 +347,8 @@ jQuery(document).ready(function() {
                     }
                     else{
                         alert("Change successful");
+                        location.reload(true);
                     }
-                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -386,8 +386,8 @@ jQuery(document).ready(function() {
                     }
                     else{
                         alert("Change successful");
+                        location.reload(true);
                     }
-                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -488,8 +488,8 @@ jQuery(document).ready(function() {
                     }
                     else{
                         alert("Change successful");
+                        location.reload(true);
                     }
-                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
