@@ -56,13 +56,14 @@ jQuery(document).ready(function() {
                   newValue: newValue
                 },
                 success: function (data) {
-                    if (data.valid == false){
+                    if (data.success == false){
                         console.log("Edit for title was not successful, no changes made to file");
                         alert("Change not successful");
                     }
                     else{
                         alert("Change successful");
                     }
+                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -75,33 +76,33 @@ jQuery(document).ready(function() {
         let newValue = document.getElementById('newTitleDesc').value;
         if (newValue.length > 256){
             alert(newValue + " is greater than 256 characters, the length restriction");
+            return;
         }
-        else{
-            // make an request to change the title
-            let selectedVal = jQuery("#svg").children("option:selected").val();
-            let fileName = "uploads/" + selectedVal;
-            jQuery.ajax({
-                type: 'get',
-                dataType: 'json',
-                url: '/editDesc',
-                data: {
-                  info: fileName,
-                  newValue: newValue
-                },
-                success: function (data) {
-                    if (data.valid == false){
-                        console.log("Edit for description was not successful, no changes made to file");
-                        alert("Change not successful");
-                    }
-                    else{
-                        alert("Change successful");
-                    }
-                },
-                fail: function(error) {
-                    alert(error);
+        // make an request to change the title
+        let selectedVal = jQuery("#svg").children("option:selected").val();
+        let fileName = "uploads/" + selectedVal;
+        jQuery.ajax({
+            type: 'get',
+            dataType: 'json',
+            url: '/editDesc',
+            data: {
+              info: fileName,
+              newValue: newValue
+            },
+            success: function (data) {
+                if (data.success == false){
+                    console.log("Edit for description was not successful, no changes made to file");
+                    alert("Change not successful");
                 }
-            });
-        }
+                else{
+                    alert("Change successful");
+                }
+                location.reload(true);
+            },
+            fail: function(error) {
+                alert(error);
+            }
+        });
     };
 
     document.getElementById('sRect').onclick = function () {
@@ -121,13 +122,14 @@ jQuery(document).ready(function() {
               newScale: newScale
             },
             success: function (data) {
-                if (data.valid == false){
+                if (data.success == false){
                     console.log("Scaling rectangles was not successful, no changes made to file");
                     alert("Change not successful");
                 }
                 else{
                     alert("Change successful");
                 }
+                location.reload(true);
             },
             fail: function(error) {
                 alert(error);
@@ -152,13 +154,14 @@ jQuery(document).ready(function() {
               newScale: newScale
             },
             success: function (data) {
-                if (data.valid == false){
+                if (data.success == false){
                     console.log("Scaling circles was not successful, no changes made to file");
                     alert("Change not successful");
                 }
                 else{
                     alert("Change successful");
                 }
+                location.reload(true);
             },
             fail: function(error) {
                 alert(error);
@@ -205,6 +208,7 @@ jQuery(document).ready(function() {
                         }
                         jQuery("#showAttributes").html(otherAttributes);
                     }
+                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -240,6 +244,7 @@ jQuery(document).ready(function() {
                 else{
                     alert("Change successful");
                 }
+                location.reload(true);
             },
             fail: function(error) {
                 alert(error);
@@ -290,6 +295,7 @@ jQuery(document).ready(function() {
                     else{
                         alert("Change successful");
                     }
+                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -337,12 +343,13 @@ jQuery(document).ready(function() {
                 },
                 success: function (data) {
                     if (data.success == false){
-                        console.log("Rectangle creation was not successful due to invalid circle");
+                        console.log("Rectangle creation was not successful due to invalid rectangle");
                         alert("Change not successful");
                     }
                     else{
                         alert("Change successful");
                     }
+                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -374,13 +381,14 @@ jQuery(document).ready(function() {
                   value: newValue
                 },
                 success: function (data) {
-                    if (data.valid == false){
+                    if (data.success == false){
                         console.log("Attribute was not successful, no changes made to file");
                         alert("Change not successful");
                     }
                     else{
                         alert("Change successful");
                     }
+                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -448,6 +456,7 @@ jQuery(document).ready(function() {
                             jQuery("#editAttrList").append(newOption);
                         }
                     }
+                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
@@ -456,7 +465,7 @@ jQuery(document).ready(function() {
         }
 
         // 5. form to actually submit changes
-        let submit = "<input type=\"text\" class=\"form-control\" id=\"newEditAttr\" value=\"New Value\" placeholder=\"Placeholder\"><br><button id=\"submitChanges\" class=\"btn btn-secondary\">Submit</button>";
+        let submit = "<input type=\"text\" class=\"form-control\" id=\"newEditAttr\" value=\"New Value\" placeholder=\"Placeholder\"><br><button id=\"submitChanges\" type=\"button\">Submit</button>";
         jQuery("#editShapeAttrSection").append(submit);
 
         document.getElementById('submitChanges').onclick = function () {
@@ -474,13 +483,14 @@ jQuery(document).ready(function() {
                   value: newValue
                 },
                 success: function (data) {
-                    if (data.valid == false){
+                    if (data.success == false){
                         console.log("Attribute was not successful, no changes made to file");
                         alert("Change not successful");
                     }
                     else{
                         alert("Change successful");
                     }
+                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);

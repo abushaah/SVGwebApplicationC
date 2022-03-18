@@ -173,7 +173,7 @@ app.get('/editTitle', function(req , res){
   // return status
   res.send(
     {
-      valid: valid
+      success: valid
     }
   );
 
@@ -189,7 +189,7 @@ app.get('/editDesc', function(req , res){ // same as title
   }
   res.send(
     {
-      valid: valid
+      success: valid
     }
   );
 
@@ -207,7 +207,7 @@ app.get('/scaleRects', function(req , res){ // scaling rectangles by a factor
   }
   res.send(
     {
-      valid: valid
+      success: valid
     }
   );
 
@@ -223,7 +223,7 @@ app.get('/scaleCircs', function(req , res){ // same as rectangles
   }
   res.send(
     {
-      valid: valid
+      success: valid
     }
   );
 
@@ -262,7 +262,7 @@ app.get('/addEditAttrs', function(req , res){
   }
   res.send(
     {
-      valid: valid // returns the result
+      success: valid // returns the result
     }
   );
 
