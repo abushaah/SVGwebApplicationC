@@ -185,8 +185,15 @@ bool changeTitle(char* filename, char* newValue){
     }
     strcpy(img->title, newValue);
 
-    // 3. overwrite changes to file
-    bool valid = writeSVG(img, filename);
+    // 3. validate change
+    bool valid = validateSVG(img, "uploads/svg.xsd");
+    if (valid == false){
+        deleteSVG(img);
+        return false;
+    }
+
+    // 4. overwrite changes to file
+    valid = writeSVG(img, filename);
 
     deleteSVG(img);
     return valid;
@@ -207,8 +214,15 @@ bool changeDescr(char* filename, char* newValue){
     }
     strcpy(img->description, newValue);
 
-    // 3. overwrite changes to file
-    bool valid = writeSVG(img, filename);
+    // 3. validate change
+    bool valid = validateSVG(img, "uploads/svg.xsd");
+    if (valid == false){
+        deleteSVG(img);
+        return false;
+    }
+
+    // 4. overwrite changes to file
+    valid = writeSVG(img, filename);
 
     deleteSVG(img);
     return valid;
@@ -237,8 +251,15 @@ bool scaleRectangles(char* filename, float scaleValue){
 
     freeList(rectangles);
 
-    // 3. overwrite changes to file
-    bool valid = writeSVG(img, filename);
+    // 3. validate change
+    bool valid = validateSVG(img, "uploads/svg.xsd");
+    if (valid == false){
+        deleteSVG(img);
+        return false;
+    }
+
+    // 4. overwrite changes to file
+    valid = writeSVG(img, filename);
 
     deleteSVG(img);
     return valid;
@@ -268,8 +289,15 @@ bool scaleCircles(char* filename, float scaleValue){
 
     freeList(circles);
 
-    // 3. overwrite changes to file
-    bool valid = writeSVG(img, filename);
+    // 3. validate change
+    bool valid = validateSVG(img, "uploads/svg.xsd");
+    if (valid == false){
+        deleteSVG(img);
+        return false;
+    }
+
+    // 4. overwrite changes to file
+    valid = writeSVG(img, filename);
 
     deleteSVG(img);
     return valid;
@@ -314,11 +342,18 @@ bool setNewAttributes(char* filename, char* componentType, int componentNumber, 
         return false;
     }
 
-    // 5. overwrite changes to file
+    // 5. validate change
+    valid = validateSVG(img, "uploads/svg.xsd");
+    if (valid == false){
+        deleteSVG(img);
+        return false;
+    }
+
+    // 6. overwrite changes to file
     valid = writeSVG(img, filename);
 
-    // 6. memory management
-    // 6. if the return vaue is false, will display error in the console
+    // 7. memory management
+    // 7. if the return vaue is false, will display error in the console
     deleteSVG(img);
     return valid;
 }
@@ -370,7 +405,14 @@ bool addCircle(char* filename, char* circle){
     // 4. add to svg
     addComponent(img, CIRC, (void*)circ);
 
-    // 5. write updates to file
+    // 5. validate change
+    valid = validateSVG(img, "uploads/svg.xsd");
+    if (valid == false){
+        deleteSVG(img);
+        return false;
+    }
+
+    // 6. write updates to file
     valid = writeSVG(img, filename);
 
     deleteSVG(img);
@@ -402,7 +444,14 @@ bool addRectangle(char* filename, char* rectangle){
     // 4. add to svg
     addComponent(img, RECT, (void*)rect);
 
-    // 5. write updates to file
+    // 5. validate change
+    valid = validateSVG(img, "uploads/svg.xsd");
+    if (valid == false){
+        deleteSVG(img);
+        return false;
+    }
+
+    // 6. write updates to file
     valid = writeSVG(img, filename);
 
     deleteSVG(img);

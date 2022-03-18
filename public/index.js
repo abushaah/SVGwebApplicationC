@@ -41,7 +41,7 @@ jQuery(document).ready(function() {
         let newValue = document.getElementById('newTitleDesc').value;
         // enforce restrictions
         if (newValue.length > 256){
-            alert(newValue + " is greater than 256 characters, the length restriction");
+            alert("New title is greater than 256 characters, the length restriction");
         }
         else{
             // make an request to change the title
@@ -75,7 +75,7 @@ jQuery(document).ready(function() {
     document.getElementById('editDescr').onclick = function () {
         let newValue = document.getElementById('newTitleDesc').value;
         if (newValue.length > 256){
-            alert(newValue + " is greater than 256 characters, the length restriction");
+            alert("New description is greater than 256 characters, the length restriction");
             return;
         }
         // make an request to change the title
@@ -226,6 +226,14 @@ jQuery(document).ready(function() {
         let svg = {};
         svg.title = document.getElementById('titleName').value;
         svg.descr = document.getElementById('descName').value;
+        if (svg.title.length > 256){
+            alert("New title is greater than 256 characters, the length restriction");
+            return;
+        }
+        if (svg.descr.length > 256){
+            alert("New description is greater than 256 characters, the length restriction");
+            return;
+        }
 
         jQuery.ajax({
             type: 'get',
@@ -455,7 +463,6 @@ jQuery(document).ready(function() {
                             jQuery("#editAttrList").append(newOption);
                         }
                     }
-                    location.reload(true);
                 },
                 fail: function(error) {
                     alert(error);
