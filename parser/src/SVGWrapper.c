@@ -245,8 +245,8 @@ bool scaleRectangles(char* filename, float scaleValue){
     ListIterator iter = createIterator(rectangles);
     while ((elem = nextElement(&iter)) != NULL){
         Rectangle* rect = (Rectangle*) elem;
-        rect->x = rect->x * scaleValue;
-        rect->y = rect->y * scaleValue;
+        rect->width = rect->width * scaleValue;
+        rect->height = rect->height * scaleValue;
     }
 
     freeList(rectangles);
@@ -283,8 +283,7 @@ bool scaleCircles(char* filename, float scaleValue){
     ListIterator iter = createIterator(circles);
     while ((elem = nextElement(&iter)) != NULL){
         Circle* circ = (Circle*) elem;
-        circ->cx = circ->cx * scaleValue;
-        circ->cy = circ->cy * scaleValue;
+        circ->r = circ->r * scaleValue;
     }
 
     freeList(circles);
