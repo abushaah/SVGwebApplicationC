@@ -1,6 +1,9 @@
-delete from FILE where file_name='Emoji_Hearts.svg';
-delete from FILE where file_name='Emoji_Butterfly.svg';
-/* Will clear rest of rows from other tables, since they are connected by ID */
-truncate table DOWNLOAD;
-truncate table MODIFICATION;
-truncate table FILE;
+/* CLEAR THE FILE TABLE WITH THE FOLLOWING 3 LINES  */
+SET FOREIGN_KEY_CHECKS=0;
+TRUNCATE TABLE FILE;
+SET FOREIGN_KEY_CHECKS=1;
+
+TRUNCATE TABLE DOWNLOAD;
+
+TRUNCATE TABLE MODIFICATION;
+
