@@ -1,0 +1,3 @@
+create table FILE (svg_id INT AUTO_INCREMENT, file_name VARCHAR(60) NOT NULL, file_title VARCHAR(256), file_description VARCHAR(256), creation_time DATETIME NOT NULL, file_size INT NOT NULL, PRIMARY KEY (svg_id));
+create table MODIFICATION (mod_id INT AUTO_INCREMENT, mod_type VARCHAR(256) NOT NULL, mod_summary VARCHAR(256) NOT NULL, mod_date DATETIME NOT NULL, svg_id INT NOT NULL, PRIMARY KEY (mod_id), FOREIGN KEY (svg_id) REFERENCES FILE (svg_id) ON DELETE CASCADE);
+create table DOWNLOAD (download_id INT AUTO_INCREMENT, d_time DATETIME NOT NULL, d_hostname VARCHAR(256) NOT NULL, svg_id INT NOT NULL, PRIMARY KEY (download_id), FOREIGN KEY (svg_id) REFERENCES FILE (svg_id) ON DELETE CASCADE);
