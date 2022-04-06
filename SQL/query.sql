@@ -21,11 +21,11 @@ Uses: union, aggregate functions */
 
 /* 6 (additional non-simplistic queries)
 Purpose: to find popular / most interacted with files
-Query: lists all the files with their matching date data if and only if they have been downloaded AND modified
-       at least once. The result is ordered by creation time, and only the first modification/edit
-       date is printed, no duplicate download or modification dates.
+Query: multiple inner join query, an intersection of all 3 tables, that lists all the files with their matching date
+       data if and only if they have been downloaded AND modified at least once. The result is ordered by creation time, and only
+       the first modification/edit date is printed, no duplicate download or modification dates.
 Uses: inner join */
-SELECT file_name, creation_time, d_time, mod_date FROM FILE, DOWNLOAD, MODIFICATION WHERE (FILE.svg_id = DOWNLOAD.svg_id || FILE.svg_id = MODIFICATION.svg_id) GROUP BY file_name ORDER BY creation_time;
+SELECT file_name, creation_time, d_time, mod_date FROM (FILE INNER JOIN DOWNLOAD ON FILE.svg_id=DOWNLOAD.svg_id INNER JOIN MODIFICATION ON DOWNLOAD.svg_id=MODIFICATION.svg_id) GROUP BY file_name ORDER BY creation_time;
 
 /*
 Purpose: find most common downloader hostname and lists all the files they have downloaded
