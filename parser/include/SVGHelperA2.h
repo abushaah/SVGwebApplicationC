@@ -1,4 +1,4 @@
-// Name: Haifaa Abushaaban [1146372]
+// Name: Haifaa Abushaaban
 
 #ifndef SVGHELPERA2_H
 #define SVGHELPERA2_H
