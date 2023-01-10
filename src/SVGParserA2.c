@@ -1,4 +1,4 @@
-// Name: Haifaa Abushaaban[1146372]
+// Name: Haifaa Abushaaban
 /*
     Sample code "tree2.c" used for understanding how to create a document and nodes
     for an xml tree from: http://www.xmlsoft.org/examples/tree2.c
