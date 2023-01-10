@@ -69,7 +69,7 @@ app.get('/uploads/:name', function(req , res){
   });
 });
 
-//******************** Your code goes here ********************/
+//******************** My code here ********************/
 
 let sharedLib = ffi.Library('./libsvgparser', {
   'validFile' : [ 'bool', [ 'string' ] ],
