@@ -1,4 +1,4 @@
-// Name: Haifaa Abushaaban [1146372]
+// Name: Haifaa Abushaaban
 // Sample code "libXmlExample" used for understanding the traversal of tree from: http://xmlsoft.org/
 
 #include <stdio.h>
