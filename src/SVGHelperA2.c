@@ -1,4 +1,4 @@
-// Name: Haifaa Abushaaban[1146372]
+// Name: Haifaa Abushaaban
 /*
     Sample code "xmlvalidation.c" used for understanding how to validate xmlDoc against
     an XSD file from: http://knol2share.blogspot.com/2009/05/validate-xml-against-xsd-in-c.html
